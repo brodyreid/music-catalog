@@ -1,27 +1,34 @@
-import { useState } from 'react'
-import './App.css'
+import { useEffect, useState } from 'react';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface Project {
+  project_id: number;
+  project_number?: number;
+  title?: string;
+  folder_path?: string;
+  date_created?: Date
 }
 
-export default App
+function App() {
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await fetch('http://localhost/projects');
+        const data = await response.json() as Project[];
+        setProjects(data);
+      } catch (err) {
+        console.error(err);
+        throw new Error('oopsy daisy did i do that?');
+      }
+    })();
+  }, []);
+  return (
+    <div>
+    {projects.length ? `<pre>${projects[0]}</pre>` : "negative gamers, we'll get em next time"}
+    </div>
+  );
+}
+
+export default App;
