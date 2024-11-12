@@ -5,7 +5,8 @@ interface Project {
   project_number?: number;
   title?: string;
   folder_path?: string;
-  date_created?: Date;
+  notes?: string;
+  date_created?: string;
 }
 
 export default function ProjectsList() {
@@ -31,25 +32,34 @@ export default function ProjectsList() {
   }
 
   return (
-      <>
-        <h2 className="mb-8">Current projects</h2>
-        <table>
+   <>
+      <h2 className="mb-8">Current projects</h2>
+      <div className="flex justify-center">
+        <table className="font-mono leading-8">
           <thead>
-            
+            <tr className='text-left border-b'>
+              <th className='pr-8'>id</th>
+              <th className='pr-8'>number</th>
+              <th className='pr-8'>title</th>
+              <th className='pr-8'>path</th>
+              <th className='pr-8'>notes</th>
+              <th className=''>date_created</th>
+            </tr>
           </thead>
-          <tr className="font-mono">
-            <th>project_id</th>
-            <th>project_number</th>
-            <th>title</th>
-            <th>folder_path</th>
-            <th>date_created</th>
-          </tr>
-          {projects.map(project => (
-            <div key={project.project_id}>
-              {project.title}
-            </div>
-          ))}
+          <tbody>
+            {projects.map(({ project_id, project_number, title, folder_path, notes, date_created }) => (
+              <tr key={project_id}>
+                <td className='pr-8'>{project_id}</td>
+                <td className='pr-8'>{project_number}</td>
+                <td className='pr-8'>{title}</td>
+                <td className='pr-8'>{folder_path}</td>
+                <td className='pr-8'>{notes}</td>
+                <td>{date_created && new Date(date_created).toDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
-      </>
+      </div>
+   </>
   );
 }
