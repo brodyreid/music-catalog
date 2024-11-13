@@ -8,6 +8,16 @@ export default function ProjectsSearch() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
 
+  const formattedDate = (dateString: string | undefined) => {
+    if (!dateString) { return; }
+
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric'
+    });
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -24,7 +34,15 @@ export default function ProjectsSearch() {
   useEffect(() => {
     if (!projects.length) { return; }
 
-    setFilteredProjects(projects.filter(project => project.title?.toLowerCase().includes(currentSearchTerm.toLowerCase())
+    setFilteredProjects(projects.filter(project => {
+      const wordsToSearch: string[] = currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '');
+      return wordsToSearch.every(word =>
+        project.project_number?.toString().includes(word) ||
+        project.title?.toLowerCase().includes(word) ||
+        project.folder_path?.toLowerCase().includes(word) ||
+        formattedDate(project.date_created)?.toLowerCase().includes(word)
+      );
+    }
     ));
   }, [currentSearchTerm, projects]);
 
@@ -53,34 +71,30 @@ export default function ProjectsSearch() {
       )}
       {filteredProjects.length && (
         <div className="mt-16">
-        <table className="font-mono leading-8">
-          <thead>
-            <tr className='text-left border-b'>
-              <th className='pr-8'>id</th>
-              <th className='pr-8'>number</th>
-              <th className='pr-8'>title</th>
-              <th className='pr-8'>path</th>
-              <th>date_created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProjects.map(({ project_id, project_number, title, folder_path, date_created }) => (
-              <tr key={project_id}>
-                <td className='text-nowrap pr-8'>{project_id}</td>
-                <td className='text-nowrap pr-8'>{project_number}</td>
-                <td className='text-nowrap pr-8'>{title}</td>
-                <td className='text-nowrap pr-8'>{folder_path}</td>
-                <td className="text-nowrap ">{date_created && new Date(date_created).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: '2-digit',
-                  year: 'numeric'
-                })}</td>
+          <table className="font-mono leading-8">
+            <thead>
+              <tr className='text-left border-b'>
+                <th className='pr-8'>id</th>
+                <th className='pr-8'>number</th>
+                <th className='pr-8'>title</th>
+                <th className='pr-8'>path</th>
+                <th>date_created</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filteredProjects.map(({ project_id, project_number, title, folder_path, date_created }) => (
+                <tr key={project_id}>
+                  <td className='text-nowrap pr-8'>{project_id}</td>
+                  <td className='text-nowrap pr-8'>{project_number}</td>
+                  <td className='text-nowrap pr-8'>{title}</td>
+                  <td className='text-nowrap pr-8'>{folder_path}</td>
+                  <td className="text-nowrap ">{formattedDate(date_created)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );
-}
+};
