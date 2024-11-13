@@ -8,6 +8,9 @@
       "DOM",
       "DOM.Iterable"
     ],
+    "paths": {
+      "@icons/*": ["./src/icons/*"]
+    },
     "module": "NodeNext",
     "noEmit": true,
     "noUnusedParameters": true,
