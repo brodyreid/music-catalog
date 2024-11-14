@@ -1,4 +1,4 @@
-import { Project } from './Projects.tsx';
+import { Project } from '../types.ts';
 
 export default function ProjectsTable({ projects }: { projects: Project[]; }) {
   return (

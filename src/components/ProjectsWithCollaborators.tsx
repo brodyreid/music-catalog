@@ -5,7 +5,7 @@ import { ProjectCollab } from '../types.ts';
 import ProjectsWithCollaboratorsTable from './ProjectsWithCollaboratorsTable.tsx';
 
 export default function ProjectsWithCollaborators() {
-  const { data: projects, loading, error } = useFetchData<ProjectCollab>('http://localhost:3000/projects/collaborators');
+  const { data: projects, loading, error: fetchError } = useFetchData<ProjectCollab>('http://localhost:3000/projects/collaborators');
 
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState<string>('');
@@ -32,6 +32,7 @@ export default function ProjectsWithCollaborators() {
           project.project_number?.toString().includes(word) ||
           project.title?.toLowerCase().includes(word) ||
           project.folder_path?.toLowerCase().includes(word) ||
+          project.name?.toLowerCase().includes(word) ||
           project.date_created?.toLowerCase().includes(word)
         );
       }
@@ -55,12 +56,12 @@ export default function ProjectsWithCollaborators() {
     );
   }
 
-  if (error) {
-    console.error(error);
+  if (fetchError) {
+    console.error(fetchError);
     return (
       <>
         <div>Sorry gamer, there was an error!</div>
-        <pre className='mt-8'>{error.name}: {error.message}</pre>
+        <pre className='mt-8'>{fetchError.name}: {fetchError.message}</pre>
       </>
     );
   }
