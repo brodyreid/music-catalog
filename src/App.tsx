@@ -1,4 +1,4 @@
-import ProjectsWithCollaborators from './components/ProjectsWithCollaborators.tsx';
+import ProjectsWithContributors from './components/ProjectsWithContributors.tsx';
 
 export default function App() {
   return (
@@ -9,7 +9,7 @@ export default function App() {
       </div>
       <div className="container mx-auto mt-12">
         {/* <ProjectsSearch /> */}
-        <ProjectsWithCollaborators />
+        <ProjectsWithContributors />
       </div>
     </>
   );

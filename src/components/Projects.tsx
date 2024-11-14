@@ -1,9 +1,9 @@
 import { KeyboardEvent, useEffect, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
 import ArrowRight from '../icons/ArrowRight.tsx';
-import ProjectsTable from './ProjectsTable.tsx';
-import { formatDate } from '../utils.ts';
 import { Project } from '../types.ts';
+import { formatDate } from '../utils.ts';
+import ProjectsTable from './ProjectsTable.tsx';
 
 export default function ProjectsSearch() {
   const { data: projects, loading, error } = useFetchData<Project>('http://localhost:3000/projects');
@@ -20,9 +20,9 @@ export default function ProjectsSearch() {
       .filter(project => {
         const wordsToSearch: string[] = currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '');
         return wordsToSearch.every(word =>
-          project.project_number?.toString().includes(word) ||
           project.title?.toLowerCase().includes(word) ||
           project.folder_path?.toLowerCase().includes(word) ||
+          project.notes?.toLowerCase().includes(word) ||
           project.date_created?.toLowerCase().includes(word)
         );
       }

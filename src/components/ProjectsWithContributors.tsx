@@ -1,15 +1,15 @@
 import { KeyboardEvent, useEffect, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
 import ArrowRight from '../icons/ArrowRight.tsx';
-import { ProjectCollab } from '../types.ts';
-import ProjectsWithCollaboratorsTable from './ProjectsWithCollaboratorsTable.tsx';
+import { ProjectContributor } from '../types.ts';
+import ProjectsWithContributorsTable from './ProjectsWithContributorsTable.tsx';
 
-export default function ProjectsWithCollaborators() {
-  const { data: projects, loading, error: fetchError } = useFetchData<ProjectCollab>('http://localhost:3000/projects/collaborators');
+export default function ProjectsWithContributors() {
+  const { data: projects, loading, error: fetchError } = useFetchData<ProjectContributor>('http://localhost:3000/projects/contributors');
 
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState<string>('');
-  const [filteredProjects, setFilteredProjects] = useState<ProjectCollab[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<ProjectContributor[]>([]);
 
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) { return; }
@@ -29,10 +29,10 @@ export default function ProjectsWithCollaborators() {
       .filter(project => {
         const wordsToSearch: string[] = currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '');
         return wordsToSearch.every(word =>
-          project.project_number?.toString().includes(word) ||
           project.title?.toLowerCase().includes(word) ||
           project.folder_path?.toLowerCase().includes(word) ||
-          project.name?.toLowerCase().includes(word) ||
+          project.notes?.toLowerCase().includes(word) ||
+          project.contributors?.join(' ').toLowerCase().includes(word) ||
           project.date_created?.toLowerCase().includes(word)
         );
       }
@@ -85,7 +85,7 @@ export default function ProjectsWithCollaborators() {
         </div>
       )}
       {filteredProjects.length && (
-        <ProjectsWithCollaboratorsTable projects={filteredProjects} />
+        <ProjectsWithContributorsTable projects={filteredProjects} />
       )}
     </>
   );
