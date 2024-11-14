@@ -1,14 +1,25 @@
 import { KeyboardEvent, useEffect, useState } from 'react';
+import useFetchData from '../hooks/useFetchData.tsx';
 import ArrowRight from '../icons/ArrowRight.tsx';
-import { Project } from './ProjectsList.tsx';
+import ProjectsList from './ProjectsList.tsx';
+
+export interface Project {
+  project_id: number;
+  project_number?: number;
+  title?: string;
+  folder_path?: string;
+  notes?: string;
+  date_created?: string;
+}
 
 export default function ProjectsSearch() {
+  const { data: projects, loading, error } = useFetchData<Project>('http://localhost:3000/projects');
+
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState<string>('');
-  const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
 
-  const formattedDate = (dateString: string | undefined) => {
+  const formatDate = (dateString: string | undefined) => {
     if (!dateString) { return; }
 
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -19,31 +30,20 @@ export default function ProjectsSearch() {
   };
 
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch('http://localhost:3000/projects');
-        const data = await response.json() as Project[];
-        setProjects(data);
-      } catch (err) {
-        console.error(err);
-        throw new Error('oopsy daisy did i do that?');
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
     if (!projects.length) { return; }
 
-    setFilteredProjects(projects.filter(project => {
-      const wordsToSearch: string[] = currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '');
-      return wordsToSearch.every(word =>
-        project.project_number?.toString().includes(word) ||
-        project.title?.toLowerCase().includes(word) ||
-        project.folder_path?.toLowerCase().includes(word) ||
-        formattedDate(project.date_created)?.toLowerCase().includes(word)
-      );
-    }
-    ));
+    setFilteredProjects(projects
+      .map(project => ({ ...project, date_created: formatDate(project.date_created) }))
+      .filter(project => {
+        const wordsToSearch: string[] = currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '');
+        return wordsToSearch.every(word =>
+          project.project_number?.toString().includes(word) ||
+          project.title?.toLowerCase().includes(word) ||
+          project.folder_path?.toLowerCase().includes(word) ||
+          project.date_created?.toLowerCase().includes(word)
+        );
+      }
+      ));
   }, [currentSearchTerm, projects]);
 
   const handleKeyPress = (event: KeyboardEvent) => {
@@ -56,6 +56,28 @@ export default function ProjectsSearch() {
     setSubmittedSearchTerm(currentSearchTerm);
     setCurrentSearchTerm('');
   };
+
+  if (!projects.length) {
+    return (
+      <div>Sorry gamer, we couldn't find any projects :/</div>
+    );
+  }
+
+  if (error) {
+    console.error(error);
+    return (
+      <>
+        <div>Sorry gamer, there was an error!</div>
+        <pre className='mt-8'>{error.name}: {error.message}</pre>
+      </>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>Please wait, gamer! It's loading...</div>
+    );
+  }
 
   return (
     <>
@@ -70,30 +92,7 @@ export default function ProjectsSearch() {
         </div>
       )}
       {filteredProjects.length && (
-        <div className="mt-16">
-          <table className="font-mono leading-8">
-            <thead>
-              <tr className='text-left border-b'>
-                <th className='pr-8'>id</th>
-                <th className='pr-8'>number</th>
-                <th className='pr-8'>title</th>
-                <th className='pr-8'>path</th>
-                <th>date_created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProjects.map(({ project_id, project_number, title, folder_path, date_created }) => (
-                <tr key={project_id}>
-                  <td className='text-nowrap pr-8'>{project_id}</td>
-                  <td className='text-nowrap pr-8'>{project_number}</td>
-                  <td className='text-nowrap pr-8'>{title}</td>
-                  <td className='text-nowrap pr-8'>{folder_path}</td>
-                  <td className="text-nowrap ">{formattedDate(date_created)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ProjectsList projects={filteredProjects} />
       )}
     </>
   );
