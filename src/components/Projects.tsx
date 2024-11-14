@@ -1,16 +1,9 @@
 import { KeyboardEvent, useEffect, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
 import ArrowRight from '../icons/ArrowRight.tsx';
-import ProjectsList from './ProjectsList.tsx';
-
-export interface Project {
-  project_id: number;
-  project_number?: number;
-  title?: string;
-  folder_path?: string;
-  notes?: string;
-  date_created?: string;
-}
+import ProjectsTable from './ProjectsTable.tsx';
+import { formatDate } from '../utils.ts';
+import { Project } from '../types.ts';
 
 export default function ProjectsSearch() {
   const { data: projects, loading, error } = useFetchData<Project>('http://localhost:3000/projects');
@@ -18,16 +11,6 @@ export default function ProjectsSearch() {
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState<string>('');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
-
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) { return; }
-
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   useEffect(() => {
     if (!projects.length) { return; }
@@ -92,7 +75,7 @@ export default function ProjectsSearch() {
         </div>
       )}
       {filteredProjects.length && (
-        <ProjectsList projects={filteredProjects} />
+        <ProjectsTable projects={filteredProjects} />
       )}
     </>
   );

@@ -1,4 +1,4 @@
-import ProjectsSearch from "./components/ProjectsSearch.tsx";
+import ProjectsWithCollaboratorsSearch from './components/ProjectsWithCollaborators.tsx';
 
 export default function App() {
   return (
@@ -8,7 +8,8 @@ export default function App() {
         <h2 className="text-[#9D74B3]">music_catalog</h2>
       </div>
       <div className="container mx-auto mt-12">
-        <ProjectsSearch />
+        {/* <ProjectsSearch /> */}
+        <ProjectsWithCollaboratorsSearch />
       </div>
     </>
   );

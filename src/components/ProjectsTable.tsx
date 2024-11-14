@@ -1,10 +1,6 @@
-import { Project } from './ProjectsSearch.tsx';
+import { Project } from './Projects.tsx';
 
-interface ProjectsListProps {
-  projects: Project[];
-}
-
-export default function ProjectsList({ projects }: ProjectsListProps) {
+export default function ProjectsTable({ projects }: { projects: Project[]; }) {
   return (
     <div className="mt-16">
       <table className="font-mono leading-8">
