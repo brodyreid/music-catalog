@@ -1,31 +1,20 @@
-import { KeyboardEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
-import ArrowRight from '../icons/ArrowRight.tsx';
-import { ProjectContributor } from '../types.ts';
+import { ProjectFull, SortOptions } from '../types.ts';
+import { formatDate } from '../utils.ts';
 import ProjectsWithContributorsTable from './ProjectsWithContributorsTable.tsx';
 
 export default function ProjectsWithContributors() {
-  const { data: projects, loading, error: fetchError } = useFetchData<ProjectContributor>('http://localhost:3000/projects/contributors');
+  const { data: projects, loading, error: fetchError } = useFetchData<ProjectFull>('http://localhost:3000/projects/versions/contributors');
 
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
-  const [submittedSearchTerm, setSubmittedSearchTerm] = useState<string>('');
-  const [filteredProjects, setFilteredProjects] = useState<ProjectContributor[]>([]);
-
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) { return; }
-
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: '2-digit',
-      year: 'numeric'
-    });
-  };
+  const [filteredProjects, setFilteredProjects] = useState<ProjectFull[]>([]);
+  const [sortDirection, setSortDirection] = useState<SortOptions>(null);
 
   useEffect(() => {
     if (!projects.length) { return; }
 
     setFilteredProjects(projects
-      .map(project => ({ ...project, date_created: formatDate(project.date_created) }))
       .filter(project => {
         const wordsToSearch: string[] = currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '');
         return wordsToSearch.every(word =>
@@ -33,23 +22,31 @@ export default function ProjectsWithContributors() {
           project.folder_path?.toLowerCase().includes(word) ||
           project.notes?.toLowerCase().includes(word) ||
           project.contributors?.join(' ').toLowerCase().includes(word) ||
-          project.date_created?.toLowerCase().includes(word)
+          formatDate(project.date_created)?.toLowerCase().includes(word)
         );
       }
       ));
   }, [currentSearchTerm, projects]);
 
-  const handleKeyPress = (event: KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      handleSubmit();
-    }
-  };
+  const sortByDate = (direction: SortOptions) => {
+    const newData = projects.sort((a, b) => {
+      if (!a.date_created || !b.date_created) { return 0; }
 
-  const handleSubmit = () => {
-    setSubmittedSearchTerm(currentSearchTerm);
-    setCurrentSearchTerm('');
-  };
+      if (direction === 'asc') {
+        return (a.date_created < b.date_created) ? -1 : ((a.date_created > b.date_created) ? 1 : 0);
+      }
+      if (direction === 'desc') {
+        return (a.date_created < b.date_created) ? 1 : ((a.date_created > b.date_created) ? -1 : 0);
+      }
 
+      return (a.id < b.id) ? -1 : ((a.id > b.id) ? 1 : 0);
+    });
+
+    setSortDirection(direction);
+    setFilteredProjects(newData);
+
+  };
+  console.log(sortDirection);
   if (!projects.length) {
     return (
       <div>Sorry gamer, we couldn't find any projects :/</div>
@@ -75,17 +72,10 @@ export default function ProjectsWithContributors() {
   return (
     <>
       <div className='flex items-center gap-8'>
-        <input type="text" onChange={(event) => setCurrentSearchTerm(event.target.value)}
-          onKeyDown={handleKeyPress} className='rounded p-2 bg-stone-300 text-zinc-900' />
-        <button type='button' onClick={handleSubmit} className='py-2 px-4 rounded bg-indigo-700 hover:brightness-90 duration-100'><ArrowRight className='text-stone-300 w-4' /></button>
+        <input type="text" onChange={(event) => setCurrentSearchTerm(event.target.value)} className='rounded p-2 bg-primary text-secondary' />
       </div>
-      {submittedSearchTerm && (
-        <div className='mt-4 py-0.5 px-4 w-min bg-zinc-500 rounded-full border border-gray-700'>
-          <p className='text-zinc-800 text-sm'>{submittedSearchTerm}</p>
-        </div>
-      )}
       {filteredProjects.length && (
-        <ProjectsWithContributorsTable projects={filteredProjects} />
+        <ProjectsWithContributorsTable projects={filteredProjects} sortDirection={sortDirection} onSort={sortByDate} />
       )}
     </>
   );

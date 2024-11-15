@@ -66,8 +66,8 @@ export default function ProjectsSearch() {
     <>
       <div className='flex items-center gap-8'>
         <input type="text" onChange={(event) => setCurrentSearchTerm(event.target.value)}
-          onKeyDown={handleKeyPress} className='rounded p-2 bg-stone-300 text-zinc-900' />
-        <button type='button' onClick={handleSubmit} className='py-2 px-4 rounded bg-indigo-700 hover:brightness-90 duration-100'><ArrowRight className='text-stone-300 w-4' /></button>
+          onKeyDown={handleKeyPress} className='rounded p-2 bg-primary text-secondary' />
+        <button type='button' onClick={handleSubmit} className='py-2 px-4 rounded bg-indigo-700 hover:brightness-90 duration-100'><ArrowRight className='text-primary w-4' /></button>
       </div>
       {submittedSearchTerm && (
         <div className='mt-4 py-0.5 px-4 w-min bg-zinc-500 rounded-full border border-gray-700'>

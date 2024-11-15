@@ -9,3 +9,9 @@ export interface Project {
 export interface ProjectContributor extends Project {
   contributors: string[];
 }
+
+export interface ProjectFull extends ProjectContributor {
+  versions: string[];
+}
+
+export type SortOptions = 'asc' | 'desc' | null;
