@@ -2,7 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { ProjectFull, SortOptions } from '../types.ts';
 import { formatDate } from '../utils.ts';
 
-export default function ProjectsWithContributorsTable({ projects, onSelectProject, sortDirection, onSort }: { projects: ProjectFull[]; onSelectProject: ({ id, title }: { id: string; title: string; }) => void; sortDirection: SortOptions; onSort: (direction: SortOptions) => void; }) {
+interface TableProps {
+  projects: ProjectFull[];
+  currentlySelectedProject: string | null;
+  onSelectProject: ({ id, title }: { id: string; title: string; }) => void;
+  sortDirection: SortOptions;
+  onSort: (direction: SortOptions) => void;
+}
+
+export default function ProjectsWithContributorsTable({ projects, currentlySelectedProject, onSelectProject, sortDirection, onSort }: TableProps) {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const [showTooltip, setShowTooltip] = useState<{ show: boolean; rowId: string | null; }>({
     show: false,
@@ -57,7 +65,7 @@ export default function ProjectsWithContributorsTable({ projects, onSelectProjec
         </thead>
         <tbody>
           {projects.map(({ id, title, release_name, folder_path, notes, date_created, contributors, versions }) => (
-            <tr key={id} className='relative'>
+            <tr key={id} className={`relative ${currentlySelectedProject === id && 'font-bold text-orange-300'}`}>
               <td className='text-nowrap pr-3 truncate max-w-72'>
                 {
                   <>

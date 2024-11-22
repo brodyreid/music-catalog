@@ -113,22 +113,24 @@ export default function ProjectsWithContributors() {
 
   return (
     <>
-      <div className='flex items-end gap-16'>
+      <div className='flex items-end gap-16 h-32'>
         <div>
           <p className='mb-2 text-lg'>search</p>
           <input type="text" onChange={(event) => setCurrentSearchTerm(event.target.value)} className='rounded p-2 bg-primary text-secondary' />
         </div>
-        <div>
-          <p className='text-lg'>update release_name for</p>
-          <p className='mb-2 text-lg text-orange-300'>{currentlySelectedProject?.title}</p>
-          <input type="text" ref={releaseNameRef} className='rounded p-2 bg-primary text-secondary' />
-          <button type='button' onClick={() => updateReleaseName(releaseNameRef.current?.value)} className='ml-4 bg-accent px-4 py-2 rounded hover:brightness-90 duration-100'>
-            update
-          </button>
-        </div>
+        {currentlySelectedProject?.id && (
+          <div>
+            <p className='text-lg'>update release_name for</p>
+            <p className='mb-2 text-lg h-8 text-orange-300'>{currentlySelectedProject?.title}</p>
+            <input type="text" ref={releaseNameRef} className='rounded p-2 bg-primary text-secondary' />
+            <button type='button' onClick={() => updateReleaseName(releaseNameRef.current?.value)} className='ml-4 bg-accent px-4 py-2 rounded hover:brightness-90 duration-100'>
+              update
+            </button>
+          </div>
+        )}
       </div>
       {filteredProjects.length && (
-        <ProjectsWithContributorsTable projects={filteredProjects} onSelectProject={setCurrentlySelectedProject} sortDirection={sortDirection} onSort={sortByDate} />
+        <ProjectsWithContributorsTable projects={filteredProjects} currentlySelectedProject={currentlySelectedProject?.id ?? null} onSelectProject={setCurrentlySelectedProject} sortDirection={sortDirection} onSort={sortByDate} />
       )}
     </>
   );
