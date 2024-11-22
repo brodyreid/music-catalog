@@ -7,8 +7,7 @@ import ProjectsWithContributorsTable from './ProjectsWithContributorsTable.tsx';
 export default function ProjectsWithContributors() {
   const [currentlySelectedProject, setCurrentlySelectedProject] = useState<{ id: string; title: string; }>();
   const releaseNameRef = useRef<HTMLInputElement | null>(null);
-  const { data: projects, loading, error: fetchError } = useFetchData<ProjectFull>('http://localhost:3000/projects');
-
+  const { data: projects, loading, error: fetchError, refetch } = useFetchData<ProjectFull>('http://localhost:3000/projects');
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [filteredProjects, setFilteredProjects] = useState<ProjectFull[]>([]);
   const [sortDirection, setSortDirection] = useState<SortOptions>(null);
@@ -55,8 +54,39 @@ export default function ProjectsWithContributors() {
     setFilteredProjects(newData);
   };
 
-  const updateReleaseName = (releaseName: string | undefined) => {
+  const updateReleaseName = async (releaseName: string | undefined) => {
     console.log(releaseName);
+    if (!releaseName) {
+      console.error('No release name.');
+      return;
+    }
+    if (!currentlySelectedProject?.id) {
+      console.error('No selected project id.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/project/${currentlySelectedProject?.id}/release_name`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          'release_name': releaseName
+        })
+      });
+
+      if (!response.ok) {
+        console.error(response.status);
+        return;
+      }
+
+      await response.json();
+
+      refetch();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (!projects.length) {
@@ -83,13 +113,14 @@ export default function ProjectsWithContributors() {
 
   return (
     <>
-      <div className='flex gap-16'>
+      <div className='flex items-end gap-16'>
         <div>
-          <div className='mb-2 text-lg'>search</div>
+          <p className='mb-2 text-lg'>search</p>
           <input type="text" onChange={(event) => setCurrentSearchTerm(event.target.value)} className='rounded p-2 bg-primary text-secondary' />
         </div>
         <div>
-          <div className='mb-2 text-lg'>update release_name of project {currentlySelectedProject?.title}</div>
+          <p className='text-lg'>update release_name for</p>
+          <p className='mb-2 text-lg text-orange-300'>{currentlySelectedProject?.title}</p>
           <input type="text" ref={releaseNameRef} className='rounded p-2 bg-primary text-secondary' />
           <button type='button' onClick={() => updateReleaseName(releaseNameRef.current?.value)} className='ml-4 bg-accent px-4 py-2 rounded hover:brightness-90 duration-100'>
             update
