@@ -14,10 +14,9 @@ export default function ProjectsTable({ projects }: { projects: Project[]; }) {
           </tr>
         </thead>
         <tbody>
-          {projects.map(({ project_id, project_number, title, folder_path, date_created }) => (
-            <tr key={project_id}>
-              <td className='text-nowrap pr-8'>{project_id}</td>
-              <td className='text-nowrap pr-8'>{project_number}</td>
+          {projects.map(({ id, title, folder_path, date_created }) => (
+            <tr key={id}>
+              <td className='text-nowrap pr-8'>{id}</td>
               <td className='text-nowrap pr-8'>{title}</td>
               <td className='text-nowrap pr-8'>{folder_path}</td>
               <td className="text-nowrap ">{date_created}</td>

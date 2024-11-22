@@ -1,17 +1,24 @@
 export interface Project {
-  id: number;
-  title?: string;
-  folder_path?: string;
+  id: string;
+  title: string;
+  release_name?: string;
+  folder_path: string;
   notes?: string;
   date_created?: string;
 }
 
 export interface ProjectContributor extends Project {
-  contributors: string[];
+  contributors: {
+    id: string;
+    name: string;
+  }[];
 }
 
 export interface ProjectFull extends ProjectContributor {
-  versions: string[];
+  versions: {
+    id: string;
+    name: string;
+  }[];
 }
 
 export type SortOptions = 'asc' | 'desc' | null;

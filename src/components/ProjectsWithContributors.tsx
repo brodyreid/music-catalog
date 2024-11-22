@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
 import { ProjectFull, SortOptions } from '../types.ts';
 import { formatDate } from '../utils.ts';
 import ProjectsWithContributorsTable from './ProjectsWithContributorsTable.tsx';
 
 export default function ProjectsWithContributors() {
-  const { data: projects, loading, error: fetchError } = useFetchData<ProjectFull>('http://localhost:3000/projects/versions/contributors');
+  const [currentlySelectedProject, setCurrentlySelectedProject] = useState<{ id: string; title: string; }>();
+  const releaseNameRef = useRef<HTMLInputElement | null>(null);
+  const { data: projects, loading, error: fetchError } = useFetchData<ProjectFull>('http://localhost:3000/projects');
 
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [filteredProjects, setFilteredProjects] = useState<ProjectFull[]>([]);
@@ -14,14 +16,21 @@ export default function ProjectsWithContributors() {
   useEffect(() => {
     if (!projects.length) { return; }
 
-    setFilteredProjects(projects
+    const cleanProjects = projects.map(({ title, versions, ...rest }) => ({
+      title: title.replace('Project', '').trim(),
+      versions: versions.filter(v => v.name.replace('.als', '') !== title.replace(' Project', '')),
+      ...rest,
+    }));
+
+    setFilteredProjects(cleanProjects
       .filter(project => {
         const wordsToSearch: string[] = currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '');
         return wordsToSearch.every(word =>
-          project.title?.toLowerCase().includes(word) ||
+          project.title.toLowerCase().includes(word) ||
           project.folder_path?.toLowerCase().includes(word) ||
           project.notes?.toLowerCase().includes(word) ||
-          project.contributors?.join(' ').toLowerCase().includes(word) ||
+          project.contributors.map(c => c.name).join(' ').toLowerCase().includes(word) ||
+          project.versions.map(v => v.name).join(' ').toLowerCase().includes(word) ||
           formatDate(project.date_created)?.toLowerCase().includes(word)
         );
       }
@@ -44,9 +53,12 @@ export default function ProjectsWithContributors() {
 
     setSortDirection(direction);
     setFilteredProjects(newData);
-
   };
-  console.log(sortDirection);
+
+  const updateReleaseName = (releaseName: string | undefined) => {
+    console.log(releaseName);
+  };
+
   if (!projects.length) {
     return (
       <div>Sorry gamer, we couldn't find any projects :/</div>
@@ -71,11 +83,21 @@ export default function ProjectsWithContributors() {
 
   return (
     <>
-      <div className='flex items-center gap-8'>
-        <input type="text" onChange={(event) => setCurrentSearchTerm(event.target.value)} className='rounded p-2 bg-primary text-secondary' />
+      <div className='flex gap-16'>
+        <div>
+          <div className='mb-2 text-lg'>search</div>
+          <input type="text" onChange={(event) => setCurrentSearchTerm(event.target.value)} className='rounded p-2 bg-primary text-secondary' />
+        </div>
+        <div>
+          <div className='mb-2 text-lg'>update release_name of project {currentlySelectedProject?.title}</div>
+          <input type="text" ref={releaseNameRef} className='rounded p-2 bg-primary text-secondary' />
+          <button type='button' onClick={() => updateReleaseName(releaseNameRef.current?.value)} className='ml-4 bg-accent px-4 py-2 rounded hover:brightness-90 duration-100'>
+            update
+          </button>
+        </div>
       </div>
       {filteredProjects.length && (
-        <ProjectsWithContributorsTable projects={filteredProjects} sortDirection={sortDirection} onSort={sortByDate} />
+        <ProjectsWithContributorsTable projects={filteredProjects} onSelectProject={setCurrentlySelectedProject} sortDirection={sortDirection} onSort={sortByDate} />
       )}
     </>
   );
