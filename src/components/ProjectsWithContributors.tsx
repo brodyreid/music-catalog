@@ -1,16 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
-import { ProjectFull, SortOptions } from '../types.ts';
+import { Project, SortOptions } from '../types.ts';
 import { formatDate } from '../utils.ts';
 import ProjectsWithContributorsTable from './ProjectsWithContributorsTable.tsx';
+import Search from './Search.tsx';
+import UpdateNotes from './UpdateNotes.tsx';
+import UpdateReleaseName from './UpdateReleaseName.tsx';
 
 export default function ProjectsWithContributors() {
-  const [currentlySelectedProject, setCurrentlySelectedProject] = useState<{ id: string; title: string; }>();
-  const releaseNameRef = useRef<HTMLInputElement | null>(null);
-  const { data: projects, loading, error: fetchError, refetch } = useFetchData<ProjectFull>('http://localhost:3000/projects');
+  const [selectedProject, setSelectedProject] = useState<Project>();
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
-  const [filteredProjects, setFilteredProjects] = useState<ProjectFull[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [sortDirection, setSortDirection] = useState<SortOptions>(null);
+  const { data: projects, loading, error: fetchError, refetch } = useFetchData<Project>('http://localhost:3000/projects');
 
   useEffect(() => {
     if (!projects.length) { return; }
@@ -28,6 +30,7 @@ export default function ProjectsWithContributors() {
           project.title.toLowerCase().includes(word) ||
           project.folder_path?.toLowerCase().includes(word) ||
           project.notes?.toLowerCase().includes(word) ||
+          project.release_name?.toLowerCase().includes(word) ||
           project.contributors.map(c => c.name).join(' ').toLowerCase().includes(word) ||
           project.versions.map(v => v.name).join(' ').toLowerCase().includes(word) ||
           formatDate(project.date_created)?.toLowerCase().includes(word)
@@ -55,24 +58,57 @@ export default function ProjectsWithContributors() {
   };
 
   const updateReleaseName = async (releaseName: string | undefined) => {
-    console.log(releaseName);
     if (!releaseName) {
       console.error('No release name.');
       return;
     }
-    if (!currentlySelectedProject?.id) {
+    if (!selectedProject?.id) {
       console.error('No selected project id.');
       return;
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/project/${currentlySelectedProject?.id}/release_name`, {
+      const response = await fetch(`http://localhost:3000/project/${selectedProject?.id}/release_name`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           'release_name': releaseName
+        })
+      });
+
+      if (!response.ok) {
+        console.error(response.status);
+        return;
+      }
+
+      await response.json();
+
+      refetch();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const updateNotes = async (notes: string | undefined) => {
+    if (!notes) {
+      console.error('No notes.');
+      return;
+    }
+    if (!selectedProject?.id) {
+      console.error('No selected project id.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/project/${selectedProject?.id}/notes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          'notes': notes
         })
       });
 
@@ -113,24 +149,23 @@ export default function ProjectsWithContributors() {
 
   return (
     <>
-      <div className='flex items-end gap-16 h-32'>
-        <div>
-          <p className='mb-2 text-lg'>search</p>
-          <input type="text" onChange={(event) => setCurrentSearchTerm(event.target.value)} className='rounded p-2 bg-primary text-secondary' />
-        </div>
-        {currentlySelectedProject?.id && (
-          <div>
-            <p className='text-lg'>update release_name for</p>
-            <p className='mb-2 text-lg h-8 text-orange-300'>{currentlySelectedProject?.title}</p>
-            <input type="text" ref={releaseNameRef} className='rounded p-2 bg-primary text-secondary' />
-            <button type='button' onClick={() => updateReleaseName(releaseNameRef.current?.value)} className='ml-4 bg-accent px-4 py-2 rounded hover:brightness-90 duration-100'>
-              update
-            </button>
+      <div className='flex items-start justify-between'>
+        <Search onSearch={setCurrentSearchTerm} />
+        <>
+          {selectedProject?.id && (
+            <p className='absolute top-4 right-4'>
+              <span>currently selected project:</span>
+              <span className='ml-2 text-lg text-orange-300'>{selectedProject?.title}</span>
+            </p>
+          )}
+          <div className='flex flex-col gap-2'>
+            <UpdateReleaseName onUpdateReleaseName={updateReleaseName} />
+            <UpdateNotes onUpdateNotes={updateNotes} />
           </div>
-        )}
+        </>
       </div>
       {filteredProjects.length && (
-        <ProjectsWithContributorsTable projects={filteredProjects} currentlySelectedProject={currentlySelectedProject?.id ?? null} onSelectProject={setCurrentlySelectedProject} sortDirection={sortDirection} onSort={sortByDate} />
+        <ProjectsWithContributorsTable projects={filteredProjects} selectedProject={selectedProject} onSelectProject={setSelectedProject} sortDirection={sortDirection} onSort={sortByDate} />
       )}
     </>
   );

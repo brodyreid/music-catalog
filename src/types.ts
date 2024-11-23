@@ -5,16 +5,10 @@ export interface Project {
   folder_path: string;
   notes?: string;
   date_created?: string;
-}
-
-export interface ProjectContributor extends Project {
   contributors: {
     id: string;
     name: string;
   }[];
-}
-
-export interface ProjectFull extends ProjectContributor {
   versions: {
     id: string;
     name: string;

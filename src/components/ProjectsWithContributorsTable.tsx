@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-import { ProjectFull, SortOptions } from '../types.ts';
+import { Project, SortOptions } from '../types.ts';
 import { formatDate } from '../utils.ts';
 
-interface TableProps {
-  projects: ProjectFull[];
-  currentlySelectedProject: string | null;
-  onSelectProject: ({ id, title }: { id: string; title: string; }) => void;
+interface ProjectsWithContributorsTableProps {
+  projects: Project[];
+  selectedProject?: Project | null;
+  onSelectProject: (props: Project) => void;
   sortDirection: SortOptions;
   onSort: (direction: SortOptions) => void;
 }
 
-export default function ProjectsWithContributorsTable({ projects, currentlySelectedProject, onSelectProject, sortDirection, onSort }: TableProps) {
+export default function ProjectsWithContributorsTable({ projects, selectedProject, onSelectProject, sortDirection, onSort }: ProjectsWithContributorsTableProps) {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const [showTooltip, setShowTooltip] = useState<{ show: boolean; rowId: string | null; }>({
     show: false,
@@ -32,8 +32,8 @@ export default function ProjectsWithContributorsTable({ projects, currentlySelec
     }
   };
 
-  const handleSelectProject = (id: string, title: string) => {
-    onSelectProject({ id, title });
+  const handleSelectProject = (props: Project) => {
+    onSelectProject({ ...props });
   };
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function ProjectsWithContributorsTable({ projects, currentlySelec
         </thead>
         <tbody>
           {projects.map(({ id, title, release_name, folder_path, notes, date_created, contributors, versions }) => (
-            <tr key={id} className={`relative ${currentlySelectedProject === id && 'font-bold text-orange-300'}`}>
+            <tr key={id} className={`relative ${selectedProject?.id === id && 'font-bold text-orange-300'}`}>
               <td className='text-nowrap pr-3 truncate max-w-72'>
                 {
                   <>
@@ -79,7 +79,7 @@ export default function ProjectsWithContributorsTable({ projects, currentlySelec
                         }
                       </>
                     }
-                    <button type='button' onClick={() => handleSelectProject(id, title)} className='cursor-pointer hover:brightness-90 duration-100'>{title}</button>
+                    <button type='button' onClick={() => handleSelectProject({ id, title, release_name, folder_path, notes, date_created, contributors, versions })} className='cursor-pointer hover:brightness-90 duration-100'>{title}</button>
                   </>
                 }
               </td>
