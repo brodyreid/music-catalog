@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
+import { projectReducer, ProjectState } from '../reducers/projectReducer.ts';
 import { Project, SortOptions } from '../types.ts';
 import { formatDate, saveData } from '../utils.ts';
+import ProjectActions from './ProjectActions.tsx';
 import ProjectsTable from './ProjectsTable.tsx';
 import Search from './Search.tsx';
-import UpdateNotes from './UpdateNotes.tsx';
-import UpdateReleaseName from './UpdateReleaseName.tsx';
 
 export default function Projects() {
-  const [selectedProject, setSelectedProject] = useState<Project>();
+  const [projectState, projectDispatch] = useReducer(projectReducer, { selectedProject: null, release_name: null, notes: null } as ProjectState);
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>();
   const [filteredProjects, setFilteredProjects] = useState<Project[]>();
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');
@@ -28,12 +28,12 @@ export default function Projects() {
         const wordsToSearch: string[] = currentSearchTerm ? currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '') : [];
         return wordsToSearch.every(word =>
           project.title.toLowerCase().includes(word) ||
-          project.folder_path?.toLowerCase().includes(word) ||
+          project.folder_path.toLowerCase().includes(word) ||
           project.notes?.toLowerCase().includes(word) ||
           project.release_name?.toLowerCase().includes(word) ||
-          project.contributors?.map(c => c.name).join(' ').toLowerCase().includes(word) ||
+          project.contributors?.map(c => [c.first_name, c.artist_name]).join(' ').toLowerCase().includes(word) ||
           project.versions?.map(v => v.name).join(' ').toLowerCase().includes(word) ||
-          formatDate(project.date_created)?.toLowerCase().includes(word)
+          project.date_created && formatDate(project.date_created).toLowerCase().includes(word)
         );
       }
       ));
@@ -57,18 +57,17 @@ export default function Projects() {
     setFilteredProjects(newData);
   };
 
-  const updateReleaseName = async (releaseName: string) => {
-    if (!releaseName) {
-      console.error('No release name.');
-      return;
-    }
-    if (!selectedProject?.id) {
-      console.error('No selected project id.');
+  const handleUpdateProject = async () => {
+    if (!projectState.selectedProject) {
+      console.error('No project to update.');
       return;
     }
 
     try {
-      await saveData(`http://localhost:3000/project/${selectedProject?.id}/release_name`, { 'release_name': releaseName });
+      await saveData(`http://localhost:3000/project/${projectState.selectedProject.id}`, {
+        release_name: projectState.release_name ?? null,
+        notes: projectState.notes ?? null
+      });
       refetch();
       setSortDirection('desc');
     } catch (error) {
@@ -76,25 +75,43 @@ export default function Projects() {
     }
   };
 
-  const updateNotes = async (notes: string) => {
-    if (!notes) {
-      console.error('No notes.');
-      return;
-    }
-    if (!selectedProject?.id) {
-      console.error('No selected project id.');
-      return;
-    }
+  // const updateReleaseName = async (releaseName: string) => {
+  //   if (!releaseName) {
+  //     console.error('No release name.');
+  //     return;
+  //   }
+  //   if (!projectState.selectedProject) {
+  //     console.error('No selected project to update.');
+  //     return;
+  //   }
 
-    try {
-      await saveData(`http://localhost:3000/project/${selectedProject?.id}/notes`, { 'notes': notes });
-      refetch();
-      setSortDirection('desc');
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  console.log(selectedProject);
+  //   try {
+  //     await saveData(`http://localhost:3000/project/${selectedProject?.id}/release_name`, { 'release_name': releaseName });
+  //     refetch();
+  //     setSortDirection('desc');
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  // const updateNotes = async (notes: string) => {
+  //   if (!notes) {
+  //     console.error('No notes.');
+  //     return;
+  //   }
+  //   if (!projectState.selectedProject) {
+  //     console.error('No selected project');
+  //     return;
+  //   }
+
+  //   try {
+  //     await saveData(`http://localhost:3000/project/${selectedProject?.id}/notes`, { 'notes': notes });
+  //     refetch();
+  //     setSortDirection('desc');
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
   if (!projects.length) {
     return (
       <div>Sorry gamer, we couldn't find any projects :/</div>
@@ -121,21 +138,17 @@ export default function Projects() {
     <>
       <div className='flex items-start justify-between'>
         <Search onSearch={setCurrentSearchTerm} />
-        <>
-          {selectedProject?.id && (
-            <p className='absolute top-4 right-4'>
-              <span>currently selected project:</span>
-              <span className='ml-2 text-lg text-orange-300'>{selectedProject?.title}</span>
-            </p>
-          )}
-          <div className='flex flex-col gap-2'>
-            <UpdateReleaseName selectedProject={selectedProject} onUpdateReleaseName={updateReleaseName} />
-            <UpdateNotes selectedProject={selectedProject} onUpdateNotes={updateNotes} />
+        <div className='relative flex flex-col gap-2'>
+          <div className='flex items-center h-12'>
+            {projectState.selectedProject && (
+              <p className='text-lg text-orange-300'>{projectState.selectedProject.title}</p>
+            )}
           </div>
-        </>
+          <ProjectActions projectState={projectState} projectDispatch={projectDispatch} onUpdate={handleUpdateProject} />
+        </div>
       </div>
       {filteredProjects?.length && (
-        <ProjectsTable projects={filteredProjects} selectedProject={selectedProject} onSelectProject={setSelectedProject} sortDirection={sortDirection} onSort={sortByDate} />
+        <ProjectsTable projects={filteredProjects} projectState={projectState} projectDispatch={projectDispatch} sortDirection={sortDirection} onSort={sortByDate} />
       )}
     </>
   );

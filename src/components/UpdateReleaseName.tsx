@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Project } from '../types.ts';
 
 interface UpdateReleaseNameProps {
@@ -8,6 +8,10 @@ interface UpdateReleaseNameProps {
 
 export default function UpdateReleaseName({ selectedProject, onUpdateReleaseName }: UpdateReleaseNameProps) {
   const [releaseName, setReleaseName] = useState<string>('');
+
+  useEffect(() => {
+    setReleaseName(selectedProject?.release_name ?? '');
+  }, [selectedProject]);
 
   return (
     <div>

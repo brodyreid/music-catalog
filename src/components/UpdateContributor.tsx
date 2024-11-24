@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Contributor } from '../types.ts';
 import { generateId } from '../utils.ts';
 
@@ -10,6 +10,11 @@ interface UpdateContributorProps {
 export default function UpdateContributor({ selectedContributor, onUpdateContributor }: UpdateContributorProps) {
   const [firstName, setFirstName] = useState<string>('');
   const [artistName, setArtistName] = useState<string>('');
+
+  useEffect(() => {
+    setFirstName(selectedContributor?.first_name ?? '');
+    setArtistName(selectedContributor?.artist_name ?? '');
+  }, [selectedContributor]);
 
   const handleSubmit = () => {
     if ((firstName || artistName)) {

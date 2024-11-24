@@ -1,16 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
-import { Project, SortOptions } from '../types.ts';
+import { Dispatch, useEffect, useRef, useState } from 'react';
+import { ProjectState } from '../reducers/projectReducer.ts';
+import { Project, ProjectActions, SortOptions } from '../types.ts';
 import { formatDate } from '../utils.ts';
 
 interface ProjectsTableProps {
   projects: Project[];
-  selectedProject?: Project;
-  onSelectProject: (props: Project) => void;
+  projectState: ProjectState;
+  projectDispatch: Dispatch<ProjectActions>;
   sortDirection: SortOptions;
   onSort: (direction: SortOptions) => void;
 }
 
-export default function ProjectsTable({ projects, selectedProject, onSelectProject, sortDirection, onSort }: ProjectsTableProps) {
+export default function ProjectsTable({ projects, projectState, projectDispatch, sortDirection, onSort }: ProjectsTableProps) {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const [showTooltip, setShowTooltip] = useState<{ show: boolean; rowId: string | null; }>({
     show: false,
@@ -29,14 +30,6 @@ export default function ProjectsTable({ projects, selectedProject, onSelectProje
   const handlePageClick = (event: MouseEvent) => {
     if (tooltipRef.current && !tooltipRef.current.contains(event.target as Node)) {
       setShowTooltip({ show: false, rowId: null });
-    }
-  };
-
-  const handleSelectProject = (project: Project) => {
-    if (project.id === selectedProject?.id) {
-      onSelectProject({ id: '', title: '', folder_path: '' });
-    } else {
-      onSelectProject({ ...project });
     }
   };
 
@@ -73,7 +66,7 @@ export default function ProjectsTable({ projects, selectedProject, onSelectProje
             const path = folder_path && folder_path.replace(/^.*\/projects\//i, '/');
 
             return (
-              <tr key={id} className={`relative ${selectedProject?.id === id && 'font-bold text-orange-300'}`}>
+              <tr key={id} className={`relative ${projectState.selectedProject?.id === id && 'font-bold text-orange-300'}`}>
                 <td className='text-nowrap pr-3 truncate max-w-60'>
                   {
                     <>
@@ -87,15 +80,15 @@ export default function ProjectsTable({ projects, selectedProject, onSelectProje
                           }
                         </>
                       }
-                      <button type='button' onClick={() => handleSelectProject(project)} className='cursor-pointer hover:brightness-75 duration-100'>{title}</button>
+                      <button type='button' onClick={() => projectDispatch({ type: 'set_selected_project', project })} className='cursor-pointer hover:brightness-75 duration-100'>{title}</button>
                     </>
                   }
                 </td>
                 <td className='text-nowrap pr-3'>{release_name}</td>
                 <td className='text-nowrap pr-3'>{versions?.length ?? ''}</td>
                 <td className='text-nowrap pr-3'>{path}</td>
-                <td className='text-nowrap pr-3'>{contributors?.map(c => c.name).join(', ')}</td>
-                <td className="text-nowrap">{formatDate(date_created)}</td>
+                <td className='text-nowrap pr-3'>{contributors?.map(c => [c.first_name, c.artist_name]).join(', ')}</td>
+                <td className="text-nowrap">{date_created ? formatDate(date_created) : ''}</td>
               </tr>
             );
           })}
