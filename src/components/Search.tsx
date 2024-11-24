@@ -5,7 +5,7 @@ interface SearchProps {
 export default function Search({ onSearch }: SearchProps) {
   return (
     <div>
-      <p className='mb-2 text-lg'>search</p>
+      <p className='text-lg'>search</p>
       <input type="text" onChange={(event) => onSearch(event.target.value)} className='rounded p-2 bg-primary text-secondary' />
     </div>
   );

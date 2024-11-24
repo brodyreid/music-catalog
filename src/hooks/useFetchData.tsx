@@ -19,7 +19,6 @@ export default function useFetchData<T>(url: string) {
     }
   };
 
-
   useEffect(() => {
     fetchData();
   }, [url]);

@@ -1,16 +1,19 @@
-import ProjectsWithContributors from './components/ProjectsWithContributors.tsx';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Contributors from './components/Contributors.tsx';
+import Navbar from './components/Navbar.tsx';
+import Projects from './components/Projects.tsx';
 
 export default function App() {
   return (
-    <>
-      <div className="flex items-center gap-1">
-        <img src="/logo.svg" alt="logo" className="w-12 h-12 m-4" />
-        <h2 className="text-[#9D74B3]">music_catalog</h2>
-      </div>
+    <BrowserRouter>
+      <Navbar />
       <div className="container mx-auto">
-        {/* <ProjectsSearch /> */}
-        <ProjectsWithContributors />
+        <Routes>
+          <Route path='/' element={<Projects />} />
+          <Route path='/projects' element={<Projects />} />
+          <Route path='/contributors' element={<Contributors />} />
+        </Routes>
       </div>
-    </>
+    </BrowserRouter>
   );
 }

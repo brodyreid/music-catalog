@@ -5,14 +5,20 @@ export interface Project {
   folder_path: string;
   notes?: string;
   date_created?: string;
-  contributors: {
+  contributors?: {
     id: string;
     name: string;
   }[];
-  versions: {
+  versions?: {
     id: string;
     name: string;
   }[];
+}
+
+export interface Contributor {
+  id: string;
+  first_name: string | null;
+  artist_name: string | null;
 }
 
 export type SortOptions = 'asc' | 'desc' | null;
