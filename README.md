@@ -4,7 +4,7 @@ I can never remember which of my Ableton projects is for which song. I can hear 
 
 **BUT NOW I CAN!**
 
-![give up the money example](public/example.png)
+![give up the money example](frontend/public/example.png)
 
 In the backend (music-catalog-server), I can run
 ```
