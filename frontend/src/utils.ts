@@ -6,7 +6,7 @@ export const formatDate = (dateString: string) => {
   });
 };
 
-export const saveData = async<TBody>(url: string, body: TBody) => {
+export const saveData = async<TBody, TResponse>(url: string, body: TBody): Promise<TResponse> => {
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

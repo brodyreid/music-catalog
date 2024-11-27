@@ -1,3 +1,4 @@
+import Cross from '@icons/Cross.tsx';
 import { useEffect, useReducer, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
 import { projectReducer } from '../reducers/projectReducer.ts';
@@ -7,12 +8,19 @@ import ProjectActions from './ProjectActions.tsx';
 import ProjectsTable from './ProjectsTable.tsx';
 import Search from './Search.tsx';
 
+interface UpdateProjectBody {
+  release_name: string | null;
+  notes: string | null;
+  contributor_ids: string[];
+}
+
 export default function Projects() {
-  const [projectState, projectDispatch] = useReducer(projectReducer, { selectedProject: null, release_name: null, notes: null, contributors: [] });
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>();
   const [filteredProjects, setFilteredProjects] = useState<Project[]>();
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');
-  const { data: projects, loading, error: fetchError, refetch } = useFetchData<Project>('http://localhost:3000/projects');
+  const [projectState, projectDispatch] = useReducer(projectReducer, { selectedProject: null, release_name: null, notes: null, contributors: [] });
+  const { data: projects, loading, error: fetchError } = useFetchData<Project>('http://localhost:3000/projects');
 
   useEffect(() => {
     if (!projects.length) { return; }
@@ -64,14 +72,13 @@ export default function Projects() {
     }
 
     try {
-      await saveData(`http://localhost:3000/project/${projectState.selectedProject.id}`, {
+      const response = await saveData<UpdateProjectBody, { message: string; updatedProject: Project; }>(`http://localhost:3000/project/${projectState.selectedProject.id}`, {
         release_name: projectState.release_name,
         notes: projectState.notes,
         contributor_ids: projectState.contributors?.map(c => c.id) ?? []
       });
 
-      refetch();
-      setSortDirection('desc');
+      setToastMessage(response.message);
     } catch (error) {
       console.error(error);
     }
@@ -101,6 +108,12 @@ export default function Projects() {
 
   return (
     <>
+      {toastMessage && (
+        <div className='absolute z-10 bottom-5 right-5 p-4 bg-green-700 w-64 h-24 rounded-md shadow-lg'>
+          <button onClick={() => setToastMessage(null)}><Cross className='absolute top-2 right-2 w-4' /></button>
+          {toastMessage}
+        </div>
+      )}
       <div className='flex items-start justify-between'>
         <Search onSearch={setCurrentSearchTerm} />
         <div className='flex flex-col gap-2'>

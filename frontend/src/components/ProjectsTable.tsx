@@ -1,6 +1,6 @@
 import { Dispatch, useEffect, useRef, useState } from 'react';
-import { ProjectState } from '../reducers/projectReducer.ts';
-import { Project, ProjectActions, SortOptions } from '../types.ts';
+import { ProjectActions, ProjectState } from '../reducers/projectReducer.ts';
+import { Project, SortOptions } from '../types.ts';
 import { formatDate } from '../utils.ts';
 
 interface ProjectsTableProps {

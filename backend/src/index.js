@@ -46,7 +46,7 @@ app.post('/project/:id', async (req, res) => {
 
   try {
     await client.query('BEGIN');
-    await client.query(`
+    const projectResult = await client.query(`
       UPDATE projects
       SET release_name = $2, notes = $3
       WHERE id = $1
@@ -63,7 +63,10 @@ app.post('/project/:id', async (req, res) => {
     `, [id, contributor_ids]);
     await client.query('COMMIT');
 
-    return;
+    return res.json({
+      message: 'Project successfully updated!',
+      project: projectResult.rows[0]
+    });
   } catch (error) {
     await client.query('ROLLBACK');
     serverError(res, error);
