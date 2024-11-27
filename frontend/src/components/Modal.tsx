@@ -36,7 +36,7 @@ export default function Modal({ isOpen, closeModal, children }: ModalProps) {
   return (
     <>
       {isOpen && (
-        <div ref={modalRef} className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-64 h-64 p-4 bg-primary rounded-lg shadow-lg text-secondary'>
+        <div ref={modalRef} className='z-10 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-64 h-64 p-4 bg-primary rounded-lg shadow-lg text-secondary'>
           {children}
         </div>
       )}

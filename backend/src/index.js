@@ -45,28 +45,25 @@ app.post('/project/:id', async (req, res) => {
   }
 
   try {
-    console.log('Contributor IDs:', contributor_ids);
     await client.query('BEGIN');
-
-    const projectsResult = await client.query(`
+    await client.query(`
       UPDATE projects
       SET release_name = $2, notes = $3
       WHERE id = $1
       RETURNING *;
       `, [id, release_name, notes]);
-
-    const projectContributorsResult = await client.query(`
+    await client.query(`
+      DELETE FROM project_contributors
+      WHERE project_id = $1;  
+    `, [id]);
+    await client.query(`
       INSERT INTO project_contributors (project_id, contributor_id)
       SELECT $1, UNNEST($2::char(16)[])
       ON CONFLICT DO NOTHING;
     `, [id, contributor_ids]);
-
     await client.query('COMMIT');
 
-    return {
-      project: projectsResult.rows[0],
-      projectContributors: projectContributorsResult.rows
-    };
+    return;
   } catch (error) {
     await client.query('ROLLBACK');
     serverError(res, error);

@@ -1,8 +1,9 @@
+import Cross from '@icons/Cross.tsx';
 import Plus from '@icons/Plus.tsx';
 import { Dispatch, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
-import { ProjectState } from '../reducers/projectReducer.ts';
-import { Contributor, ProjectActions } from '../types.ts';
+import { ProjectActions, ProjectState } from '../reducers/projectReducer.ts';
+import { Contributor } from '../types.ts';
 import Modal from './Modal.tsx';
 
 interface ProjectActionsProps {
@@ -13,11 +14,13 @@ interface ProjectActionsProps {
 
 export default function ProjectActions({ projectState, projectDispatch, onUpdate }: ProjectActionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const { data: contributors } = useFetchData<Contributor>('http://localhost:3000/contributors');
-  console.log('projectState: ', projectState);
 
-  function handleButtonClick(contributor: Contributor) {
+  function handleRemoveContributor(contributorId: string) {
+    projectDispatch({ type: 'removed_contributor', contributorId });
+  }
+
+  function handleAddContributor(contributor: Contributor) {
     projectDispatch({ type: 'added_contributor', contributor });
     setIsModalOpen(false);
   }
@@ -30,7 +33,10 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
           <div className='flex flex-col gap-4'>
             <ul className='rounded p-2 bg-primary text-secondary space-y-2'>
               {projectState.contributors?.map(c => (
-                <li key={c.id}><span className='font-bold text-accent'>{c.artist_name}</span> - {c.first_name}</li>
+                <li key={c.id} className='flex items-center justify-between'>
+                  <div><span className='font-bold text-accent'>{c.artist_name}</span> - {c.first_name}</div>
+                  <button onClick={() => handleRemoveContributor(c.id)}><Cross className='w-4' /></button>
+                </li>
               ))}
               <li className='text-sm'>
                 <button type='button' className='bg-transparent text-stone-500 hover:brightness-75 duration-100 ring-0 border-none outline-none' onClick={() => setIsModalOpen(true)}>
@@ -90,7 +96,7 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
         <div>
           <ul className='space-y-2'>
             {contributors.map(c => (
-              <li key={c.id}><button onClick={() => handleButtonClick(c)}><span className='font-bold text-accent'>{c.artist_name}</span> - {c.first_name}</button></li>
+              <li key={c.id}><button onClick={() => handleAddContributor(c)}><span className='font-bold text-accent'>{c.artist_name}</span> - {c.first_name}</button></li>
             ))}
           </ul>
         </div>

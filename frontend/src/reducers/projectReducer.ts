@@ -1,4 +1,4 @@
-import { Contributor, Project, ProjectActions } from '../types.ts';
+import { Contributor, Project } from '../types.ts';
 
 export interface ProjectState {
   selectedProject: Project | null;
@@ -7,6 +7,14 @@ export interface ProjectState {
   contributors: Contributor[] | [];
 }
 
+export type ProjectActions =
+  { type: 'set_selected_project'; project: Project | null; }
+  | { type: 'changed_release_name'; release_name: string; }
+  | { type: 'changed_notes'; notes: string; }
+  | { type: 'added_contributor'; contributor: Contributor; }
+  | { type: 'removed_contributor'; contributorId: string; };
+
+
 export function projectReducer(state: ProjectState, action: ProjectActions) {
   switch (action.type) {
     case 'set_selected_project': {
@@ -14,7 +22,8 @@ export function projectReducer(state: ProjectState, action: ProjectActions) {
         ...state,
         selectedProject: action.project,
         release_name: action.project?.release_name ?? null,
-        notes: action.project?.notes ?? null
+        notes: action.project?.notes ?? null,
+        contributors: action.project?.contributors ?? []
       };
     }
 
@@ -31,12 +40,19 @@ export function projectReducer(state: ProjectState, action: ProjectActions) {
         notes: action.notes || null
       };
     }
-      
+
     case 'added_contributor': {
       return {
         ...state,
         contributors: [...state.contributors, action.contributor]
-      }
+      };
+    }
+
+    case 'removed_contributor': {
+      return {
+        ...state,
+        contributors: [...state.contributors.filter(c => c.id !== action.contributorId)]
+      };
     }
   }
 };

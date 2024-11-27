@@ -12,12 +12,6 @@ export interface Project {
   }[] | null;
 }
 
-export type ProjectActions =
-  { type: 'set_selected_project'; project: Project | null; }
-  | { type: 'changed_release_name'; release_name: string; }
-  | { type: 'changed_notes'; notes: string; }
-  | { type: 'added_contributor'; contributor: Contributor; }
-
 export interface Contributor {
   id: string;
   first_name: string | null;
