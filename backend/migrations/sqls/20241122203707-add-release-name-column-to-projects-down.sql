@@ -1,0 +1,1 @@
+ALTER TABLE projects DROP COLUMN release_name varchar(255);

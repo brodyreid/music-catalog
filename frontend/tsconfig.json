@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "allowUmdGlobalAccess": true,
+    "jsx": "react-jsx",
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "paths": {
+      "@icons/*": ["./src/icons/*"]
+    },
+    "module": "NodeNext",
+    "noEmit": true,
+    "noUnusedParameters": true,
+    "outDir": "./dist",
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2023",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./@types"
+    ]
+  },
+  "include": [
+    "src/**/*",
+    "vite.config.ts"
+  ]
+}
