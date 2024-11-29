@@ -1,6 +1,6 @@
-import Cross from '@icons/Cross.tsx';
 import { useEffect, useReducer, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
+import useToast from '../hooks/useToast.tsx';
 import { projectReducer } from '../reducers/projectReducer.ts';
 import { Project, SortOptions } from '../types.ts';
 import { formatDate, saveData } from '../utils.ts';
@@ -15,10 +15,10 @@ interface UpdateProjectBody {
 }
 
 export default function Projects() {
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>();
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>();
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');
+  const { showToast, ToastComponent } = useToast();
   const [projectState, projectDispatch] = useReducer(projectReducer, { selectedProject: null, release_name: null, notes: null, contributors: [] });
   const { data: projects, loading, error: fetchError } = useFetchData<Project>('http://localhost:3000/projects');
 
@@ -72,13 +72,14 @@ export default function Projects() {
     }
 
     try {
-      const response = await saveData<UpdateProjectBody, { message: string; updatedProject: Project; }>(`http://localhost:3000/project/${projectState.selectedProject.id}`, {
+      const response = await saveData<UpdateProjectBody, { message: string; project: Project; }>(`http://localhost:3000/project/${projectState.selectedProject.id}`, {
         release_name: projectState.release_name,
         notes: projectState.notes,
         contributor_ids: projectState.contributors?.map(c => c.id) ?? []
       });
 
-      setToastMessage(response.message);
+      setFilteredProjects(prev => prev.map(prevProject => prevProject.id === response.project.id ? response.project : prevProject));
+      showToast(response.message);
     } catch (error) {
       console.error(error);
     }
@@ -108,22 +109,10 @@ export default function Projects() {
 
   return (
     <>
-      {toastMessage && (
-        <div className='absolute z-10 bottom-5 right-5 p-4 bg-green-700 w-64 h-24 rounded-md shadow-lg'>
-          <button onClick={() => setToastMessage(null)}><Cross className='absolute top-2 right-2 w-4' /></button>
-          {toastMessage}
-        </div>
-      )}
+      <ToastComponent />
       <div className='flex items-start justify-between'>
         <Search onSearch={setCurrentSearchTerm} />
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-center h-12'>
-            {projectState.selectedProject && (
-              <p className='text-lg text-orange-300'>{projectState.selectedProject.title}</p>
-            )}
-          </div>
-          <ProjectActions projectState={projectState} projectDispatch={projectDispatch} onUpdate={handleUpdateProject} />
-        </div>
+        <ProjectActions projectState={projectState} projectDispatch={projectDispatch} onUpdate={handleUpdateProject} />
       </div>
       {filteredProjects?.length && (
         <ProjectsTable projects={filteredProjects} projectState={projectState} projectDispatch={projectDispatch} sortDirection={sortDirection} onSort={sortByDate} />

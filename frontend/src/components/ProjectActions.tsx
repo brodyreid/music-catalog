@@ -26,15 +26,18 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
   }
 
   return (
-    <>
-      <div className='grid grid-cols-2 gap-8'>
-        <div>
-          <p className='text-lg'>contributors</p>
-          <div className='flex flex-col gap-4'>
+    <div>
+      {projectState.selectedProject && (
+        <p className='text-lg text-orange-300'>{projectState.selectedProject.title}</p>
+      )}
+      <div className={`grid grid-cols-2 gap-x-8 p-8 pt-6 border border-neutral-500 rounded-lg ${!projectState.selectedProject ? 'pointer-events-none opacity-50' : ''}`}>
+        <div className='flex flex-col justify-between min-w-64'>
+          <div>
+            <p className='text-lg'>contributors</p>
             <ul className='rounded p-2 bg-primary text-secondary space-y-2'>
               {projectState.contributors?.map(c => (
                 <li key={c.id} className='flex items-center justify-between'>
-                  <div><span className='font-bold text-accent'>{c.artist_name}</span> - {c.first_name}</div>
+                  <div className='font-bold text-accent'>{c.artist_name}</div>
                   <button onClick={() => handleRemoveContributor(c.id)}><Cross className='w-4' /></button>
                 </li>
               ))}
@@ -44,15 +47,15 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
                 </button>
               </li>
             </ul>
-            <button
-              type='button'
-              disabled={!projectState.selectedProject}
-              onClick={() => onUpdate(projectState)}
-              className='bg-accent px-4 py-2 rounded disabled:pointer-events-none disabled:opacity-50 hover:brightness-90 duration-100'
-            >
-              update
-            </button>
           </div>
+          <button
+            type='button'
+            disabled={!projectState.selectedProject}
+            onClick={() => onUpdate(projectState)}
+            className='bg-accent px-4 py-2 rounded disabled:pointer-events-none disabled:opacity-50 hover:brightness-90 duration-100'
+          >
+            update
+          </button>
         </div>
         <div>
           <p className='text-lg'>release_name</p>
@@ -60,16 +63,8 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
             <input
               type="text"
               value={projectState.release_name ?? ''}
-              onChange={(event) => projectDispatch({ type: 'changed_release_name', release_name: event.target.value ?? null })} className='rounded p-2 bg-primary text-secondary'
+              onChange={(event) => projectDispatch({ type: 'changed_release_name', release_name: event.target.value ?? null })} className='rounded p-2 bg-primary text-secondary w-full'
             />
-            <button
-              type='button'
-              disabled={!projectState.selectedProject}
-              onClick={() => onUpdate(projectState)}
-              className='bg-accent px-4 py-2 rounded disabled:pointer-events-none disabled:opacity-50 hover:brightness-90 duration-100'
-            >
-              update
-            </button>
           </div>
           <div>
             <p className='text-lg'>notes</p>
@@ -78,16 +73,8 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
                 value={projectState.notes ?? ''}
                 onChange={(event) => projectDispatch({ type: 'changed_notes', notes: event.target.value })}
                 className='rounded p-1 text-sm bg-primary text-secondary h-full'
-                rows={4}
+                rows={6}
               />
-              <button
-                type='button'
-                disabled={!projectState.selectedProject}
-                onClick={() => onUpdate(projectState)}
-                className='bg-accent px-4 py-2 rounded disabled:pointer-events-none disabled:opacity-50 hover:brightness-90 duration-100'
-              >
-                update
-              </button>
             </div>
           </div>
         </div>
@@ -96,11 +83,11 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
         <div>
           <ul className='space-y-2'>
             {contributors.map(c => (
-              <li key={c.id}><button onClick={() => handleAddContributor(c)}><span className='font-bold text-accent'>{c.artist_name}</span> - {c.first_name}</button></li>
+              <li key={c.id}><button onClick={() => handleAddContributor(c)}><span className='font-bold text-accent  hover:brightness-75 duration-100'>{c.artist_name}</span> - {c.first_name}</button></li>
             ))}
           </ul>
         </div>
       </Modal>
-    </>
+    </div>
   );
 }
