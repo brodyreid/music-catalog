@@ -1,10 +1,6 @@
-import Cross from '@icons/Cross.tsx';
-import Plus from '@icons/Plus.tsx';
-import { Dispatch, useState } from 'react';
-import useFetchData from '../hooks/useFetchData.tsx';
+import { Dispatch } from 'react';
 import { ProjectActions, ProjectState } from '../reducers/projectReducer.ts';
-import { Contributor } from '../types.ts';
-import Modal from './Modal.tsx';
+import ProjectContributors from './ProjectContributors.tsx';
 
 interface ProjectActionsProps {
   projectState: ProjectState;
@@ -13,18 +9,6 @@ interface ProjectActionsProps {
 }
 
 export default function ProjectActions({ projectState, projectDispatch, onUpdate }: ProjectActionsProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data: contributors } = useFetchData<Contributor>('http://localhost:3000/contributors');
-
-  function handleRemoveContributor(contributorId: string) {
-    projectDispatch({ type: 'removed_contributor', contributorId });
-  }
-
-  function handleAddContributor(contributor: Contributor) {
-    projectDispatch({ type: 'added_contributor', contributor });
-    setIsModalOpen(false);
-  }
-
   return (
     <div>
       {projectState.selectedProject && (
@@ -34,19 +18,7 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
         <div className='flex flex-col justify-between min-w-64'>
           <div>
             <p className='text-lg'>contributors</p>
-            <ul className='rounded p-2 bg-primary text-secondary space-y-2'>
-              {projectState.contributors?.map(c => (
-                <li key={c.id} className='flex items-center justify-between'>
-                  <div className='font-bold text-accent'>{c.artist_name}</div>
-                  <button onClick={() => handleRemoveContributor(c.id)}><Cross className='w-4' /></button>
-                </li>
-              ))}
-              <li className='text-sm'>
-                <button type='button' className='bg-transparent text-stone-500 hover:brightness-75 duration-100 ring-0 border-none outline-none' onClick={() => setIsModalOpen(true)}>
-                  <div className='flex items-center'><Plus className='w-4 mr-1' />add contributor</div>
-                </button>
-              </li>
-            </ul>
+            <ProjectContributors projectState={projectState} projectDispatch={projectDispatch} />
           </div>
           <button
             type='button'
@@ -79,15 +51,6 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
           </div>
         </div>
       </div >
-      <Modal isOpen={isModalOpen} closeModal={() => setIsModalOpen(false)}>
-        <div>
-          <ul className='space-y-2'>
-            {contributors.map(c => (
-              <li key={c.id}><button onClick={() => handleAddContributor(c)}><span className='font-bold text-accent  hover:brightness-75 duration-100'>{c.artist_name}</span> - {c.first_name}</button></li>
-            ))}
-          </ul>
-        </div>
-      </Modal>
     </div>
   );
 }

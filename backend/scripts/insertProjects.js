@@ -13,7 +13,7 @@ async function insertProjects(baseDir) {
           INSERT INTO projects (id, title, folder_path, date_created)
           VALUES ($1, $2, $3, $4)
           ON CONFLICT (id)
-          DO UPDATE SET folder_path = EXCLUDED.folder_path, date_created = EXCLUDED.date_created;
+          DO NOTHING;
           `,
           [id, title, folder_path, date_created]
         );

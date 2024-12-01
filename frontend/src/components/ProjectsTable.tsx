@@ -76,7 +76,7 @@ export default function ProjectsTable({ projects, projectState, projectDispatch,
                             <button type='button' className='mr-2 font-bold text-tertiary' onClick={() => handleNotesButtonClick(id)}>i</button>
                           </div>
                           {(showTooltip.show && showTooltip.rowId === id) &&
-                            <div ref={tooltipRef} className='absolute top-full bg-stone-300 p-2 max-w-80 whitespace-normal rounded-md text-secondary font-normal z-20'>{notes}</div>
+                            <div ref={tooltipRef} className='absolute top-full bg-stone-300 p-2 max-w-80 whitespace-pre-wrap rounded-md text-secondary font-normal z-20'>{notes}</div>
                           }
                         </>
                       }
