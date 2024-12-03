@@ -1,9 +1,9 @@
 import { useEffect, useReducer, useState } from 'react';
-import useFetchData from '../hooks/useFetchData.tsx';
+import { usePagination } from '../hooks/usePagination.tsx';
 import useToast from '../hooks/useToast.tsx';
 import { projectReducer } from '../reducers/projectReducer.ts';
 import { Project, SortOptions } from '../types.ts';
-import { formatDate, saveData } from '../utils.ts';
+import { saveData } from '../utils.ts';
 import ProjectActions from './ProjectActions.tsx';
 import ProjectsTable from './ProjectsTable.tsx';
 import Search from './Search.tsx';
@@ -20,32 +20,8 @@ export default function Projects() {
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');
   const { showToast, ToastComponent } = useToast();
   const [projectState, projectDispatch] = useReducer(projectReducer, { selectedProject: null, release_name: null, notes: null, contributors: [] });
-  const { data: projects, loading, error: fetchError } = useFetchData<Project>('http://localhost:3000/projects');
-
-  useEffect(() => {
-    if (!projects.length) { return; }
-
-    const cleanProjects = projects.map(({ title, versions, ...rest }) => ({
-      title: title.replace('Project', '').trim(),
-      versions: versions,
-      ...rest,
-    }));
-
-    setFilteredProjects(cleanProjects
-      .filter(project => {
-        const wordsToSearch: string[] = currentSearchTerm ? currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '') : [];
-        return wordsToSearch.every(word =>
-          project.title.toLowerCase().includes(word) ||
-          project.folder_path.toLowerCase().includes(word) ||
-          project.notes?.toLowerCase().includes(word) ||
-          project.release_name?.toLowerCase().includes(word) ||
-          project.contributors?.map(c => [c.first_name, c.artist_name]).join(' ').toLowerCase().includes(word) ||
-          project.versions?.map(v => v.name).join(' ').toLowerCase().includes(word) ||
-          project.date_created && formatDate(project.date_created).toLowerCase().includes(word)
-        );
-      }
-      ));
-  }, [currentSearchTerm, projects]);
+  // const { data: projects, loading, error: fetchError } = useFetchData<Project>('http://localhost:3000/projects');
+  const { currentData: projects, currentPage, loading, numberOfPages, error: fetchError, handleChangePage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
 
   const sortByDate = (direction: SortOptions) => {
     const newData = projects.sort((a, b) => {
@@ -85,6 +61,12 @@ export default function Projects() {
     }
   };
 
+  useEffect(() => {
+    setFilteredProjects(projects);
+  }, [projects]);
+
+  console.log({ currentPage, numberOfPages, projects, filteredProjects });
+
   if (!projects.length) {
     return (
       <div>Sorry gamer, we couldn't find any projects :/</div>
@@ -115,7 +97,14 @@ export default function Projects() {
         <ProjectActions projectState={projectState} projectDispatch={projectDispatch} onUpdate={handleUpdateProject} />
       </div>
       {filteredProjects?.length && (
-        <ProjectsTable projects={filteredProjects} projectState={projectState} projectDispatch={projectDispatch} sortDirection={sortDirection} onSort={sortByDate} />
+        <>
+          <div className='flex justify-center mt-16'>
+            {currentPage > 1 && <button onClick={() => handleChangePage('backward')} className='px-2' >{currentPage - 1}</button>}
+            <p className='underline underline-offset-4 px-2'>{currentPage}</p>
+            {currentPage < (numberOfPages - 1) && <button onClick={() => handleChangePage('forward')} className='px-2'>{currentPage + 1}</button>}
+          </div>
+          <ProjectsTable projects={filteredProjects} projectState={projectState} projectDispatch={projectDispatch} sortDirection={sortDirection} onSort={sortByDate} />
+        </>
       )}
     </>
   );
