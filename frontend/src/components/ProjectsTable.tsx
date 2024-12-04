@@ -79,7 +79,7 @@ export default function ProjectsTable({ projects, projectState, projectDispatch,
                         }
                       </>
                     }
-                    <button type='button' onClick={() => projectDispatch({ type: 'set_selected_project', project })} className='cursor-pointer hover:brightness-75 duration-100'>{title}</button>
+                    <button type='button' onClick={() => projectDispatch({ type: 'set_selected_project', project })} className='cursor-pointer hover'>{title}</button>
                   </>
                 }
               </td>

@@ -8,8 +8,8 @@ export default function Navbar() {
         <h2 className="text-[#9D74B3]">music-catalog</h2>
       </div>
       <div className='flex gap-4 p-4'>
-        <Link to={'/projects'} className='hover:brightness-75 duration-100'>projects</Link>
-        <Link to={'/contributors'} className='hover:brightness-75 duration-100'>contributors</Link>
+        <Link to={'/projects'} className='hover'>projects</Link>
+        <Link to={'/contributors'} className='hover'>contributors</Link>
       </div>
     </div>
   );

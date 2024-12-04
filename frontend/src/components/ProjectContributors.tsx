@@ -26,11 +26,11 @@ export default function ProjectContributors({ projectDispatch, projectState }: P
 
   return (
     <>
-      <Modal isOpen={isModalOpen} closeModal={() => setIsModalOpen(false)} dimensions={{w: 80, h: 64}}>
+      <Modal isOpen={isModalOpen} closeModal={() => setIsModalOpen(false)} dimensions={{ w: 80, h: 64 }}>
         <div>
           <ul className='space-y-2'>
             {contributors.map(c => (
-              <li key={c.id}><button onClick={() => handleAddContributor(c)}><span className='font-bold text-accent  hover:brightness-75 duration-100'>{c.artist_name}</span> - {c.first_name}</button></li>
+              <li key={c.id}><button onClick={() => handleAddContributor(c)}><span className='font-bold text-accent hover'>{c.artist_name}</span> - {c.first_name}</button></li>
             ))}
           </ul>
         </div>
@@ -43,7 +43,7 @@ export default function ProjectContributors({ projectDispatch, projectState }: P
           </li>
         ))}
         <li className='text-sm'>
-          <button type='button' className='bg-transparent text-stone-500 hover:brightness-75 duration-100 ring-0 border-none outline-none' onClick={() => setIsModalOpen(true)}>
+          <button type='button' className='bg-transparent text-stone-500 hover ring-0 border-none outline-none' onClick={() => setIsModalOpen(true)}>
             <div className='flex items-center'><Plus className='w-4 mr-1' />add contributor</div>
           </button>
         </li>

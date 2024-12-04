@@ -54,7 +54,7 @@ export default function UpdateContributor({ selectedContributor, onUpdateContrib
           <p>artist_name</p>
           <input type='text' value={artistName} onChange={(event) => setArtistName(event.target.value)} className='rounded p-2 bg-primary text-secondary' />
         </div>
-        <button type='button' onClick={handleSubmit} className='mt-2 bg-accent px-4 py-2 rounded hover:brightness-90 duration-100'>
+        <button type='button' onClick={handleSubmit} className='mt-2 bg-accent px-4 py-2 rounded hover'>
           {selectedContributor ? 'update' : 'add'}
         </button>
       </div>

@@ -24,7 +24,7 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
             type='button'
             disabled={!projectState.selectedProject}
             onClick={() => onUpdate(projectState)}
-            className='bg-accent px-4 py-2 rounded disabled:pointer-events-none disabled:opacity-50 hover:brightness-90 duration-100'
+            className='bg-accent px-4 py-2 rounded disabled:pointer-events-none disabled:opacity-50 hover'
           >
             update
           </button>

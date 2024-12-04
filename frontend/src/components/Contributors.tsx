@@ -48,7 +48,7 @@ export default function Contributors() {
               return (
                 <tr
                   key={id}
-                  className={`relative cursor-pointer hover:brightness-75 duration-100 ${selectedContributor?.id === id && 'font-bold text-orange-300'}`}
+                  className={`relative cursor-pointer hover ${selectedContributor?.id === id && 'font-bold text-orange-300'}`}
                   onClick={() => handleSelectContributor(contributor)}
                 >
                   <td className='text-nowrap pr-3'>{first_name}</td>

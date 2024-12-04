@@ -15,13 +15,12 @@ interface UpdateProjectBody {
 }
 
 export default function Projects() {
-  const [currentSearchTerm, setCurrentSearchTerm] = useState<string>();
+  const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');
   const { showToast, ToastComponent } = useToast();
   const [projectState, projectDispatch] = useReducer(projectReducer, { selectedProject: null, release_name: null, notes: null, contributors: [] });
-  // const { data: projects, loading, error: fetchError } = useFetchData<Project>('http://localhost:3000/projects');
-  const { currentData: projects, currentPage, loading, numberOfPages, error: fetchError, handleChangePage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
+  const { currentData: projects, currentPage, loading, numberOfPages, error: fetchError, refetch, PaginationNumbers, setCurrentPage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
 
   const sortByDate = (direction: SortOptions) => {
     const newData = projects.sort((a, b) => {
@@ -39,6 +38,16 @@ export default function Projects() {
 
     setSortDirection(direction);
     setFilteredProjects(newData);
+  };
+
+  const resetProjectsList = () => {
+    setCurrentSearchTerm('');
+    refetch();
+  };
+
+  const handleSearch = (term: string) => {
+    setCurrentSearchTerm(term);
+    setCurrentPage(1);
   };
 
   const handleUpdateProject = async () => {
@@ -65,14 +74,6 @@ export default function Projects() {
     setFilteredProjects(projects);
   }, [projects]);
 
-  console.log({ currentPage, numberOfPages, projects, filteredProjects });
-
-  if (!projects.length) {
-    return (
-      <div>Sorry gamer, we couldn't find any projects :/</div>
-    );
-  }
-
   if (fetchError) {
     console.error(fetchError);
     return (
@@ -93,16 +94,12 @@ export default function Projects() {
     <>
       <ToastComponent />
       <div className='flex items-start justify-between'>
-        <Search onSearch={setCurrentSearchTerm} />
+        <Search onSearch={handleSearch} handleReset={resetProjectsList} currentSearchTerm={currentSearchTerm} />
         <ProjectActions projectState={projectState} projectDispatch={projectDispatch} onUpdate={handleUpdateProject} />
       </div>
       {filteredProjects?.length && (
         <>
-          <div className='flex justify-center mt-16'>
-            {currentPage > 1 && <button onClick={() => handleChangePage('backward')} className='px-2' >{currentPage - 1}</button>}
-            <p className='underline underline-offset-4 px-2'>{currentPage}</p>
-            {currentPage < (numberOfPages - 1) && <button onClick={() => handleChangePage('forward')} className='px-2'>{currentPage + 1}</button>}
-          </div>
+          <PaginationNumbers />
           <ProjectsTable projects={filteredProjects} projectState={projectState} projectDispatch={projectDispatch} sortDirection={sortDirection} onSort={sortByDate} />
         </>
       )}

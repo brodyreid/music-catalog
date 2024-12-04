@@ -4,15 +4,46 @@ import { formatDate } from '../utils.ts';
 import useFetchData from './useFetchData.tsx';
 
 export const usePagination = (url: string, currentSearchTerm?: string) => {
-  const { data: projects, loading, error } = useFetchData<Project>(url);
+  const { data: projects, loading, error, refetch } = useFetchData<Project>(url);
   const [currentData, setCurrentData] = useState<Project[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [numberOfPages, setNumberOfPages] = useState(0);
 
   const postsPerPage = 50;
 
-  const handleChangePage = (direction: 'forward' | 'backward') => {
-    setCurrentPage(prev => direction === 'forward' ? prev + 1 : prev - 1);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const PaginationNumbers = () => {
+    return (
+      <div className='flex justify-center mt-16'>
+        {currentPage > 2 && (
+          <>
+            <button onClick={() => handlePageChange(1)} className='px-2 hover'>1</button>
+            <p>...</p>
+          </>
+        )}
+        {currentPage > 1 && (
+          <>
+            <button onClick={() => handlePageChange(currentPage - 1)} className='px-2 hover'>{currentPage - 1}</button>
+
+          </>
+        )}
+        <p className='underline underline-offset-4 px-2'>{currentPage}</p>
+        {currentPage < numberOfPages && (
+          <>
+            <button onClick={() => handlePageChange(currentPage + 1)} className='px-2 hover'>{currentPage + 1}</button>
+            {currentPage < (numberOfPages - 2) && (
+              <>
+                <p>...</p>
+                <button onClick={() => handlePageChange(numberOfPages)} className='px-2 hover'>{numberOfPages}</button>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    );
   };
 
   const searchProjects = (projects: Project[]) => {
@@ -52,5 +83,5 @@ export const usePagination = (url: string, currentSearchTerm?: string) => {
     setCurrentData(searchedProjects.slice(startIndex, stopIndex));
   }, [projects, currentPage, currentSearchTerm]);
 
-  return { numberOfPages, currentPage, currentData, handleChangePage, loading, error };
+  return { numberOfPages, currentPage, currentData, handlePageChange, loading, error, refetch, PaginationNumbers, setCurrentPage };
 };
