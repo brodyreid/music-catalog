@@ -83,5 +83,5 @@ export const usePagination = (url: string, currentSearchTerm?: string) => {
     setCurrentData(searchedProjects.slice(startIndex, stopIndex));
   }, [projects, currentPage, currentSearchTerm]);
 
-  return { numberOfPages, currentPage, currentData, handlePageChange, loading, error, refetch, PaginationNumbers, setCurrentPage };
+  return { currentData, handlePageChange, loading, error, refetch, PaginationNumbers, setCurrentPage };
 };

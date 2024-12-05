@@ -17,7 +17,7 @@ app.listen(PORT, () => {
 app.get('/projects', async (_req, res) => {
   try {
     const result = await pool.query(`
-      SELECT p.id, p.title, p.release_name, p.folder_path, p.notes, p.date_created, JSONB_AGG(DISTINCT jsonb_build_object('id', c.id, 'first_name', c.first_name, 'artist_name', c.artist_name)) FILTER (WHERE c.id IS NOT NULL) AS contributors, JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'name', v."name")) FILTER (WHERE v.id IS NOT NULL) AS versions
+      SELECT p.id, p.title, p.release_name, p.folder_path, p.notes, p.date_created, p.bpm, p.musical_key, JSONB_AGG(DISTINCT jsonb_build_object('id', c.id, 'first_name', c.first_name, 'artist_name', c.artist_name)) FILTER (WHERE c.id IS NOT NULL) AS contributors, JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'name', v."name")) FILTER (WHERE v.id IS NOT NULL) AS versions
       FROM projects p
       LEFT JOIN project_contributors pc ON
       pc.project_id = p.id
@@ -37,7 +37,7 @@ app.get('/projects', async (_req, res) => {
 
 app.post('/project/:id', async (req, res) => {
   const { id } = req.params;
-  const { release_name, notes, contributor_ids } = req.body;
+  const { release_name, notes, bpm, musical_key, contributor_ids } = req.body;
   const client = await pool.connect();
 
   if (!id) {
@@ -48,10 +48,10 @@ app.post('/project/:id', async (req, res) => {
     await client.query('BEGIN');
     const projectResult = await client.query(`
       UPDATE projects
-      SET release_name = $2, notes = $3
+      SET release_name = $2, notes = $3, bpm = $4, musical_key = $5
       WHERE id = $1
       RETURNING *;
-      `, [id, release_name, notes]);
+      `, [id, release_name, notes, bpm, musical_key]);
     await client.query(`
       DELETE FROM project_contributors
       WHERE project_id = $1;  

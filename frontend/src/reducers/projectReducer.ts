@@ -1,9 +1,11 @@
-import { Contributor, Project } from '../types.ts';
+import { Contributor, MusicalKey, Project } from '../types.ts';
 
 export interface ProjectState {
   selectedProject: Project | null;
   release_name: string | null;
   notes: string | null;
+  bpm: number | null;
+  musical_key: MusicalKey | null;
   contributors: Contributor[] | [];
 }
 
@@ -11,6 +13,8 @@ export type ProjectActions =
   { type: 'set_selected_project'; project: Project | null; }
   | { type: 'changed_release_name'; release_name: string; }
   | { type: 'changed_notes'; notes: string; }
+  | { type: 'changed_bpm'; bpm: number; }
+  | { type: 'changed_musical_key'; musical_key: MusicalKey; }
   | { type: 'added_contributor'; contributor: Contributor; }
   | { type: 'removed_contributor'; contributorId: string; };
 
@@ -23,6 +27,8 @@ export function projectReducer(state: ProjectState, action: ProjectActions) {
         selectedProject: action.project,
         release_name: action.project?.release_name ?? null,
         notes: action.project?.notes ?? null,
+        bpm: action.project?.bpm ?? null,
+        musical_key: action.project?.musical_key ?? null,
         contributors: action.project?.contributors ?? []
       };
     }
@@ -38,6 +44,22 @@ export function projectReducer(state: ProjectState, action: ProjectActions) {
       return {
         ...state,
         notes: action.notes || null
+      };
+    }
+
+    case 'changed_bpm': {
+      console.log({ action });
+      return {
+        ...state,
+        bpm: action.bpm || null
+      };
+    }
+
+    case 'changed_musical_key': {
+      console.log({ action });
+      return {
+        ...state,
+        musical_key: action.musical_key || null
       };
     }
 

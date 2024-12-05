@@ -2,7 +2,7 @@ import { useEffect, useReducer, useState } from 'react';
 import { usePagination } from '../hooks/usePagination.tsx';
 import useToast from '../hooks/useToast.tsx';
 import { projectReducer } from '../reducers/projectReducer.ts';
-import { Project, SortOptions } from '../types.ts';
+import { MusicalKey, Project, SortOptions } from '../types.ts';
 import { saveData } from '../utils.ts';
 import ProjectActions from './ProjectActions.tsx';
 import ProjectsTable from './ProjectsTable.tsx';
@@ -11,6 +11,8 @@ import Search from './Search.tsx';
 interface UpdateProjectBody {
   release_name: string | null;
   notes: string | null;
+  bpm: number | null;
+  musical_key: MusicalKey | null;
   contributor_ids: string[];
 }
 
@@ -19,8 +21,8 @@ export default function Projects() {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');
   const { showToast, ToastComponent } = useToast();
-  const [projectState, projectDispatch] = useReducer(projectReducer, { selectedProject: null, release_name: null, notes: null, contributors: [] });
-  const { currentData: projects, currentPage, loading, numberOfPages, error: fetchError, refetch, PaginationNumbers, setCurrentPage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
+  const [projectState, projectDispatch] = useReducer(projectReducer, { selectedProject: null, release_name: null, notes: null, bpm: null, musical_key: null, contributors: [] });
+  const { currentData: projects, loading, error: fetchError, refetch, PaginationNumbers, setCurrentPage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
 
   const sortByDate = (direction: SortOptions) => {
     const newData = projects.sort((a, b) => {
@@ -60,6 +62,8 @@ export default function Projects() {
       const response = await saveData<UpdateProjectBody, { message: string; project: Project; }>(`http://localhost:3000/project/${projectState.selectedProject.id}`, {
         release_name: projectState.release_name,
         notes: projectState.notes,
+        bpm: projectState.bpm,
+        musical_key: projectState.musical_key,
         contributor_ids: projectState.contributors?.map(c => c.id) ?? []
       });
 

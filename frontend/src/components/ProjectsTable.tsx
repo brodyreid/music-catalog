@@ -49,6 +49,7 @@ export default function ProjectsTable({ projects, projectState, projectDispatch,
           <th className='pr-3'>title</th>
           <th className='pr-3'>release_name</th>
           <th className='pr-3'>versions</th>
+          <th className='pr-3'>track_notation</th>
           <th className='pr-3'>folder_path</th>
           <th className='pr-3'>contributors</th>
           <th>
@@ -61,7 +62,7 @@ export default function ProjectsTable({ projects, projectState, projectDispatch,
       </thead>
       <tbody>
         {projects.map(project => {
-          const { id, title, release_name, folder_path, notes, date_created, contributors, versions } = project;
+          const { id, title, release_name, folder_path, notes, date_created, bpm, musical_key, contributors, versions } = project;
           const path = folder_path && folder_path.replace(/^.*\/projects\//i, '/');
 
           return (
@@ -85,6 +86,7 @@ export default function ProjectsTable({ projects, projectState, projectDispatch,
               </td>
               <td className='text-nowrap pr-3'>{release_name}</td>
               <td className='text-nowrap pr-3'>{versions?.length ?? ''}</td>
+              <td className='text-nowrap pr-3'>{bpm && bpm + ' bpm'}{musical_key && ', ' + musical_key}</td>
               <td className='text-nowrap pr-3'>{path}</td>
               <td className='text-nowrap pr-3'>{contributors?.map(c => [c.artist_name]).join(', ')}</td>
               <td className="text-nowrap">{date_created ? formatDate(date_created) : ''}</td>
