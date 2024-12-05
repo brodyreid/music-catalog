@@ -87,13 +87,29 @@ app.get('/contributors', async (_req, res) => {
   }
 });
 
+app.get('/contributor/:id/projects', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(`
+        SELECT p.* FROM projects p
+        JOIN project_contributors pc ON pc.project_id = p.id
+        WHERE pc.contributor_id = $1;
+      `, [id]);
+
+    res.json(result.rows);
+  } catch (error) {
+    serverError(res, error);
+  }
+});
+
 
 app.post('/contributor/:id', async (req, res) => {
   const { id } = req.params;
   const { first_name, artist_name } = req.body;
 
   if (!id || (!first_name && !artist_name)) {
-    return res.status(400).send('first_name AND artist_name cannot both be empty or no id.');
+    return res.status(400).send('first_name AND artist_name cannot both be empty or bad id.');
   }
 
   try {

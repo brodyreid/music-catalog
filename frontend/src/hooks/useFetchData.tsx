@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export default function useFetchData<T>(url: string) {
+export default function useFetchData<T>(url: string, options: { skip?: boolean; } = {}) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -20,6 +20,8 @@ export default function useFetchData<T>(url: string) {
   };
 
   useEffect(() => {
+    if (options.skip) { return; }
+
     fetchData();
   }, [url]);
 

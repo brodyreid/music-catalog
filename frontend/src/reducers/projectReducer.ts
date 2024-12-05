@@ -18,7 +18,6 @@ export type ProjectActions =
   | { type: 'added_contributor'; contributor: Contributor; }
   | { type: 'removed_contributor'; contributorId: string; };
 
-
 export function projectReducer(state: ProjectState, action: ProjectActions) {
   switch (action.type) {
     case 'set_selected_project': {

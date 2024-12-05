@@ -24,7 +24,8 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       'react-hooks/exhaustive-deps': 'off',
-      'react/jsx-max-props-per-line': ['off', { 'maximum': 1, 'when': 'multiline' }]
+      'react/jsx-max-props-per-line': ['off', { 'maximum': 1, 'when': 'multiline' }],
+      'no-explicit-any': 'off'
     },
   },
 );
