@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./pool');
 const { serverError } = require('./utils');
-// const googleDrive = require('./googleDrive');
 
 const app = express();
 app.use(express.json()).use(cors({ origin: process.env.ORIGIN_URL }));
@@ -127,13 +126,3 @@ app.post('/contributor/:id', async (req, res) => {
     serverError(res, error);
   }
 });
-
-// app.get('/list-drive-files', async (_req, res) => {
-//   try {
-//     const result = await googleDrive.listFiles();
-//     res.json(result);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Error listing files from Google Drive' });
-//   }
-// });

@@ -1,39 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { createDeterministicId } = require('./utils');
-// const { stringify } = require('csv-stringify');
-
-
-// const generateCSV = (data, fileName) => {
-//   stringify(data, { header: true }, async (error, output) => {
-//     if (error) {
-//       console.error(error);
-//       return;
-//     }
-
-//     try {
-//       const fullFilePath = path.join(process.cwd(), '/data/', fileName);
-
-//       await fs.writeFile(fullFilePath, output).then(() => console.log(`CSV has been generated at ${fullFilePath}`));
-//     } catch (err) {
-//       console.error(err);
-//     }
-//   }
-//   );
-// };
-// const main = async () => {
-//   console.log('Getting paths and generating CSV...');
-//   try {
-//     const { projectsData, versionsData } = await getPaths(baseDir).then(result => cleanData(result)).catch(console.error);
-//     // console.log('projects\n', projectsData);
-//     // console.log('versions\n', versionsData);
-//     generateCSV(projectsData, 'projects.csv');
-//     generateCSV(versionsData, 'versions.csv');
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
 
 async function getVersions(projectPath) {
   try {
