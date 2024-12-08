@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 
-export default function useFetchData<T>(url: string, options: { skip?: boolean; } = {}) {
+export default function useFetchData<T>(url: string | null, options: { skip?: boolean; } = {}) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchData = async () => {
     try {
-      const response = await fetch(url);
+      const response = await fetch(url!);
       const data = await response.json() as T[];
       setData(data);
       setLoading(false);
@@ -20,10 +20,11 @@ export default function useFetchData<T>(url: string, options: { skip?: boolean; 
   };
 
   useEffect(() => {
-    if (options.skip) { return; }
+    if (!url || options.skip) { return; }
 
+    setData([]);
     fetchData();
-  }, [url]);
+  }, [url, options.skip]);
 
   return { data, loading, error, refetch: fetchData };
 }

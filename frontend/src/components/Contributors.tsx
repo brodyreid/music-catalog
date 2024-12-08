@@ -8,7 +8,7 @@ import UpdateContributor from './UpdateContributor.tsx';
 export default function Contributors() {
   const [contributorState, contributorDispatch] = useReducer(contributorReducer, { selectedContributor: null });
   const { data, refetch } = useFetchData<Contributor>('http://localhost:3000/contributors');
-  const { data: contributorProjectsData } = useFetchData<Project>(`http://localhost:3000/contributor/${contributorState.selectedContributor?.id}/projects`, { skip: !contributorState.selectedContributor?.id });
+  const { data: contributorProjectsData } = useFetchData<Project>(contributorState.selectedContributor?.id ? `http://localhost:3000/contributor/${contributorState.selectedContributor.id}/projects` : null, { skip: !contributorState.selectedContributor?.id });
 
   const handleSelectContributor = (contributor: Contributor) => {
     if (contributor.id === contributorState.selectedContributor?.id) {
