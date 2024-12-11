@@ -102,7 +102,6 @@ app.get('/contributor/:id/projects', async (req, res) => {
   }
 });
 
-
 app.post('/contributor/:id', async (req, res) => {
   const { id } = req.params;
   const { first_name, artist_name } = req.body;
@@ -120,6 +119,18 @@ app.post('/contributor/:id', async (req, res) => {
       SET first_name = COALESCE(EXCLUDED.first_name, contributors.first_name), artist_name = COALESCE(EXCLUDED.artist_name, contributors.artist_name)
       RETURNING *;
       `, [id, first_name, artist_name]);
+
+    res.json(result.rows);
+  } catch (error) {
+    serverError(res, error);
+  }
+});
+
+app.get('/albums', async (_req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM album_projects;
+      `);
 
     res.json(result.rows);
   } catch (error) {

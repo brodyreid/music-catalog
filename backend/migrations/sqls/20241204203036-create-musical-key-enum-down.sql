@@ -1,1 +1,1 @@
-/* Replace with your SQL commands */
+DROP TYPE musical_key;

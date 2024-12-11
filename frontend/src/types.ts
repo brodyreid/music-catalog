@@ -47,4 +47,11 @@ export enum MusicalKey {
   B_MINOR = 'B Minor'
 }
 
+export interface Album {
+  id: string;
+  title: string | null;
+  notes: string | null;
+  release_date: string | null;
+}
+
 export type SortOptions = 'asc' | 'desc' | null;
