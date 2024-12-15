@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "allowUmdGlobalAccess": true,
+    "baseUrl": ".",
     "jsx": "react-jsx",
     "lib": [
       "ES2023",
@@ -9,7 +10,9 @@
       "DOM.Iterable"
     ],
     "paths": {
-      "@icons/*": ["./src/icons/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "module": "NodeNext",
     "noEmit": true,

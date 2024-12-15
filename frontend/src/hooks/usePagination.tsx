@@ -1,6 +1,6 @@
+import { Project } from '@/types.ts';
+import { formatDate } from '@/utils.ts';
 import { useEffect, useState } from 'react';
-import { Project } from '../types.ts';
-import { formatDate } from '../utils.ts';
 import useFetchData from './useFetchData.tsx';
 
 export const usePagination = (url: string, currentSearchTerm?: string) => {

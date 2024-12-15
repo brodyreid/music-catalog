@@ -1,13 +1,13 @@
+import Button from '@/components/ui/Button.tsx';
+import useFetchData from '@/hooks/useFetchData.tsx';
+import { contributorReducer } from '@/reducers/contributorReducer.ts';
+import { Contributor } from '@/types.ts';
+import { generateId, saveData } from '@/utils.ts';
 import { useReducer, useState } from 'react';
-import useFetchData from '../hooks/useFetchData.tsx';
-import { contributorReducer } from '../reducers/contributorReducer.ts';
-import { Contributor } from '../types.ts';
-import { generateId, saveData } from '../utils.ts';
 import CreateContributor from './CreateContributor.tsx';
-import Button from './ui/Button.tsx';
 import UpdateContributor from './UpdateContributor.tsx';
 
-export default function Contributors() {
+export default function ContributorList() {
   const [isCreating, setIsCreating] = useState(false);
   const [state, dispatch] = useReducer(contributorReducer, { current: null, first_name: '', artist_name: '' });
   const { current, first_name, artist_name } = state;

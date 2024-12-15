@@ -1,10 +1,10 @@
-import Cross from '@icons/Cross.tsx';
-import Plus from '@icons/Plus.tsx';
+import Modal from '@/components/shared/Modal.tsx';
+import useFetchData from '@/hooks/useFetchData.tsx';
+import Cross from '@/icons/Cross.tsx';
+import Plus from '@/icons/Plus.tsx';
+import { ProjectActions, ProjectState } from '@/reducers/projectReducer.ts';
+import { Contributor } from '@/types.ts';
 import { Dispatch, useState } from 'react';
-import useFetchData from '../hooks/useFetchData.tsx';
-import { ProjectActions, ProjectState } from '../reducers/projectReducer.ts';
-import { Contributor } from '../types.ts';
-import Modal from './Modal.tsx';
 
 interface ProjectContributorsProps {
   projectState: ProjectState;

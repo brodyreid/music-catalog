@@ -1,4 +1,4 @@
-import Cross from '@icons/Cross.tsx';
+import Cross from '@/icons/Cross.tsx';
 import { useState } from 'react';
 
 export default function useToast() {

@@ -1,4 +1,4 @@
-import RotateCw from '@icons/RotateCw.tsx';
+import RotateCw from '@/icons/RotateCw.tsx';
 
 interface SearchProps {
   onSearch: (term: string) => void;

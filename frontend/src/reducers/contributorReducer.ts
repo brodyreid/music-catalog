@@ -1,4 +1,4 @@
-import { Contributor } from '../types.ts';
+import { Contributor } from '@/types.ts';
 
 export interface ContributorState {
   current: Contributor | null;

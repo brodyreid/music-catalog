@@ -1,4 +1,4 @@
-import { Contributor, MusicalKey, Project } from '../types.ts';
+import { Contributor, MusicalKey, Project } from '@/types.ts';
 
 export interface ProjectState {
   selectedProject: Project | null;
@@ -18,11 +18,10 @@ export type ProjectActions =
   | { type: 'added_contributor'; contributor: Contributor; }
   | { type: 'removed_contributor'; contributorId: string; };
 
-export function projectReducer(state: ProjectState, action: ProjectActions) {
+export function projectReducer(state: ProjectState, action: ProjectActions): ProjectState {
   switch (action.type) {
     case 'set_selected_project': {
       return {
-        ...state,
         selectedProject: action.project,
         release_name: action.project?.release_name ?? null,
         notes: action.project?.notes ?? null,

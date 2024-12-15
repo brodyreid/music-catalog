@@ -1,8 +1,8 @@
+import AlbumList from '@/components/Albums/AlbumList.tsx';
+import ContributorList from '@/components/Contributors/ContributorList.tsx';
+import ProjectList from '@/components/Projects/ProjectList.tsx';
+import Navbar from '@/components/shared/Navbar.tsx';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Albums from './components/Albums.tsx';
-import Contributors from './components/Contributors.tsx';
-import Navbar from './components/Navbar.tsx';
-import Projects from './components/Projects.tsx';
 
 export default function App() {
   return (
@@ -10,10 +10,10 @@ export default function App() {
       <Navbar />
       <div className="container mx-auto">
         <Routes>
-          <Route path='/' element={<Projects />} />
-          <Route path='/projects' element={<Projects />} />
-          <Route path='/albums' element={<Albums />} />
-          <Route path='/contributors' element={<Contributors />} />
+          <Route path='/' element={<ProjectList />} />
+          <Route path='/projects' element={<ProjectList />} />
+          <Route path='/albums' element={<AlbumList />} />
+          <Route path='/contributors' element={<ContributorList />} />
         </Routes>
       </div>
     </BrowserRouter>

@@ -1,10 +1,11 @@
+import SelectField from '@/components/ui/SelectField.tsx';
+import TextArea from '@/components/ui/TextArea.tsx';
+import TextField from '@/components/ui/TextField.tsx';
+import { ProjectActions, ProjectState } from '@/reducers/projectReducer.ts';
+import { MusicalKey } from '@/types.ts';
 import { Dispatch } from 'react';
-import { ProjectActions, ProjectState } from '../reducers/projectReducer.ts';
-import { MusicalKey } from '../types.ts';
 import ProjectContributors from './ProjectContributors.tsx';
-import SelectField from './ui/SelectField.tsx';
-import TextArea from './ui/TextArea.tsx';
-import TextField from './ui/TextField.tsx';
+
 
 interface ProjectActionsProps {
   projectState: ProjectState;

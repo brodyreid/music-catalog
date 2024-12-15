@@ -1,12 +1,12 @@
+import useFetchData from '@/hooks/useFetchData.tsx';
+import { albumReducer } from '@/reducers/albumReducer.ts';
+import { Album } from '@/types.ts';
+import { formatDate, generateId, saveData } from '@/utils.ts';
 import { useReducer } from 'react';
-import useFetchData from '../hooks/useFetchData.tsx';
-import { albumReducer } from '../reducers/albumReducer.ts';
-import { Album } from '../types.ts';
-import { formatDate, generateId, saveData } from '../utils.ts';
 import CreateAlbum from './CreateAlbum.tsx';
 
-export default function Albums() {
-  const [state, dispatch] = useReducer(albumReducer, { title: null, notes: null, release_date: null });
+export default function AlbumList() {
+  const [state, dispatch] = useReducer(albumReducer, { current: null, title: '', notes: '', release_date: '' });
   const { title, notes, release_date } = state;
   const { data, error, refetch } = useFetchData<Album>('http://localhost:3000/albums');
 

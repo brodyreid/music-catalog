@@ -1,12 +1,12 @@
+import Search from '@/components/shared/Search.tsx';
+import { usePagination } from '@/hooks/usePagination.tsx';
+import useToast from '@/hooks/useToast.tsx';
+import { projectReducer } from '@/reducers/projectReducer.ts';
+import { MusicalKey, Project, SortOptions } from '@/types.ts';
+import { saveData } from '@/utils.ts';
 import { useEffect, useReducer, useState } from 'react';
-import { usePagination } from '../hooks/usePagination.tsx';
-import useToast from '../hooks/useToast.tsx';
-import { projectReducer } from '../reducers/projectReducer.ts';
-import { MusicalKey, Project, SortOptions } from '../types.ts';
-import { saveData } from '../utils.ts';
 import ProjectActions from './ProjectActions.tsx';
 import ProjectsTable from './ProjectsTable.tsx';
-import Search from './Search.tsx';
 
 interface UpdateProjectBody {
   release_name: string | null;
@@ -16,7 +16,7 @@ interface UpdateProjectBody {
   contributor_ids: string[];
 }
 
-export default function Projects() {
+export default function ProjectList() {
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');

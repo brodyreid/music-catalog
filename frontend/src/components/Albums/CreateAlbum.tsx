@@ -1,9 +1,9 @@
+import Button from '@/components/ui/Button.tsx';
+import DateField from '@/components/ui/DateField.tsx';
+import TextArea from '@/components/ui/TextArea.tsx';
+import TextField from '@/components/ui/TextField.tsx';
+import { AlbumActions, AlbumState } from '@/reducers/albumReducer.ts';
 import { Dispatch } from 'react';
-import { AlbumActions, AlbumState } from '../reducers/albumReducer.ts';
-import Button from './ui/Button.tsx';
-import DateField from './ui/DateField.tsx';
-import TextArea from './ui/TextArea.tsx';
-import TextField from './ui/TextField.tsx';
 
 interface CreateAlbumProps {
   state: AlbumState;

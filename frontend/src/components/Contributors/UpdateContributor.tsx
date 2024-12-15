@@ -1,7 +1,7 @@
+import Button from '@/components/ui/Button.tsx';
+import TextField from '@/components/ui/TextField.tsx';
+import { ContributorActions, ContributorState } from '@/reducers/contributorReducer.ts';
 import { Dispatch } from 'react';
-import { ContributorActions, ContributorState } from '../reducers/contributorReducer.ts';
-import Button from './ui/Button.tsx';
-import TextField from './ui/TextField.tsx';
 
 interface UpdateContributorProps {
   state: ContributorState;
