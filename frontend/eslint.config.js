@@ -25,7 +25,7 @@ export default tseslint.config(
       ],
       'react-hooks/exhaustive-deps': 'off',
       'react/jsx-max-props-per-line': ['off', { 'maximum': 1, 'when': 'multiline' }],
-      'no-explicit-any': 'off'
+      'typescript-eslint/no-explicit-any': 'off'
     },
   },
 );

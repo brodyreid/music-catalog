@@ -23,12 +23,7 @@ export function projectReducer(state: ProjectState, action: ProjectActions) {
     case 'set_selected_project': {
       return {
         ...state,
-        selectedProject: action.project,
-        release_name: action.project?.release_name ?? null,
-        notes: action.project?.notes ?? null,
-        bpm: action.project?.bpm ?? null,
-        musical_key: action.project?.musical_key ?? null,
-        contributors: action.project?.contributors ?? []
+        selectedProject: action.project
       };
     }
 
@@ -47,7 +42,6 @@ export function projectReducer(state: ProjectState, action: ProjectActions) {
     }
 
     case 'changed_bpm': {
-      console.log({ action });
       return {
         ...state,
         bpm: action.bpm || null
@@ -55,7 +49,6 @@ export function projectReducer(state: ProjectState, action: ProjectActions) {
     }
 
     case 'changed_musical_key': {
-      console.log({ action });
       return {
         ...state,
         musical_key: action.musical_key || null

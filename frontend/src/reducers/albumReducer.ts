@@ -1,18 +1,34 @@
-import { Album } from '../types.ts';
-
 export interface AlbumState {
-  selectedAlbum: Album | null;
+  title: string | null;
+  notes: string | null;
+  release_date: string | null;
 }
 
 export type AlbumActions =
-  { type: 'set_selected_album'; album: Album | null; };
+  | { type: 'changed_title'; title: string; }
+  | { type: 'changed_notes'; notes: string; }
+  | { type: 'changed_release_date'; release_date: string; };
 
-export function albumReducer(state: AlbumState, action: AlbumActions) {
+export function albumReducer(state: AlbumState, action: AlbumActions): AlbumState {
   switch (action.type) {
-    case 'set_selected_album': {
+    case 'changed_title': {
       return {
         ...state,
-        selectedAlbum: action.album
+        title: action.title
+      };
+    }
+
+    case 'changed_notes': {
+      return {
+        ...state,
+        notes: action.notes
+      };
+    }
+
+    case 'changed_release_date': {
+      return {
+        ...state,
+        release_date: action.release_date
       };
     }
   }

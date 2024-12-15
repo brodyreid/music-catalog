@@ -10,7 +10,7 @@ export const saveData = async<TBody, TResponse>(url: string, body: TBody): Promi
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body) // "that's fine, right?" - alex
   });
 
   if (!response.ok) {

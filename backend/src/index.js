@@ -129,8 +129,32 @@ app.post('/contributor/:id', async (req, res) => {
 app.get('/albums', async (_req, res) => {
   try {
     const result = await pool.query(`
-      SELECT * FROM album_projects;
+      SELECT * FROM albums;
       `);
+
+    res.json(result.rows);
+  } catch (error) {
+    serverError(res, error);
+  }
+});
+
+app.post('/album/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, notes, release_date } = req.body;
+
+  if (!id) {
+    return res.status(400).send('Bad id.');
+  }
+
+  try {
+    const result = await pool.query(`
+      INSERT INTO albums (id, title, notes, release_date)
+      VALUES ($1, $2, $3, $4)
+      ON CONFLICT (id)
+      DO UPDATE
+      SET title = COALESCE(EXCLUDED.title, albums.title), notes = COALESCE(EXCLUDED.notes, albums.notes), release_date = COALESCE(EXCLUDED.release_date, albums.release_date)
+      RETURNING *;
+      `, [id, title, notes, release_date]);
 
     res.json(result.rows);
   } catch (error) {

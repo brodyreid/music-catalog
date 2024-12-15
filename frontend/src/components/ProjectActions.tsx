@@ -2,6 +2,9 @@ import { Dispatch } from 'react';
 import { ProjectActions, ProjectState } from '../reducers/projectReducer.ts';
 import { MusicalKey } from '../types.ts';
 import ProjectContributors from './ProjectContributors.tsx';
+import SelectField from './ui/SelectField.tsx';
+import TextArea from './ui/TextArea.tsx';
+import TextField from './ui/TextField.tsx';
 
 interface ProjectActionsProps {
   projectState: ProjectState;
@@ -32,32 +35,28 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
         </div>
         <div>
           <p className='text-lg'>release_name</p>
-          <input
-            type="text"
+          <TextField
             value={projectState.release_name ?? ''}
-            onChange={(event) => projectDispatch({ type: 'changed_release_name', release_name: event.target.value ?? null })} className='rounded p-2 bg-primary text-secondary w-full'
+            onChange={(event) => projectDispatch({ type: 'changed_release_name', release_name: event.target.value ?? null })}
           />
           <p className='text-lg'>notes</p>
           <div className='flex flex-col'>
-            <textarea
+            <TextArea
               value={projectState.notes ?? ''}
               onChange={(event) => projectDispatch({ type: 'changed_notes', notes: event.target.value })}
-              className='rounded p-1 text-sm bg-primary text-secondary h-full'
-              rows={6}
+
             />
           </div>
         </div>
         <div>
           <p className='text-lg'>bpm</p>
-          <input
-            type="text"
+          <TextField
             value={projectState.bpm?.toString() ?? ''}
-            onChange={(event) => projectDispatch({ type: 'changed_bpm', bpm: parseInt(event.target.value) ?? null })} className='rounded p-2 bg-primary text-secondary w-full' />
+            onChange={(event) => projectDispatch({ type: 'changed_bpm', bpm: parseInt(event.target.value) ?? null })} />
           <p className='text-lg'>musical_key</p>
-          <select
+          <SelectField
             value={projectState.musical_key ?? ''}
             onChange={(event) => projectDispatch({ type: 'changed_musical_key', musical_key: event.target.value as MusicalKey ?? null })}
-            className='rounded p-2 text-sm bg-primary text-secondary w-full'
           >
             <option>{null}</option>
             {Object.values(MusicalKey).map((key) => (
@@ -65,7 +64,7 @@ export default function ProjectActions({ projectState, projectDispatch, onUpdate
                 {key}
               </option>
             ))}
-          </select>
+          </SelectField>
         </div>
       </div>
     </div>

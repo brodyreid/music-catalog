@@ -43,7 +43,7 @@ export default function ProjectsTable({ projects, projectState, projectDispatch,
   }, [showTooltip]);
 
   return (
-    <table className="font-mono font-extralight text-sm border-separate border-spacing-2">
+    <table className="font-mono font-extralight text-sm border-separate border-spacing-2 mb-12">
       <thead>
         <tr className='text-left border-b'>
           <th className='pr-3'>title</th>
