@@ -1,55 +1,43 @@
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
 import useFetchData from '../hooks/useFetchData.tsx';
 import { contributorReducer } from '../reducers/contributorReducer.ts';
 import { Contributor, Project } from '../types.ts';
 import { generateId, saveData } from '../utils.ts';
-import UpdateContributor from './UpdateContributor.tsx';
+import CreateContributor from './CreateContributor.tsx';
+import Button from './ui/Button.tsx';
 
 export default function Contributors() {
-  const [contributorState, contributorDispatch] = useReducer(contributorReducer, { selectedContributor: null, firstName: null, artistName: null });
-  const { selectedContributor, firstName, artistName } = contributorState;
+  const [isCreateVisible, setIsCreateVisible] = useState(false);
+  const [state, dispatch] = useReducer(contributorReducer, { current: null, first_name: null, artist_name: null });
+  const { current, first_name, artist_name } = state;
   const { data, refetch } = useFetchData<Contributor>('http://localhost:3000/contributors');
-  const { data: contributorProjectsData } = useFetchData<Project>(selectedContributor?.id ? `http://localhost:3000/contributor/${selectedContributor.id}/projects` : null, { skip: !selectedContributor?.id });
+  const { data: contributorProjectsData } = useFetchData<Project>(current?.id ? `http://localhost:3000/contributor/${current.id}/projects` : null, { skip: !current?.id });
 
   const handleSelectContributor = (contributor: Contributor) => {
-    if (contributor.id === selectedContributor?.id) {
-      contributorDispatch({ type: 'set_selected_contributor', contributor: null });
+    if (contributor.id === current?.id) {
+      dispatch({ type: 'set_current_contributor', contributor: null });
     } else {
-      contributorDispatch({ type: 'set_selected_contributor', contributor });
+      dispatch({ type: 'set_current_contributor', contributor });
     }
   };
 
-  const updateContributor = async () => {
-    if ((firstName || artistName)) {
-      const id = selectedContributor ? selectedContributor.id : generateId();
+  const createContributor = async () => {
+    const id = generateId();
 
-      let first_name = null;
-      let artist_name = null;
-
-      if (firstName) {
-        first_name = firstName;
-      } else if (selectedContributor?.first_name) {
-        first_name = selectedContributor.first_name;
-      }
-
-      if (artistName) {
-        artist_name = artistName;
-      } else if (selectedContributor?.artist_name) {
-        artist_name = selectedContributor.artist_name;
-      }
-
-      try {
-        await saveData(`http://localhost:3000/contributor/${id}`, { first_name, artist_name });
-        refetch();
-      } catch (error) {
-        console.error(error);
-      }
+    try {
+      await saveData(`http://localhost:3000/contributor/${id}`, { first_name, artist_name });
+      refetch();
+      setIsCreateVisible(false);
+    } catch (error) {
+      console.error(error);
     }
   };
 
   return (
     <>
-      <UpdateContributor contributorState={contributorState} contributorDispatch={contributorDispatch} onUpdate={updateContributor} />
+      {!isCreateVisible && <Button onClick={() => setIsCreateVisible(true)}>create new contributor</Button>}
+      {isCreateVisible && <CreateContributor state={state} dispatch={dispatch} onSubmit={createContributor} onClose={() => setIsCreateVisible(false)} />}
+      {/* <UpdateContributor state={state} contributorDispatch={contributorDispatch} onUpdate={updateContributor} /> */}
       <div className='flex gap-16 mt-16'>
         <div>
           <table className="font-mono font-extralight text-sm border-separate border-spacing-2">
@@ -66,7 +54,7 @@ export default function Contributors() {
                 return (
                   <tr
                     key={id}
-                    className={`relative cursor-pointer hover ${selectedContributor?.id === id && 'font-bold text-orange-300'}`}
+                    className={`relative cursor-pointer hover ${current?.id === id && 'font-bold text-orange-300'}`}
                     onClick={() => handleSelectContributor(contributor)}
                   >
                     <td className='text-nowrap pr-3'>{first_name}</td>

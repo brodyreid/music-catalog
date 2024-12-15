@@ -1,28 +1,27 @@
 import { Dispatch } from 'react';
 import { ContributorActions, ContributorState } from '../reducers/contributorReducer.ts';
+import Button from './ui/Button.tsx';
 import TextField from './ui/TextField.tsx';
 
 interface UpdateContributorProps {
-  contributorState: ContributorState;
-  contributorDispatch: Dispatch<ContributorActions>;
+  state: ContributorState;
+  dispatch: Dispatch<ContributorActions>;
   onUpdate: (contributorState: ContributorState) => void;
 }
 
-export default function UpdateContributor({ contributorState, contributorDispatch, onUpdate }: UpdateContributorProps) {
+export default function UpdateContributor({ state, dispatch, onUpdate }: UpdateContributorProps) {
   return (
     <>
       <div className='flex flex-col gap-2 w-min'>
         <div>
           <p>first_name</p>
-          <TextField value={contributorState?.firstName || ''} onChange={(event) => contributorDispatch({ type: 'changed_first_name', firstName: event.target.value ?? null })} />
+          <TextField value={state?.first_name || ''} onChange={(event) => dispatch({ type: 'changed_first_name', first_name: event.target.value })} />
         </div>
         <div>
           <p>artist_name</p>
-          <TextField value={contributorState?.artistName || ''} onChange={(event) => contributorDispatch({ type: 'changed_artist_name', artistName: event.target.value ?? null })} />
+          <TextField value={state?.artist_name || ''} onChange={(event) => dispatch({ type: 'changed_artist_name', artist_name: event.target.value })} />
         </div>
-        <button type='button' onClick={() => onUpdate(contributorState)} className='mt-2 bg-accent px-4 py-2 rounded hover'>
-          {contributorState.selectedContributor ? 'update' : 'add'}
-        </button>
+        <Button onClick={() => onUpdate(state)} className='mt-2 bg-green-700'>update</Button>
       </div>
     </>
   );
