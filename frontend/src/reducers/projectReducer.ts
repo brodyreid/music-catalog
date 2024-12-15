@@ -23,7 +23,12 @@ export function projectReducer(state: ProjectState, action: ProjectActions) {
     case 'set_selected_project': {
       return {
         ...state,
-        selectedProject: action.project
+        selectedProject: action.project,
+        release_name: action.project?.release_name ?? null,
+        notes: action.project?.notes ?? null,
+        bpm: action.project?.bpm ?? null,
+        musical_key: action.project?.musical_key ?? null,
+        contributors: action.project?.contributors ?? []
       };
     }
 

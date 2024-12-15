@@ -1,10 +1,9 @@
 import { Dispatch } from 'react';
-import { ContributorActions, ContributorState } from '../reducers/contributorReducer.ts';
+import { ContributorActions } from '../reducers/contributorReducer.ts';
 import Button from './ui/Button.tsx';
 import TextField from './ui/TextField.tsx';
 
 interface CreateContributorProps {
-  state: ContributorState;
   dispatch: Dispatch<ContributorActions>;
   onSubmit: () => void;
   onClose: () => void;
