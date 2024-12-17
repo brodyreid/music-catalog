@@ -1,10 +1,10 @@
 import Button from '@/components/ui/Button.tsx';
-import useFetchData from '@/hooks/useFetchData.tsx';
 import useToast from '@/hooks/useToast.tsx';
 import { contributorReducer } from '@/reducers/contributorReducer.ts';
+import { contributorService } from '@/services/index.ts';
 import { Contributor } from '@/types.ts';
 import { deleteData, generateId, saveData } from '@/utils.ts';
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import CreateContributor from './CreateContributor.tsx';
 import UpdateContributor from './UpdateContributor.tsx';
 
@@ -22,15 +22,28 @@ export default function ContributorList() {
   const [isCreating, setIsCreating] = useState(false);
   const [state, dispatch] = useReducer(contributorReducer, { current: null, first_name: '', artist_name: '' });
   const { current, first_name, artist_name } = state;
-  const { data, refetch } = useFetchData<Contributor>('http://localhost:3000/contributors');
   const { showToast, ToastComponent } = useToast();
+  const [data, setData] = useState<Contributor[]>([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const egg = await contributorService.getAll();
+      setData(egg);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   const createContributor = async () => {
     const id = generateId();
 
     try {
       await saveData(`http://localhost:3000/contributor/${id}`, { first_name, artist_name });
-      refetch();
+      fetchData();
       setIsCreating(false);
     } catch (error) {
       console.error(error);
@@ -48,7 +61,7 @@ export default function ContributorList() {
 
       showToast(response.message + ': ' + response.contributor.first_name + ' ' + response.contributor.artist_name);
       dispatch({ type: 'set_current_contributor', contributor: null });
-      refetch();
+      fetchData();
     } catch (error) {
       console.error(error);
     }
@@ -60,13 +73,17 @@ export default function ContributorList() {
       return;
     }
 
-    try {
-      const response = await deleteData<ContributorResponse>(`http://localhost:3000/contributor/${current?.id}`);
-      showToast(response.message);
-      dispatch({ type: 'set_current_contributor', contributor: null });
-      refetch();
-    } catch (error) {
-      console.error(error);
+    const confirmed = window.confirm('Are you sure you want to delete this item?');
+
+    if (confirmed) {
+      try {
+        const response = await deleteData<ContributorResponse>(`http://localhost:3000/contributor/${current?.id}`);
+        showToast(response.message);
+        dispatch({ type: 'set_current_contributor', contributor: null });
+        fetchData();
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 

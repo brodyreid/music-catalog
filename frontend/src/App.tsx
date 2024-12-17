@@ -3,16 +3,12 @@ import ContributorList from '@/components/Contributors/ContributorList.tsx';
 import ProjectList from '@/components/Projects/ProjectList.tsx';
 import Navbar from '@/components/shared/Navbar.tsx';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import useToast from './hooks/useToast.tsx';
 
 export default function App() {
-  const { ToastComponent } = useToast();
-
   return (
     <BrowserRouter>
-      <ToastComponent />
       <Navbar />
-      <div className="container mx-auto">
+      <div className="container mx-auto px-12">
         <Routes>
           <Route path='/' element={<ProjectList />} />
           <Route path='/projects' element={<ProjectList />} />

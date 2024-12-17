@@ -20,13 +20,6 @@ export const saveData = async<TBody, TResponse>(url: string, body: TBody): Promi
   return response.json();
 };
 
-export const generateId = () => {
-  const array = new Uint8Array(8);
-  window.crypto.getRandomValues(array);
-
-  return Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('');
-};
-
 export const deleteData = async<TResponse>(url: string): Promise<TResponse> => {
   const response = await fetch(url, {
     method: 'DELETE'
@@ -37,4 +30,11 @@ export const deleteData = async<TResponse>(url: string): Promise<TResponse> => {
   }
 
   return response.json();
+};
+
+export const generateId = () => {
+  const array = new Uint8Array(8);
+  window.crypto.getRandomValues(array);
+
+  return Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('');
 };

@@ -13,7 +13,6 @@ interface UpdateContributorProps {
 }
 
 export default function UpdateContributor({ state, dispatch, onSubmit, onClose, onDelete }: UpdateContributorProps) {
-  console.log({ state });
   return (
     <>
       <div className='flex flex-col gap-2 w-min'>
