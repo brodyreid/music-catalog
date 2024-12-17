@@ -88,7 +88,7 @@ export default function ProjectsTable({ projects, projectState, projectDispatch,
               <td className='text-nowrap pr-3'>{versions?.length ?? ''}</td>
               <td className='text-nowrap pr-3'>{bpm && bpm + ' bpm'}{musical_key && ', ' + musical_key}</td>
               <td className='text-nowrap pr-3'>{path}</td>
-              <td className='text-nowrap pr-3'>{contributors?.map(c => [c.artist_name]).join(', ')}</td>
+              <td className='text-nowrap pr-3'>{contributors?.map(c => [c.first_name]).join(', ')}</td>
               <td className="text-nowrap">{date_created ? formatDate(date_created) : ''}</td>
             </tr>
           );

@@ -30,7 +30,7 @@ export default function ProjectContributors({ projectDispatch, projectState }: P
         <div>
           <ul className='space-y-2'>
             {contributors.map(c => (
-              <li key={c.id}><button onClick={() => handleAddContributor(c)}><span className='font-bold text-accent hover'>{c.artist_name}</span> - {c.first_name}</button></li>
+              <li key={c.id}><button className='font-bold text-accent hover' onClick={() => handleAddContributor(c)}>{c.first_name}</button></li>
             ))}
           </ul>
         </div>
@@ -38,7 +38,7 @@ export default function ProjectContributors({ projectDispatch, projectState }: P
       <ul className='rounded p-2 bg-primary text-secondary space-y-2'>
         {projectState.contributors?.map(c => (
           <li key={c.id} className='flex items-center justify-between'>
-            <div className='font-bold text-accent'>{c.artist_name}</div>
+            <div className='font-bold text-accent'>{c.first_name}</div>
             <button onClick={() => handleRemoveContributor(c.id)}><Cross className='w-4' /></button>
           </li>
         ))}

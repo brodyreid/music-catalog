@@ -16,11 +16,16 @@ interface UpdateProjectBody {
   contributor_ids: string[];
 }
 
+interface UpdateProjectResponse {
+  message: string;
+  project: Project;
+}
+
 export default function ProjectList() {
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');
-  const { showToast, ToastComponent } = useToast();
+  const { showToast } = useToast();
   const [projectState, projectDispatch] = useReducer(projectReducer, { selectedProject: null, release_name: null, notes: null, bpm: null, musical_key: null, contributors: [] });
   const { currentData: projects, loading, error: fetchError, refetch, PaginationNumbers, setCurrentPage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
 
@@ -59,7 +64,7 @@ export default function ProjectList() {
     }
 
     try {
-      const response = await saveData<UpdateProjectBody, { message: string; project: Project; }>(`http://localhost:3000/project/${projectState.selectedProject.id}`, {
+      const response = await saveData<UpdateProjectBody, UpdateProjectResponse>(`http://localhost:3000/project/${projectState.selectedProject.id}`, {
         release_name: projectState.release_name,
         notes: projectState.notes,
         bpm: projectState.bpm,
@@ -77,6 +82,8 @@ export default function ProjectList() {
   useEffect(() => {
     setFilteredProjects(projects);
   }, [projects]);
+
+  console.log(filteredProjects);
 
   if (fetchError) {
     console.error(fetchError);
@@ -96,7 +103,6 @@ export default function ProjectList() {
 
   return (
     <>
-      <ToastComponent />
       <div className='flex items-start justify-between'>
         <Search onSearch={handleSearch} handleReset={resetProjectsList} currentSearchTerm={currentSearchTerm} />
         <ProjectActions projectState={projectState} projectDispatch={projectDispatch} onUpdate={handleUpdateProject} />

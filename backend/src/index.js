@@ -77,7 +77,7 @@ app.post('/project/:id', async (req, res) => {
 app.get('/contributors', async (_req, res) => {
   try {
     const result = await pool.query(`
-      SELECT * FROM contributors;
+      SELECT * FROM contributors ORDER BY first_name DESC;
       `);
 
     res.json(result.rows);
@@ -120,7 +120,28 @@ app.post('/contributor/:id', async (req, res) => {
       RETURNING *;
       `, [id, first_name, artist_name]);
 
-    res.json(result.rows);
+
+    return res.json({
+      message: 'Contributor successfully updated',
+      contributor: result.rows[0]
+    });
+  } catch (error) {
+    serverError(res, error);
+  }
+});
+
+app.delete('/contributor/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(`
+      DELETE FROM contributors WHERE id = $1
+      `, [id]);
+
+    return res.json({
+      message: 'Contributor successfully deleted',
+      contributor: result.rows[0]
+    });
   } catch (error) {
     serverError(res, error);
   }

@@ -26,3 +26,15 @@ export const generateId = () => {
 
   return Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('');
 };
+
+export const deleteData = async<TResponse>(url: string): Promise<TResponse> => {
+  const response = await fetch(url, {
+    method: 'DELETE'
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+};
