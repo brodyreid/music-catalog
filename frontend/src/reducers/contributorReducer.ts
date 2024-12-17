@@ -1,23 +1,33 @@
-import { Contributor } from '@/types.ts';
+import { Contributor, CreateStateType, ReducerActions } from '@/types.ts';
 
-export interface ContributorState {
-  current: Contributor | null;
-  first_name: string;
-  artist_name: string;
-}
+export type ContributorState = CreateStateType<Contributor>;
 
-export type ContributorActions =
-  | { type: 'set_current_contributor'; contributor: Contributor | null; }
+export type ContributorActions = ReducerActions<Contributor>
   | { type: 'changed_first_name'; first_name: string; }
   | { type: 'changed_artist_name'; artist_name: string; };
 
+export const initialState = {
+  all: [],
+  current: null,
+  first_name: '',
+  artist_name: ''
+};
+
 export function contributorReducer(state: ContributorState, action: ContributorActions): ContributorState {
   switch (action.type) {
-    case 'set_current_contributor': {
+    case 'set_all': {
       return {
-        current: action.contributor,
-        first_name: action.contributor?.first_name ?? '',
-        artist_name: action.contributor?.artist_name ?? ''
+        ...state,
+        all: action.all
+      };
+    }
+
+    case 'set_current': {
+      return {
+        ...state,
+        current: action.current,
+        first_name: action.current?.first_name ?? '',
+        artist_name: action.current?.artist_name ?? ''
       };
     }
 

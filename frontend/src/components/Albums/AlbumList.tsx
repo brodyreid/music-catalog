@@ -1,27 +1,37 @@
-import useFetchData from '@/hooks/useFetchData.tsx';
-import { albumReducer } from '@/reducers/albumReducer.ts';
-import { Album } from '@/types.ts';
+import { albumReducer, initialState } from '@/reducers/albumReducer.ts';
+import { albumService } from '@/services/index.ts';
 import { formatDate, generateId, saveData } from '@/utils.ts';
-import { useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 import CreateAlbum from './CreateAlbum.tsx';
 
 export default function AlbumList() {
-  const [state, dispatch] = useReducer(albumReducer, { current: null, title: '', notes: '', release_date: '' });
-  const { title, notes, release_date } = state;
-  const { data, error, refetch } = useFetchData<Album>('http://localhost:3000/albums');
+  const [state, dispatch] = useReducer(albumReducer, initialState);
+  const { all: data, title, notes, release_date } = state;
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await albumService.getAll();
+      dispatch({ type: 'set_all', all: response });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const createAlbum = async () => {
     const id = generateId();
 
     try {
       await saveData(`http://localhost:3000/album/${id}`, { title, notes, release_date });
-      refetch();
+      fetchData();
     } catch (error) {
       console.error(error);
     }
   };
 
-  console.log({ data, error, state });
   return (
     <>
       <CreateAlbum state={state} dispatch={dispatch} onSubmit={createAlbum} />

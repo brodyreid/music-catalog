@@ -1,6 +1,6 @@
 import Button from '@/components/ui/Button.tsx';
 import useToast from '@/hooks/useToast.tsx';
-import { contributorReducer } from '@/reducers/contributorReducer.ts';
+import { contributorReducer, initialState } from '@/reducers/contributorReducer.ts';
 import { contributorService } from '@/services/index.ts';
 import { Contributor } from '@/types.ts';
 import { deleteData, generateId, saveData } from '@/utils.ts';
@@ -20,10 +20,9 @@ interface ContributorResponse {
 
 export default function ContributorList() {
   const [isCreating, setIsCreating] = useState(false);
-  const [state, dispatch] = useReducer(contributorReducer, { current: null, first_name: '', artist_name: '' });
-  const { current, first_name, artist_name } = state;
+  const [state, dispatch] = useReducer(contributorReducer, initialState);
+  const { all: data, current, first_name, artist_name } = state;
   const { showToast, ToastComponent } = useToast();
-  const [data, setData] = useState<Contributor[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -31,8 +30,8 @@ export default function ContributorList() {
 
   const fetchData = async () => {
     try {
-      const egg = await contributorService.getAll();
-      setData(egg);
+      const response = await contributorService.getAll();
+      dispatch({ type: 'set_all', all: response });
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -60,7 +59,7 @@ export default function ContributorList() {
       const response = await saveData<UpdateContributorBody, ContributorResponse>(`http://localhost:3000/contributor/${current?.id}`, { first_name, artist_name });
 
       showToast(response.message + ': ' + response.contributor.first_name + ' ' + response.contributor.artist_name);
-      dispatch({ type: 'set_current_contributor', contributor: null });
+      dispatch({ type: 'set_current', current: null });
       fetchData();
     } catch (error) {
       console.error(error);
@@ -79,7 +78,7 @@ export default function ContributorList() {
       try {
         const response = await deleteData<ContributorResponse>(`http://localhost:3000/contributor/${current?.id}`);
         showToast(response.message);
-        dispatch({ type: 'set_current_contributor', contributor: null });
+        dispatch({ type: 'set_current', current: null });
         fetchData();
       } catch (error) {
         console.error(error);
@@ -91,11 +90,11 @@ export default function ContributorList() {
     <>
       <ToastComponent />
       {!(isCreating || state.current) &&
-        <Button onClick={() => { dispatch({ type: 'set_current_contributor', contributor: null }); setIsCreating(true); }}>
+        <Button onClick={() => { dispatch({ type: 'set_current', current: null }); setIsCreating(true); }}>
           create new contributor
         </Button>}
       {isCreating && <CreateContributor dispatch={dispatch} onSubmit={createContributor} onClose={() => setIsCreating(false)} />}
-      {state.current && <UpdateContributor state={state} dispatch={dispatch} onSubmit={updateContributor} onDelete={deleteContributor} onClose={() => dispatch({ type: 'set_current_contributor', contributor: null })} />}
+      {state.current && <UpdateContributor state={state} dispatch={dispatch} onSubmit={updateContributor} onDelete={deleteContributor} onClose={() => dispatch({ type: 'set_current', current: null })} />}
       <div className={`flex gap-16 mt-16 ${isCreating && 'opacity-50'}`}>
         <table className="font-mono font-extralight text-sm border-separate border-spacing-2">
           <thead>
@@ -113,7 +112,7 @@ export default function ContributorList() {
                   className={`relative ${!isCreating && 'cursor-pointer hover'} ${current?.id === id && 'font-bold text-orange-300'}`}
                   onClick={() => {
                     if (isCreating) { return; }
-                    dispatch({ type: 'set_current_contributor', contributor });
+                    dispatch({ type: 'set_current', current });
                   }}
                 >
                   <td className='text-nowrap pr-3'>{first_name}</td>

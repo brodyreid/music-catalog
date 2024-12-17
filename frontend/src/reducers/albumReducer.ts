@@ -1,26 +1,36 @@
-import { Album } from '@/types.ts';
+import { Album, CreateStateType, ReducerActions } from '@/types.ts';
 
-export interface AlbumState {
-  current: Album | null;
-  title: string;
-  notes: string;
-  release_date: string;
-}
+export type AlbumState = CreateStateType<Album>;
 
-export type AlbumActions =
-  | { type: 'set_current_album'; album: Album | null; }
+export type AlbumActions = ReducerActions<Album>
   | { type: 'changed_title'; title: string; }
   | { type: 'changed_notes'; notes: string; }
   | { type: 'changed_release_date'; release_date: string; };
 
+export const initialState = {
+  all: [],
+  current: null,
+  title: '',
+  notes: '',
+  release_date: ''
+};
+
 export function albumReducer(state: AlbumState, action: AlbumActions): AlbumState {
   switch (action.type) {
-    case 'set_current_album': {
+    case 'set_all': {
       return {
-        current: action.album,
-        title: action.album?.title ?? '',
-        notes: action.album?.notes ?? '',
-        release_date: action.album?.release_date ?? ''
+        ...state,
+        all: action.all
+      };
+    }
+
+    case 'set_current': {
+      return {
+        ...state,
+        current: action.current,
+        title: action.current?.title ?? '',
+        notes: action.current?.notes ?? '',
+        release_date: action.current?.release_date ?? ''
       };
     }
 

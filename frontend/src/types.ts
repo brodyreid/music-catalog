@@ -1,3 +1,12 @@
+export interface ReducerState<T> {
+  all: T[] | [];
+  current: T | null;
+}
+
+export type ReducerActions<T> = { type: 'set_all'; all: T[] | []; } | { type: 'set_current'; current: T | null; };
+
+export type CreateStateType<T> = ReducerState<T> & Omit<T, 'id'>;
+
 export interface Project {
   id: string;
   title: string;
@@ -19,6 +28,15 @@ export interface Contributor {
   first_name: string | null;
   artist_name: string | null;
 }
+
+export interface Album {
+  id: string;
+  title: string | null;
+  notes: string | null;
+  release_date: string | null;
+}
+
+export type SortOptions = 'asc' | 'desc' | null;
 
 export enum MusicalKey {
   C_MAJOR = 'C Major',
@@ -46,12 +64,3 @@ export enum MusicalKey {
   B_MAJOR = 'B Major',
   B_MINOR = 'B Minor'
 }
-
-export interface Album {
-  id: string;
-  title: string | null;
-  notes: string | null;
-  release_date: string | null;
-}
-
-export type SortOptions = 'asc' | 'desc' | null;

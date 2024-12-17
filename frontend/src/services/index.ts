@@ -9,8 +9,8 @@ interface ResourceTypeMap {
 type Resource = keyof ResourceTypeMap;
 
 class ApiService<T extends Resource> {
-  readonly resource: T;
-  readonly resourceUrl: string;
+  private readonly resource: T;
+  private readonly resourceUrl: string;
 
   constructor(resource: T) {
     this.resource = resource;
