@@ -1,17 +1,17 @@
 import { ProjectActions, ProjectState } from '@/reducers/projectReducer.ts';
-import { Project, SortOptions } from '@/types.ts';
+import { CatalogEntry, SortOptions } from '@/types.ts';
 import { formatDate } from '@/utils.ts';
 import { Dispatch, useEffect, useRef, useState } from 'react';
 
 interface ProjectsTableProps {
-  projects: Project[];
-  projectState: ProjectState;
-  projectDispatch: Dispatch<ProjectActions>;
+  catalog: CatalogEntry[];
+  state: ProjectState;
+  dispatch: Dispatch<ProjectActions>;
   sortDirection: SortOptions;
   onSort: (direction: SortOptions) => void;
 }
 
-export default function ProjectsTable({ projects, projectState, projectDispatch, sortDirection, onSort }: ProjectsTableProps) {
+export default function ProjectsTable({ catalog, state, dispatch, sortDirection, onSort }: ProjectsTableProps) {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const [showTooltip, setShowTooltip] = useState<{ show: boolean; rowId: string | null; }>({
     show: false,
@@ -61,12 +61,13 @@ export default function ProjectsTable({ projects, projectState, projectDispatch,
         </tr>
       </thead>
       <tbody>
-        {projects.map(project => {
-          const { id, title, release_name, folder_path, notes, date_created, bpm, musical_key, contributors, versions } = project;
+        {catalog.map(entry => {
+          const { contributors, versions } = entry;
+          const { id, title, release_name, folder_path, notes, date_created, bpm, musical_key } = entry.project;
           const path = folder_path && folder_path.replace(/^.*\/projects\//i, '/');
 
           return (
-            <tr key={id} className={`relative ${projectState.selectedProject?.id === id && 'font-bold text-orange-300'}`}>
+            <tr key={id} className={`relative ${state.current?.id === id && 'font-bold text-orange-300'}`}>
               <td className='text-nowrap pr-3 truncate max-w-60'>
                 {
                   <>
@@ -80,7 +81,7 @@ export default function ProjectsTable({ projects, projectState, projectDispatch,
                         }
                       </>
                     }
-                    <button type='button' onClick={() => projectDispatch({ type: 'set_selected_project', project })} className='cursor-pointer hover'>{title}</button>
+                    <button type='button' onClick={() => dispatch({ type: 'set_current', current: { ...entry.project, contributors: entry.contributors || [] } })} className='cursor-pointer hover'>{title}</button>
                   </>
                 }
               </td>

@@ -1,11 +1,11 @@
-import { Project } from '@/types.ts';
+import { CatalogEntry } from '@/types.ts';
 import { formatDate } from '@/utils.ts';
 import { useEffect, useState } from 'react';
 import useFetchData from './useFetchData.tsx';
 
 export const usePagination = (url: string, currentSearchTerm?: string) => {
-  const { data: projects, loading, error, refetch } = useFetchData<Project>(url);
-  const [currentData, setCurrentData] = useState<Project[]>([]);
+  const { data: catalog, loading, error, refetch } = useFetchData<CatalogEntry>(url);
+  const [currentData, setCurrentData] = useState<CatalogEntry[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [numberOfPages, setNumberOfPages] = useState(0);
 
@@ -46,42 +46,45 @@ export const usePagination = (url: string, currentSearchTerm?: string) => {
     );
   };
 
-  const searchProjects = (projects: Project[]) => {
-    const cleanProjects = projects.map(({ title, versions, ...rest }) => ({
-      title: title.replace('Project', '').trim(),
+  const searchCatalog = (catalog: CatalogEntry[]) => {
+    const cleanCatalog: CatalogEntry[] = catalog.map(({ project: { title, ...projectRest }, versions, ...rest }) => ({
+      project: {
+        title: title.replace('Project', '').trim(),
+        ...projectRest
+      },
       versions: versions,
       ...rest,
     }));
 
-    if (!currentSearchTerm) { return cleanProjects; }
+    if (!currentSearchTerm) { return cleanCatalog; }
 
     const wordsToSearch: string[] = currentSearchTerm ? currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '') : [];
 
-    return cleanProjects.filter(project =>
+    return cleanCatalog.filter(entry =>
       wordsToSearch.every(word =>
-        project.title.toLowerCase().includes(word) ||
-        project.folder_path.toLowerCase().includes(word) ||
-        project.notes?.toLowerCase().includes(word) ||
-        project.release_name?.toLowerCase().includes(word) ||
-        project.contributors?.map(c => [c.first_name, c.artist_name]).join(' ').toLowerCase().includes(word) ||
-        project.versions?.map(v => v.name).join(' ').toLowerCase().includes(word) ||
-        project.date_created && formatDate(project.date_created).toLowerCase().includes(word)
+        entry.project.title.toLowerCase().includes(word) ||
+        entry.project.folder_path.toLowerCase().includes(word) ||
+        entry.project.notes?.toLowerCase().includes(word) ||
+        entry.project.release_name?.toLowerCase().includes(word) ||
+        entry.contributors?.map(c => [c.first_name, c.artist_name]).join(' ').toLowerCase().includes(word) ||
+        entry.versions?.map(v => v.name).join(' ').toLowerCase().includes(word) ||
+        entry.project.date_created && formatDate(entry.project.date_created).toLowerCase().includes(word)
       )
     );
   };
 
   useEffect(() => {
-    if (!projects.length) { return; }
+    if (!catalog.length) { return; }
 
-    const searchedProjects = searchProjects(projects);
+    const searchedCatalog = searchCatalog(catalog);
 
-    setNumberOfPages(Math.ceil(searchedProjects.length / postsPerPage));
+    setNumberOfPages(Math.ceil(searchedCatalog.length / postsPerPage));
 
     const startIndex = postsPerPage * (currentPage - 1);
     const stopIndex = startIndex + postsPerPage;
 
-    setCurrentData(searchedProjects.slice(startIndex, stopIndex));
-  }, [projects, currentPage, currentSearchTerm]);
+    setCurrentData(searchedCatalog.slice(startIndex, stopIndex));
+  }, [catalog, currentPage, currentSearchTerm]);
 
   return { currentData, handlePageChange, loading, error, refetch, PaginationNumbers, setCurrentPage };
 };

@@ -1,16 +1,8 @@
-import { Contributor, MusicalKey, Project } from '@/types.ts';
+import { Contributor, CreateStateType, MusicalKey, ProjectWithContributors, ReducerActions } from '@/types.ts';
 
-export interface ProjectState {
-  selectedProject: Project | null;
-  release_name: string | null;
-  notes: string | null;
-  bpm: number | null;
-  musical_key: MusicalKey | null;
-  contributors: Contributor[] | [];
-}
+export type ProjectState = Omit<CreateStateType<ProjectWithContributors>, 'title' | 'folder_path' | 'date_created'>;
 
-export type ProjectActions =
-  { type: 'set_selected_project'; project: Project | null; }
+export type ProjectActions = ReducerActions<ProjectWithContributors>
   | { type: 'changed_release_name'; release_name: string; }
   | { type: 'changed_notes'; notes: string; }
   | { type: 'changed_bpm'; bpm: number; }
@@ -18,16 +10,34 @@ export type ProjectActions =
   | { type: 'added_contributor'; contributor: Contributor; }
   | { type: 'removed_contributor'; contributorId: string; };
 
+export const initialState = {
+  all: [],
+  current: null,
+  release_name: '',
+  notes: '',
+  bpm: null,
+  musical_key: null,
+  contributors: []
+};
+
 export function projectReducer(state: ProjectState, action: ProjectActions): ProjectState {
   switch (action.type) {
-    case 'set_selected_project': {
+    case 'set_all': {
       return {
-        selectedProject: action.project,
-        release_name: action.project?.release_name ?? null,
-        notes: action.project?.notes ?? null,
-        bpm: action.project?.bpm ?? null,
-        musical_key: action.project?.musical_key ?? null,
-        contributors: action.project?.contributors ?? []
+        ...state,
+        all: action.all
+      };
+    }
+
+    case 'set_current': {
+      return {
+        ...state,
+        current: action.current,
+        release_name: action.current?.release_name ?? null,
+        notes: action.current?.notes ?? null,
+        bpm: action.current?.bpm ?? null,
+        musical_key: action.current?.musical_key ?? null,
+        contributors: action.current?.contributors ?? []
       };
     }
 

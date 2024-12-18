@@ -7,21 +7,21 @@ import { Contributor } from '@/types.ts';
 import { Dispatch, useState } from 'react';
 
 interface ProjectContributorsProps {
-  projectState: ProjectState;
-  projectDispatch: Dispatch<ProjectActions>;
+  state: ProjectState;
+  dispatch: Dispatch<ProjectActions>;
 }
 
-export default function ProjectContributors({ projectDispatch, projectState }: ProjectContributorsProps) {
+export default function ProjectContributors({ state, dispatch }: ProjectContributorsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: contributors } = useFetchData<Contributor>('http://localhost:3000/contributors');
 
   function handleAddContributor(contributor: Contributor) {
-    projectDispatch({ type: 'added_contributor', contributor });
+    dispatch({ type: 'added_contributor', contributor });
     setIsModalOpen(false);
   }
 
   function handleRemoveContributor(contributorId: string) {
-    projectDispatch({ type: 'removed_contributor', contributorId });
+    dispatch({ type: 'removed_contributor', contributorId });
   }
 
   return (
@@ -36,7 +36,7 @@ export default function ProjectContributors({ projectDispatch, projectState }: P
         </div>
       </Modal>
       <ul className='rounded p-2 bg-primary text-secondary space-y-2'>
-        {projectState.contributors?.map(c => (
+        {state.contributors?.map(c => (
           <li key={c.id} className='flex items-center justify-between'>
             <div className='font-bold text-accent'>{c.first_name}</div>
             <button onClick={() => handleRemoveContributor(c.id)}><Cross className='w-4' /></button>

@@ -16,7 +16,11 @@ app.listen(PORT, () => {
 app.get('/projects', async (_req, res) => {
   try {
     const result = await pool.query(`
-      SELECT p.id, p.title, p.release_name, p.folder_path, p.notes, p.date_created, p.bpm, p.musical_key, JSONB_AGG(DISTINCT jsonb_build_object('id', c.id, 'first_name', c.first_name, 'artist_name', c.artist_name)) FILTER (WHERE c.id IS NOT NULL) AS contributors, JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'name', v."name")) FILTER (WHERE v.id IS NOT NULL) AS versions
+      SELECT
+      p.id,
+      to_jsonb(p.*) as project,
+      JSONB_AGG(DISTINCT jsonb_build_object('id', c.id, 'first_name', c.first_name, 'artist_name', c.artist_name)) FILTER (WHERE c.id IS NOT NULL) AS contributors,
+      JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'name', v."name")) FILTER (WHERE v.id IS NOT NULL) AS versions
       FROM projects p
       LEFT JOIN project_contributors pc ON
       pc.project_id = p.id

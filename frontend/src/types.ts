@@ -7,20 +7,33 @@ export type ReducerActions<T> = { type: 'set_all'; all: T[] | []; } | { type: 's
 
 export type CreateStateType<T> = ReducerState<T> & Omit<T, 'id'>;
 
+export interface CatalogEntry {
+  id: string;
+  project: Project;
+  contributors: Contributor[] | null;
+  versions: Version[] | null;
+  albums: Album[] | null;
+};
+
 export interface Project {
   id: string;
   title: string;
   release_name: string | null;
   folder_path: string;
   notes: string | null;
-  date_created: string | null;
   bpm: number | null;
   musical_key: MusicalKey | null;
-  contributors: Contributor[] | null;
-  versions: {
-    id: string;
-    name: string;
-  }[] | null;
+  date_created: string | null;
+}
+
+export interface ProjectWithContributors extends Project {
+  contributors: Contributor[];
+}
+
+export interface Version {
+  id: string;
+  name: string | null;
+  date_created: string | null;
 }
 
 export interface Contributor {

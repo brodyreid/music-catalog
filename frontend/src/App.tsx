@@ -1,6 +1,6 @@
 import AlbumList from '@/components/Albums/AlbumList.tsx';
+import ProjectList from '@/components/Catalog/CatalogList.tsx';
 import ContributorList from '@/components/Contributors/ContributorList.tsx';
-import ProjectList from '@/components/Projects/ProjectList.tsx';
 import Navbar from '@/components/shared/Navbar.tsx';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 

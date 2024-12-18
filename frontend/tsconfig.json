@@ -16,6 +16,7 @@
     },
     "module": "NodeNext",
     "noEmit": true,
+    "noErrorTruncation": true,
     "noUnusedParameters": true,
     "outDir": "./dist",
     "skipLibCheck": true,

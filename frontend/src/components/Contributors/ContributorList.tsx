@@ -112,7 +112,7 @@ export default function ContributorList() {
                   className={`relative ${!isCreating && 'cursor-pointer hover'} ${current?.id === id && 'font-bold text-orange-300'}`}
                   onClick={() => {
                     if (isCreating) { return; }
-                    dispatch({ type: 'set_current', current });
+                    dispatch({ type: 'set_current', current: contributor });
                   }}
                 >
                   <td className='text-nowrap pr-3'>{first_name}</td>
