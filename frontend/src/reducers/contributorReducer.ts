@@ -9,8 +9,8 @@ export type ContributorActions = ReducerActions<Contributor>
 export const initialState = {
   all: [],
   current: null,
-  first_name: '',
-  artist_name: ''
+  first_name: null,
+  artist_name: null
 };
 
 export function contributorReducer(state: ContributorState, action: ContributorActions): ContributorState {

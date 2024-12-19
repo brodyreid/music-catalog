@@ -3,16 +3,16 @@ import { Album, CreateStateType, ReducerActions } from '@/types.ts';
 export type AlbumState = CreateStateType<Album>;
 
 export type AlbumActions = ReducerActions<Album>
-  | { type: 'changed_title'; title: string; }
-  | { type: 'changed_notes'; notes: string; }
-  | { type: 'changed_release_date'; release_date: string; };
+  | { type: 'changed_title'; title: string | null; }
+  | { type: 'changed_notes'; notes: string | null; }
+  | { type: 'changed_release_date'; release_date: string | null; };
 
 export const initialState = {
   all: [],
   current: null,
-  title: '',
-  notes: '',
-  release_date: ''
+  title: null,
+  notes: null,
+  release_date: null
 };
 
 export function albumReducer(state: AlbumState, action: AlbumActions): AlbumState {

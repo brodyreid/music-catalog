@@ -1,6 +1,6 @@
 import { ProjectActions, ProjectState } from '@/reducers/projectReducer.ts';
 import { CatalogEntry, SortOptions } from '@/types.ts';
-import { formatDate } from '@/utils.ts';
+import { formatReadableDate } from '@/utils.ts';
 import { Dispatch, useEffect, useRef, useState } from 'react';
 
 interface ProjectsTableProps {
@@ -90,7 +90,7 @@ export default function ProjectsTable({ catalog, state, dispatch, sortDirection,
               <td className='text-nowrap pr-3'>{bpm && bpm + ' bpm'}{musical_key && ', ' + musical_key}</td>
               <td className='text-nowrap pr-3'>{path}</td>
               <td className='text-nowrap pr-3'>{contributors?.map(c => [c.first_name]).join(', ')}</td>
-              <td className="text-nowrap">{date_created ? formatDate(date_created) : ''}</td>
+              <td className="text-nowrap">{date_created ? formatReadableDate(date_created) : ''}</td>
             </tr>
           );
         })}

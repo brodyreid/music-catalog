@@ -16,11 +16,6 @@ interface UpdateProjectBody {
   contributor_ids: string[];
 }
 
-interface UpdateProjectResponse {
-  message: string;
-  project: Project;
-}
-
 export default function CatalogList() {
   const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
   const [filteredCatalog, setFilteredCatalog] = useState<CatalogEntry[]>([]);
@@ -64,7 +59,7 @@ export default function CatalogList() {
     }
 
     try {
-      const response = await saveData<UpdateProjectBody, UpdateProjectResponse>(`http://localhost:3000/project/${state.current.id}`, {
+      const response = await saveData<UpdateProjectBody, Project>(`http://localhost:3000/project/${state.current.id}`, {
         release_name: state.release_name,
         notes: state.notes,
         bpm: state.bpm,
@@ -73,10 +68,10 @@ export default function CatalogList() {
       });
 
       setFilteredCatalog(prev => prev.map(prevEntry => {
-        if (prevEntry.id === response.project.id) {
+        if (prevEntry.id === response.data.id) {
           return {
             ...prevEntry,
-            project: response.project
+            project: response.data
           };
         }
         return prevEntry;

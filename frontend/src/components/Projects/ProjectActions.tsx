@@ -39,6 +39,7 @@ export default function ProjectActions({ state, dispatch, onUpdate }: ProjectAct
           <TextField
             value={state.release_name ?? ''}
             onChange={(event) => dispatch({ type: 'changed_release_name', release_name: event.target.value ?? null })}
+            className='w-full'
           />
           <p className='text-lg'>notes</p>
           <div className='flex flex-col'>
@@ -53,7 +54,9 @@ export default function ProjectActions({ state, dispatch, onUpdate }: ProjectAct
           <p className='text-lg'>bpm</p>
           <TextField
             value={state.bpm?.toString() ?? ''}
-            onChange={(event) => dispatch({ type: 'changed_bpm', bpm: parseInt(event.target.value) ?? null })} />
+            onChange={(event) => dispatch({ type: 'changed_bpm', bpm: parseInt(event.target.value) ?? null })}
+            className='w-full'
+          />
           <p className='text-lg'>musical_key</p>
           <SelectField
             value={state.musical_key ?? ''}

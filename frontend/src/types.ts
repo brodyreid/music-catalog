@@ -7,6 +7,8 @@ export type ReducerActions<T> = { type: 'set_all'; all: T[] | []; } | { type: 's
 
 export type CreateStateType<T> = ReducerState<T> & Omit<T, 'id'>;
 
+export type SaveDataResponse<T> = { message: string; } & { data: T; };
+
 export interface CatalogEntry {
   id: string;
   project: Project;

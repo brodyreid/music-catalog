@@ -1,5 +1,5 @@
 import { CatalogEntry } from '@/types.ts';
-import { formatDate } from '@/utils.ts';
+import { formatReadableDate } from '@/utils.ts';
 import { useEffect, useState } from 'react';
 import useFetchData from './useFetchData.tsx';
 
@@ -68,7 +68,7 @@ export const usePagination = (url: string, currentSearchTerm?: string) => {
         entry.project.release_name?.toLowerCase().includes(word) ||
         entry.contributors?.map(c => [c.first_name, c.artist_name]).join(' ').toLowerCase().includes(word) ||
         entry.versions?.map(v => v.name).join(' ').toLowerCase().includes(word) ||
-        entry.project.date_created && formatDate(entry.project.date_created).toLowerCase().includes(word)
+        entry.project.date_created && formatReadableDate(entry.project.date_created).toLowerCase().includes(word)
       )
     );
   };

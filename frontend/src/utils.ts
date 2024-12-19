@@ -1,4 +1,6 @@
-export const formatDate = (dateString: string) => {
+import { SaveDataResponse } from './types.ts';
+
+export const formatReadableDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
     month: 'short',
     day: '2-digit',
@@ -6,7 +8,12 @@ export const formatDate = (dateString: string) => {
   });
 };
 
-export const saveData = async<TBody, TResponse>(url: string, body: TBody): Promise<TResponse> => {
+export const formatNumericDate = (dateString: string | null) => {
+  if (!dateString) { return ''; }
+  return new Date(dateString).toISOString().split('T')[0];
+};
+
+export const saveData = async<TBody, TResponse>(url: string, body: Omit<TBody, 'id'>): Promise<SaveDataResponse<TResponse>> => {
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -20,7 +27,7 @@ export const saveData = async<TBody, TResponse>(url: string, body: TBody): Promi
   return response.json();
 };
 
-export const deleteData = async<TResponse>(url: string): Promise<TResponse> => {
+export const deleteData = async<T>(url: string): Promise<SaveDataResponse<T>> => {
   const response = await fetch(url, {
     method: 'DELETE'
   });

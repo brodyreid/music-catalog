@@ -13,8 +13,8 @@ export type ProjectActions = ReducerActions<ProjectWithContributors>
 export const initialState = {
   all: [],
   current: null,
-  release_name: '',
-  notes: '',
+  release_name: null,
+  notes: null,
   bpm: null,
   musical_key: null,
   contributors: []

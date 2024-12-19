@@ -8,16 +8,6 @@ import { useEffect, useReducer, useState } from 'react';
 import CreateContributor from './CreateContributor.tsx';
 import UpdateContributor from './UpdateContributor.tsx';
 
-interface UpdateContributorBody {
-  first_name: string | null;
-  artist_name: string | null;
-}
-
-interface ContributorResponse {
-  message: string;
-  contributor: Contributor;
-}
-
 export default function ContributorList() {
   const [isCreating, setIsCreating] = useState(false);
   const [state, dispatch] = useReducer(contributorReducer, initialState);
@@ -41,9 +31,10 @@ export default function ContributorList() {
     const id = generateId();
 
     try {
-      await saveData(`http://localhost:3000/contributor/${id}`, { first_name, artist_name });
-      fetchData();
+      const response = await saveData<Contributor, Contributor>(`http://localhost:3000/contributor/${id}`, { first_name, artist_name });
       setIsCreating(false);
+      showToast(response.message);
+      fetchData();
     } catch (error) {
       console.error(error);
     }
@@ -56,9 +47,9 @@ export default function ContributorList() {
     }
 
     try {
-      const response = await saveData<UpdateContributorBody, ContributorResponse>(`http://localhost:3000/contributor/${current?.id}`, { first_name, artist_name });
+      const response = await saveData<Contributor, Contributor>(`http://localhost:3000/contributor/${current?.id}`, { first_name, artist_name });
 
-      showToast(response.message + ': ' + response.contributor.first_name + ' ' + response.contributor.artist_name);
+      showToast(response.message);
       dispatch({ type: 'set_current', current: null });
       fetchData();
     } catch (error) {
@@ -76,7 +67,7 @@ export default function ContributorList() {
 
     if (confirmed) {
       try {
-        const response = await deleteData<ContributorResponse>(`http://localhost:3000/contributor/${current?.id}`);
+        const response = await deleteData<Contributor>(`http://localhost:3000/contributor/${current?.id}`);
         showToast(response.message);
         dispatch({ type: 'set_current', current: null });
         fetchData();
