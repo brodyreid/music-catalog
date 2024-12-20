@@ -2,7 +2,7 @@ import useToast from '@/hooks/useToast.tsx';
 import { albumReducer, initialState } from '@/reducers/albumReducer.ts';
 import { albumService } from '@/services/index.ts';
 import { Album } from '@/types.ts';
-import { formatReadableDate, generateId, saveData } from '@/utils.ts';
+import { deleteData, formatReadableDate, generateId, saveData } from '@/utils.ts';
 import { useEffect, useReducer, useState } from 'react';
 import Button from '../ui/Button.tsx';
 import CreateAlbum from './CreateAlbum.tsx';
@@ -44,7 +44,23 @@ export default function AlbumList() {
   };
 
   const deleteAlbum = async () => {
-    console.log('updated');
+    if (!current) {
+      console.error('No selected contributor');
+      return;
+    }
+
+    const confirmed = window.confirm('Are you sure you want to delete this item?');
+
+    if (confirmed) {
+      try {
+        const response = await deleteData<Album>(`http://localhost:3000/album/${current?.id}`);
+        showToast(response.message);
+        dispatch({ type: 'set_current', current: null });
+        fetchData();
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
 
   return (

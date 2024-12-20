@@ -186,3 +186,20 @@ app.post('/album/:id', async (req, res) => {
     serverError(res, error);
   }
 });
+
+app.delete('/album/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(`
+      DELETE FROM albums WHERE id = $1
+      `, [id]);
+
+    return res.json({
+      message: 'Album successfully deleted',
+      contributor: result.rows[0]
+    });
+  } catch (error) {
+    serverError(res, error);
+  }
+});
