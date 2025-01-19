@@ -1,11 +1,12 @@
 import Button from '@/components/ui/Button.tsx';
+import DateField from '@/components/ui/DateField.tsx';
 import TextArea from '@/components/ui/TextArea.tsx';
 import TextField from '@/components/ui/TextField.tsx';
 import Trash from '@/icons/Trash.tsx';
 import { AlbumActions, AlbumState } from '@/reducers/albumReducer.ts';
 import { formatNumericDate } from '@/utils.ts';
 import { Dispatch } from 'react';
-import DateField from '../ui/DateField.tsx';
+import AlbumProjects from './AlbumProjects.tsx';
 
 interface UpdateAlbumProps {
   state: AlbumState;
@@ -17,7 +18,7 @@ interface UpdateAlbumProps {
 
 export default function UpdateAlbum({ state, dispatch, onSubmit, onClose, onDelete }: UpdateAlbumProps) {
   return (
-    <>
+    <div className='flex gap-4'>
       <div className='flex flex-col gap-2 w-min'>
         <div>
           <p>title</p>
@@ -39,6 +40,7 @@ export default function UpdateAlbum({ state, dispatch, onSubmit, onClose, onDele
           <Trash className='w-4' />delete
         </Button>
       </div>
-    </>
+      <AlbumProjects state={state} dispatch={dispatch} />
+    </div>
   );
 }

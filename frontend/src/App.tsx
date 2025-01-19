@@ -8,7 +8,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <div className="container mx-auto px-12">
+      <div className="container mx-auto px-4">
         <Routes>
           <Route path='/' element={<ProjectList />} />
           <Route path='/projects' element={<ProjectList />} />

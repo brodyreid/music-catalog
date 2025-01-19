@@ -71,7 +71,9 @@ export default function AlbumList() {
           create new album
         </Button>}
       {isCreating && <CreateAlbum dispatch={dispatch} onSubmit={createAlbum} onClose={() => setIsCreating(false)} />}
-      {state.current && <UpdateAlbum state={state} dispatch={dispatch} onSubmit={updateAlbum} onDelete={deleteAlbum} onClose={() => dispatch({ type: 'set_current', current: null })} />}
+      {state.current && (
+        <UpdateAlbum state={state} dispatch={dispatch} onSubmit={updateAlbum} onDelete={deleteAlbum} onClose={() => dispatch({ type: 'set_current', current: null })} />
+      )}
       <div className='flex gap-16 mt-16'>
         <div>
           <table className="font-mono font-extralight text-sm border-separate border-spacing-2">

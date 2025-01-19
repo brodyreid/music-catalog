@@ -106,7 +106,7 @@ export default function CatalogList() {
   return (
     <>
       <div className='flex items-start justify-between'>
-        <Search onSearch={handleSearch} handleReset={resetCatalogList} currentSearchTerm={currentSearchTerm} />
+        <Search onSearch={handleSearch} onReset={resetCatalogList} currentSearchTerm={currentSearchTerm} />
         <ProjectActions state={state} dispatch={dispatch} onUpdate={handleUpdateProject} />
       </div>
       {filteredCatalog?.length && (
