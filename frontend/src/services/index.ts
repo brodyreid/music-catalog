@@ -1,39 +1,29 @@
-import { Album, Contributor, Project } from '@/types.ts';
+import { AlbumWithProjects, Contributor, Project } from '@/types.ts';
 
-interface ResourceTypeMap {
-  projects: Project;
-  albums: Album;
-  contributors: Contributor;
-}
+type Resource = 'projects' | 'albums' | 'contributors';
 
-type Resource = keyof ResourceTypeMap;
+const createService = <T>(resource: Resource) => {
+  const resourceUrl = `http://localhost:3000/${resource}`;
 
-class ApiService<T extends Resource> {
-  private readonly resource: T;
-  private readonly resourceUrl: string;
+  return {
+    getAll: async (): Promise<T[]> => {
+      const response = await fetch(resourceUrl);
+      if (!response) {
+        throw new Error(`Failed to fetch resource ${resource}`);
+      }
+      return await response.json();
+    },
 
-  constructor(resource: T) {
-    this.resource = resource;
-    this.resourceUrl = `http://localhost:3000/${this.resource}`;
-  }
-
-  async getAll(): Promise<ResourceTypeMap[T][]> {
-    const response = await fetch(this.resourceUrl);
-    if (!response) {
-      throw new Error(`Failed to fetch resource ${this.resource}`);
+    getById: async (id: string): Promise<T> => {
+      const response = await fetch(`${resourceUrl}/${id}`);
+      if (!response) {
+        throw new Error(`Failed to fetch resource ${resource}`);
+      }
+      return await response.json();
     }
-    return await response.json();
-  }
+  };
+};
 
-  async getById(id: string): Promise<ResourceTypeMap[T]> {
-    const response = await fetch(`${this.resourceUrl}/${id}`);
-    if (!response) {
-      throw new Error(`Failed to fetch resource ${this.resource}`);
-    }
-    return await response.json();
-  }
-}
-
-export const contributorService = new ApiService('contributors');
-export const projectService = new ApiService('projects');
-export const albumService = new ApiService('albums');
+export const contributorService = createService<Contributor>('contributors');
+export const projectService = createService<Project>('projects');
+export const albumService = createService<AlbumWithProjects>('albums');

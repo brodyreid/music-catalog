@@ -22,12 +22,9 @@ app.get('/projects', async (_req, res) => {
       JSONB_AGG(DISTINCT jsonb_build_object('id', c.id, 'first_name', c.first_name, 'artist_name', c.artist_name)) FILTER (WHERE c.id IS NOT NULL) AS contributors,
       JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'name', v."name")) FILTER (WHERE v.id IS NOT NULL) AS versions
       FROM projects p
-      LEFT JOIN project_contributors pc ON
-      pc.project_id = p.id
-      LEFT JOIN contributors c ON
-      c.id = pc.contributor_id
-      LEFT JOIN versions v ON
-      v.project_id = p.id
+      LEFT JOIN project_contributors pc ON pc.project_id = p.id
+      LEFT JOIN contributors c ON c.id = pc.contributor_id
+      LEFT JOIN versions v ON v.project_id = p.id
       GROUP BY p.id
       ORDER BY p.date_created DESC;
       `);
@@ -38,7 +35,7 @@ app.get('/projects', async (_req, res) => {
   }
 });
 
-app.post('/project/:id', async (req, res) => {
+app.post('/projects/:id', async (req, res) => {
   const { id } = req.params;
   const { release_name, notes, bpm, musical_key, contributor_ids } = req.body;
   const client = await pool.connect();
@@ -55,20 +52,24 @@ app.post('/project/:id', async (req, res) => {
       WHERE id = $1
       RETURNING *;
       `, [id, release_name, notes, bpm, musical_key]);
-    await client.query(`
-      DELETE FROM project_contributors
-      WHERE project_id = $1;  
-    `, [id]);
-    await client.query(`
-      INSERT INTO project_contributors (project_id, contributor_id)
-      SELECT $1, UNNEST($2::char(16)[])
-      ON CONFLICT DO NOTHING;
-    `, [id, contributor_ids]);
+    
+    if (contributor_ids?.length) {
+      await client.query(`
+        DELETE FROM project_contributors
+        WHERE project_id = $1;  
+      `, [id]);
+      await client.query(`
+        INSERT INTO project_contributors (project_id, contributor_id)
+        SELECT $1, UNNEST($2::char(16)[])
+        ON CONFLICT DO NOTHING;
+      `, [id, contributor_ids]);
+    }
+
     await client.query('COMMIT');
 
     return res.json({
       message: 'Project successfully updated!',
-      project: projectResult.rows[0]
+      data: projectResult.rows[0]
     });
   } catch (error) {
     await client.query('ROLLBACK');
@@ -90,7 +91,7 @@ app.get('/contributors', async (_req, res) => {
   }
 });
 
-app.get('/contributor/:id/projects', async (req, res) => {
+app.get('/contributors/:id/projects', async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -106,7 +107,7 @@ app.get('/contributor/:id/projects', async (req, res) => {
   }
 });
 
-app.post('/contributor/:id', async (req, res) => {
+app.post('/contributors/:id', async (req, res) => {
   const { id } = req.params;
   const { first_name, artist_name } = req.body;
 
@@ -124,17 +125,16 @@ app.post('/contributor/:id', async (req, res) => {
       RETURNING *;
       `, [id, first_name, artist_name]);
 
-
     return res.json({
       message: 'Contributor successfully updated',
-      contributor: result.rows[0]
+      data: result.rows[0]
     });
   } catch (error) {
     serverError(res, error);
   }
 });
 
-app.delete('/contributor/:id', async (req, res) => {
+app.delete('/contributors/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -144,7 +144,7 @@ app.delete('/contributor/:id', async (req, res) => {
 
     return res.json({
       message: 'Contributor successfully deleted',
-      contributor: result.rows[0]
+      data: result.rows[0]
     });
   } catch (error) {
     serverError(res, error);
@@ -154,7 +154,12 @@ app.delete('/contributor/:id', async (req, res) => {
 app.get('/albums', async (_req, res) => {
   try {
     const result = await pool.query(`
-      SELECT * FROM albums;
+      SELECT a.*, JSONB_AGG(p.*) FILTER (WHERE p.id IS NOT NULL) AS projects
+      FROM albums a
+      LEFT JOIN album_projects ap ON ap.album_id = a.id
+      LEFT JOIN projects p ON p.id = ap.project_id
+      GROUP BY a.id
+      ORDER BY a.release_date DESC;
       `);
 
     res.json(result.rows);
@@ -163,16 +168,17 @@ app.get('/albums', async (_req, res) => {
   }
 });
 
-app.post('/album/:id', async (req, res) => {
+app.post('/albums/:id', async (req, res) => {
   const { id } = req.params;
-  const { title, notes, release_date } = req.body;
+  const { title, notes, release_date, project_ids } = req.body;
 
   if (!id) {
     return res.status(400).send('Bad id.');
   }
 
   try {
-    const result = await pool.query(`
+    await client.query('BEGIN');
+    const albumResult = await pool.query(`
       INSERT INTO albums (id, title, notes, release_date)
       VALUES ($1, $2, $3, $4)
       ON CONFLICT (id)
@@ -180,14 +186,34 @@ app.post('/album/:id', async (req, res) => {
       SET title = COALESCE(EXCLUDED.title, albums.title), notes = COALESCE(EXCLUDED.notes, albums.notes), release_date = COALESCE(EXCLUDED.release_date, albums.release_date)
       RETURNING *;
       `, [id, title, notes, release_date]);
+    
+    if (project_ids?.length) {
+      await client.query(`
+          DELETE FROM album_projects
+          WHERE album_id = $1;  
+        `, [id]);
+      await client.query(`
+          INSERT INTO album_projects (album_id, project_id)
+          SELECT $1, UNNEST($2::char(16)[])
+          ON CONFLICT DO NOTHING;
+        `, [id, project_ids]);
+    }
 
-    res.json(result.rows);
+    await client.query('COMMIT');
+
+    return res.json({
+      message: 'Album successfully updated!',
+      data: albumResult.rows[0]
+    });
   } catch (error) {
+    await client.query('ROLLBACK');
     serverError(res, error);
+  } finally {
+    client.release();
   }
 });
 
-app.delete('/album/:id', async (req, res) => {
+app.delete('/albums/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -197,7 +223,7 @@ app.delete('/album/:id', async (req, res) => {
 
     return res.json({
       message: 'Album successfully deleted',
-      contributor: result.rows[0]
+      data: result.rows[0]
     });
   } catch (error) {
     serverError(res, error);

@@ -51,6 +51,10 @@ export interface Album {
   release_date: string | null;
 }
 
+export interface AlbumWithProjects extends Album {
+  projects: Project[];
+}
+
 export type SortOptions = 'asc' | 'desc' | null;
 
 export enum MusicalKey {

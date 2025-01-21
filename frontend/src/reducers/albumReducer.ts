@@ -1,18 +1,21 @@
-import { Album, CreateStateType, ReducerActions } from '@/types.ts';
+import { AlbumWithProjects, CreateStateType, Project, ReducerActions } from '@/types.ts';
 
-export type AlbumState = CreateStateType<Album>;
+export type AlbumState = CreateStateType<AlbumWithProjects>;
 
-export type AlbumActions = ReducerActions<Album>
-  | { type: 'changed_title'; title: string | null; }
-  | { type: 'changed_notes'; notes: string | null; }
-  | { type: 'changed_release_date'; release_date: string | null; };
+export type AlbumActions = ReducerActions<AlbumWithProjects>
+  | { type: 'changed_title'; title: string; }
+  | { type: 'changed_notes'; notes: string; }
+  | { type: 'changed_release_date'; release_date: string; }
+  | { type: 'added_project'; project: Project; }
+  | { type: 'removed_project'; projectId: string; };
 
 export const initialState = {
   all: [],
   current: null,
   title: null,
   notes: null,
-  release_date: null
+  release_date: null,
+  projects: []
 };
 
 export function albumReducer(state: AlbumState, action: AlbumActions): AlbumState {
@@ -52,6 +55,20 @@ export function albumReducer(state: AlbumState, action: AlbumActions): AlbumStat
       return {
         ...state,
         release_date: action.release_date
+      };
+    }
+
+    case 'added_project': {
+      return {
+        ...state,
+        projects: [...state.projects, action.project]
+      };
+    }
+
+    case 'removed_project': {
+      return {
+        ...state,
+        projects: [...state.projects.filter(p => p.id !== action.projectId)]
       };
     }
   }

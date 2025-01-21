@@ -31,7 +31,7 @@ export default function ContributorList() {
     const id = generateId();
 
     try {
-      const response = await saveData<Contributor, Contributor>(`http://localhost:3000/contributor/${id}`, { first_name, artist_name });
+      const response = await saveData<Contributor, Contributor>(`http://localhost:3000/contributors/${id}`, { first_name, artist_name });
       setIsCreating(false);
       showToast(response.message);
       fetchData();
@@ -47,7 +47,7 @@ export default function ContributorList() {
     }
 
     try {
-      const response = await saveData<Contributor, Contributor>(`http://localhost:3000/contributor/${current?.id}`, { first_name, artist_name });
+      const response = await saveData<Contributor, Contributor>(`http://localhost:3000/contributors/${current?.id}`, { first_name, artist_name });
 
       showToast(response.message);
       dispatch({ type: 'set_current', current: null });
@@ -67,7 +67,7 @@ export default function ContributorList() {
 
     if (confirmed) {
       try {
-        const response = await deleteData<Contributor>(`http://localhost:3000/contributor/${current?.id}`);
+        const response = await deleteData<Contributor>(`http://localhost:3000/contributors/${current?.id}`);
         showToast(response.message);
         dispatch({ type: 'set_current', current: null });
         fetchData();

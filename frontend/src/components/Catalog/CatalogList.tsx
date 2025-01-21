@@ -25,7 +25,7 @@ export default function CatalogList() {
   const { currentData: catalog, loading, error: fetchError, refetch, PaginationNumbers, setCurrentPage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
 
   const sortByDate = (direction: SortOptions) => {
-    const newData = catalog.sort((a, b) => {
+    const newData = catalog.toSorted((a, b) => {
       if (!a.project.date_created || !b.project.date_created) { return 0; }
 
       if (direction === 'asc') {
@@ -59,7 +59,7 @@ export default function CatalogList() {
     }
 
     try {
-      const response = await saveData<UpdateProjectBody, Project>(`http://localhost:3000/project/${state.current.id}`, {
+      const response = await saveData<UpdateProjectBody, Project>(`http://localhost:3000/projects/${state.current.id}`, {
         release_name: state.release_name,
         notes: state.notes,
         bpm: state.bpm,

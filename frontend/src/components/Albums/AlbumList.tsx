@@ -1,18 +1,25 @@
 import useToast from '@/hooks/useToast.tsx';
 import { albumReducer, initialState } from '@/reducers/albumReducer.ts';
 import { albumService } from '@/services/index.ts';
-import { Album } from '@/types.ts';
+import { Album, AlbumWithProjects } from '@/types.ts';
 import { deleteData, formatReadableDate, generateId, saveData } from '@/utils.ts';
 import { useEffect, useReducer, useState } from 'react';
 import Button from '../ui/Button.tsx';
 import CreateAlbum from './CreateAlbum.tsx';
 import UpdateAlbum from './UpdateAlbum.tsx';
 
+interface UpdateAlbumBody {
+  title: string | null;
+  notes: string | null;
+  release_date: string | null;
+  project_ids: string[];
+}
+
 export default function AlbumList() {
   const [isCreating, setIsCreating] = useState(false);
   const { showToast, ToastComponent } = useToast();
   const [state, dispatch] = useReducer(albumReducer, initialState);
-  const { all: data, current, title, notes, release_date } = state;
+  const { all: data, current, title, notes, release_date, projects } = state;
 
   useEffect(() => {
     fetchData();
@@ -31,7 +38,7 @@ export default function AlbumList() {
     const id = generateId();
 
     try {
-      const response = await saveData<Album, Album>(`http://localhost:3000/album/${id}`, { title, notes, release_date });
+      const response = await saveData<Album, AlbumWithProjects>(`http://localhost:3000/albums/${id}`, { title, notes, release_date });
       showToast(response.message);
       fetchData();
     } catch (error) {
@@ -40,12 +47,24 @@ export default function AlbumList() {
   };
 
   const updateAlbum = async () => {
-    console.log('updated');
+    if (!current) {
+      console.error('No selected album');
+      return;
+    }
+    
+    try {
+      const response = await saveData<UpdateAlbumBody, AlbumWithProjects>(`http://localhost:3000/albums/${current.id}`, { title, notes, release_date, project_ids: projects.map(p => p.id) });
+      showToast(response.message);
+      console.log(response.data);
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const deleteAlbum = async () => {
     if (!current) {
-      console.error('No selected contributor');
+      console.error('No selected album');
       return;
     }
 
@@ -53,7 +72,7 @@ export default function AlbumList() {
 
     if (confirmed) {
       try {
-        const response = await deleteData<Album>(`http://localhost:3000/album/${current?.id}`);
+        const response = await deleteData<Album>(`http://localhost:3000/albums/${current.id}`);
         showToast(response.message);
         dispatch({ type: 'set_current', current: null });
         fetchData();
