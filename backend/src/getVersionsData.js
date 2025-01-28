@@ -1,5 +1,5 @@
-const scanDirectory = require('./scanDirectory');
-const { createDeterministicId } = require('./utils');
+import scanDirectory from './scanDirectory';
+import { createDeterministicId } from './utils';
 
 async function getVersionsData(baseDir) {
   try {
@@ -25,4 +25,4 @@ async function getVersionsData(baseDir) {
   }
 }
 
-module.exports = getVersionsData;
+export default getVersionsData;

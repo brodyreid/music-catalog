@@ -1,12 +1,10 @@
-const crypto = require('crypto');
+import { createHash } from 'crypto';
 
-const createDeterministicId = (projectName) => {
-  return crypto.createHash('sha256').update(projectName).digest('hex').slice(0, 16);
+export const createDeterministicId = (projectName) => {
+  return createHash('sha256').update(projectName).digest('hex').slice(0, 16);
 };
 
-const serverError = (res, error) => {
+export const serverError = (res, error) => {
   console.error(error);
   res.status(500).send('Server error');
 };
-
-module.exports = { createDeterministicId, serverError };

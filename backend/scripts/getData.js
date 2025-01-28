@@ -1,5 +1,5 @@
-const getProjectsData = require('../src/getProjectsData');
-const getVersionsData = require('../src/getVersionsData');
+import getProjectsData from '../src/getProjectsData';
+import getVersionsData from '../src/getVersionsData';
 
 const table = process.argv[2]; // 'projects' | 'versions'
 const baseDir = process.argv[3];

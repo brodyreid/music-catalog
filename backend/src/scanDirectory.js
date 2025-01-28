@@ -1,6 +1,6 @@
-const fs = require('fs').promises;
-const path = require('path');
-const { createDeterministicId } = require('./utils');
+import { promises as fs } from 'fs';
+import { join } from 'path';
+import { createDeterministicId } from './utils';
 
 async function getVersions(projectPath) {
   try {
@@ -18,7 +18,7 @@ async function scanDirectory(baseDir) {
   try {
     const entries = await fs.readdir(baseDir, { withFileTypes: true });
     const results = await Promise.all(entries.map(async (entry) => {
-      const fullPath = path.join(baseDir, entry.name);
+      const fullPath = join(baseDir, entry.name);
 
       if (entry.name.endsWith(' Project')) {
         const metadata = await fs.stat(fullPath);
@@ -50,4 +50,4 @@ async function scanDirectory(baseDir) {
 }
 
 
-module.exports = scanDirectory;
+export default scanDirectory;

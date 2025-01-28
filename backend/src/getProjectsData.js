@@ -1,4 +1,4 @@
-const scanDirectory = require('./scanDirectory');
+import scanDirectory from './scanDirectory';
 
 async function getProjectsData(baseDir) {
   try {
@@ -18,4 +18,4 @@ async function getProjectsData(baseDir) {
   }
 }
 
-module.exports = getProjectsData;
+export default getProjectsData;
