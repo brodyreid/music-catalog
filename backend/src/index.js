@@ -52,7 +52,7 @@ app.post('/projects/:id', async (req, res) => {
       WHERE id = $1
       RETURNING *;
       `, [id, release_name, notes, bpm, musical_key]);
-    
+
     if (contributor_ids?.length) {
       await client.query(`
         DELETE FROM project_contributors
@@ -186,7 +186,7 @@ app.post('/albums/:id', async (req, res) => {
       SET title = COALESCE(EXCLUDED.title, albums.title), notes = COALESCE(EXCLUDED.notes, albums.notes), release_date = COALESCE(EXCLUDED.release_date, albums.release_date)
       RETURNING *;
       `, [id, title, notes, release_date]);
-    
+
     if (project_ids?.length) {
       await client.query(`
           DELETE FROM album_projects

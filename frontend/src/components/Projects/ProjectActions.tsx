@@ -19,7 +19,7 @@ export default function ProjectActions({ state, dispatch, onUpdate }: ProjectAct
       {state.current && (
         <p className='text-lg text-orange-300'>{state.current.title}</p>
       )}
-      <div className={`grid grid-cols-3 gap-x-8 p-8 pt-6 border border-neutral-500 rounded-lg ${!state.current ? 'pointer-events-none opacity-50' : ''}`}>
+      <div className={`grid grid-cols-3 gap-x-8 p-4 border border-neutral-500 rounded-lg ${!state.current ? 'pointer-events-none opacity-50' : ''}`}>
         <div className='flex flex-col justify-between min-w-64'>
           <div>
             <p className='text-lg'>contributors</p>
