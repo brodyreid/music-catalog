@@ -35,7 +35,7 @@ export default function ProjectContributors({ state, dispatch }: ProjectContribu
           </ul>
         </div>
       </Modal>
-      <ul className='rounded p-2 bg-primary text-secondary space-y-2'>
+      <ul className='rounded-sm p-2 bg-primary text-secondary space-y-2'>
         {state.contributors?.map(c => (
           <li key={c.id} className='flex items-center justify-between'>
             <div className='font-bold text-accent'>{c.first_name}</div>
@@ -43,7 +43,7 @@ export default function ProjectContributors({ state, dispatch }: ProjectContribu
           </li>
         ))}
         <li className='text-sm'>
-          <button type='button' className='bg-transparent text-stone-500 hover ring-0 border-none outline-none' onClick={() => setIsModalOpen(true)}>
+          <button type='button' className='bg-transparent text-stone-500 hover ring-0 border-none outline-hidden' onClick={() => setIsModalOpen(true)}>
             <div className='flex items-center'><Plus className='w-4 mr-1' />add contributor</div>
           </button>
         </li>

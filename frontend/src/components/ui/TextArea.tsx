@@ -5,7 +5,7 @@ export default function TextArea(props: InputHTMLAttributes<HTMLTextAreaElement>
 
   return (
     <textarea
-      className={`rounded p-1 text-sm bg-primary text-secondary ${className || ''}`}
+      className={`rounded-sm p-1 text-sm bg-primary text-secondary ${className || ''}`}
       rows={6}
       {...rest}
     />
