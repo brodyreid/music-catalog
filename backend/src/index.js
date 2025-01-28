@@ -1,10 +1,10 @@
-import express, { json } from 'express';
 import cors from 'cors';
-import { query, connect } from './pool';
-import { serverError } from './utils';
+import express from 'express';
+import pool from './pool.cjs';
+import { serverError } from './utils.js';
 
 const app = express();
-app.use(json()).use(cors({ origin: process.env.ORIGIN_URL }));
+app.use(express.json()).use(cors({ origin: process.env.ORIGIN_URL }));
 
 const PORT = process.env.SERVER_PORT || 3000;
 
@@ -15,7 +15,7 @@ app.listen(PORT, () => {
 // Routes
 app.get('/projects', async (_req, res) => {
   try {
-    const result = await query(`
+    const result = await pool.query(`
       SELECT
       p.id,
       to_jsonb(p.*) as project,
@@ -38,7 +38,7 @@ app.get('/projects', async (_req, res) => {
 app.post('/projects/:id', async (req, res) => {
   const { id } = req.params;
   const { release_name, notes, bpm, musical_key, contributor_ids } = req.body;
-  const client = await connect();
+  const client = await pool.connect();
 
   if (!id) {
     return res.status(400).send('Bad id');
@@ -81,7 +81,7 @@ app.post('/projects/:id', async (req, res) => {
 
 app.get('/contributors', async (_req, res) => {
   try {
-    const result = await query(`
+    const result = await pool.query(`
       SELECT * FROM contributors ORDER BY first_name DESC;
       `);
 
@@ -95,7 +95,7 @@ app.get('/contributors/:id/projects', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await query(`
+    const result = await pool.query(`
         SELECT p.* FROM projects p
         JOIN project_contributors pc ON pc.project_id = p.id
         WHERE pc.contributor_id = $1;
@@ -116,7 +116,7 @@ app.post('/contributors/:id', async (req, res) => {
   }
 
   try {
-    const result = await query(`
+    const result = await pool.query(`
       INSERT INTO contributors (id, first_name, artist_name)
       VALUES ($1, $2, $3)
       ON CONFLICT (id)
@@ -138,7 +138,7 @@ app.delete('/contributors/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await query(`
+    const result = await pool.query(`
       DELETE FROM contributors WHERE id = $1
       `, [id]);
 
@@ -153,7 +153,7 @@ app.delete('/contributors/:id', async (req, res) => {
 
 app.get('/albums', async (_req, res) => {
   try {
-    const result = await query(`
+    const result = await pool.query(`
       SELECT a.*, JSONB_AGG(p.*) FILTER (WHERE p.id IS NOT NULL) AS projects
       FROM albums a
       LEFT JOIN album_projects ap ON ap.album_id = a.id
@@ -178,7 +178,7 @@ app.post('/albums/:id', async (req, res) => {
 
   try {
     await client.query('BEGIN');
-    const albumResult = await query(`
+    const albumResult = await pool.query(`
       INSERT INTO albums (id, title, notes, release_date)
       VALUES ($1, $2, $3, $4)
       ON CONFLICT (id)
@@ -217,7 +217,7 @@ app.delete('/albums/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await query(`
+    const result = await pool.query(`
       DELETE FROM albums WHERE id = $1
       `, [id]);
 
