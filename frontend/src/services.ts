@@ -20,7 +20,7 @@ const createService = <T>(resource: Resource) => {
         throw new Error(`Failed to fetch resource ${resource}`);
       }
       return await response.json();
-    }
+    },
   };
 };
 

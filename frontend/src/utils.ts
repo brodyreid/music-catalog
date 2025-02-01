@@ -4,20 +4,22 @@ export const formatReadableDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
     month: 'short',
     day: '2-digit',
-    year: 'numeric'
+    year: 'numeric',
   });
 };
 
 export const formatNumericDate = (dateString: string | null) => {
-  if (!dateString) { return ''; }
+  if (!dateString) {
+    return '';
+  }
   return new Date(dateString).toISOString().split('T')[0];
 };
 
-export const saveData = async<TBody, TResponse>(url: string, body: Omit<TBody, 'id'>): Promise<SaveDataResponse<TResponse>> => {
+export const saveData = async <TBody, TResponse>(url: string, body: Omit<TBody, 'id'>): Promise<SaveDataResponse<TResponse>> => {
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body) // "that's fine, right?" - alex
+    body: JSON.stringify(body), // "that's fine, right?" - alex
   });
 
   if (!response.ok) {
@@ -27,9 +29,9 @@ export const saveData = async<TBody, TResponse>(url: string, body: Omit<TBody, '
   return response.json();
 };
 
-export const deleteData = async<T>(url: string): Promise<SaveDataResponse<T>> => {
+export const deleteData = async <T>(url: string): Promise<SaveDataResponse<T>> => {
   const response = await fetch(url, {
-    method: 'DELETE'
+    method: 'DELETE',
   });
 
   if (!response.ok) {
@@ -43,5 +45,7 @@ export const generateId = () => {
   const array = new Uint8Array(8);
   window.crypto.getRandomValues(array);
 
-  return Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('');
+  return Array.from(array)
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
 };

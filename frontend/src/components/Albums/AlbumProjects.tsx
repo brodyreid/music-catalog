@@ -16,9 +16,7 @@ export default function AlbumProjects({ state }: AlbumProjectsProps) {
   return (
     <div>
       <p>tracks:</p>
-      <ol>
-        {state.current?.projects.map(p => <li key={p.id}>{p.release_name || p.title || 'no title'}</li>)}
-      </ol>
+      <ol>{state.current?.projects.map((p) => <li key={p.id}>{p.release_name || p.title || 'no title'}</li>)}</ol>
     </div>
   );
 }

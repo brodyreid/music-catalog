@@ -53,7 +53,7 @@ export default function AlbumList() {
     }
 
     try {
-      const response = await saveData<UpdateAlbumBody, AlbumWithProjects>(`http://localhost:3000/albums/${current.id}`, { title, notes, release_date, project_ids: projects.map(p => p.id) });
+      const response = await saveData<UpdateAlbumBody, AlbumWithProjects>(`http://localhost:3000/albums/${current.id}`, { title, notes, release_date, project_ids: projects.map((p) => p.id) });
       showToast(response.message);
       console.log(response.data);
       fetchData();
@@ -85,17 +85,20 @@ export default function AlbumList() {
   return (
     <>
       <ToastComponent />
-      {!(isCreating || state.current) &&
-        <Button onClick={() => { dispatch({ type: 'set_current', current: null }); setIsCreating(true); }}>
+      {!(isCreating || state.current) && (
+        <Button
+          onClick={() => {
+            dispatch({ type: 'set_current', current: null });
+            setIsCreating(true);
+          }}>
           create new album
-        </Button>}
-      {isCreating && <CreateAlbum dispatch={dispatch} onSubmit={createAlbum} onClose={() => setIsCreating(false)} />}
-      {state.current && (
-        <UpdateAlbum state={state} dispatch={dispatch} onSubmit={updateAlbum} onDelete={deleteAlbum} onClose={() => dispatch({ type: 'set_current', current: null })} />
+        </Button>
       )}
+      {isCreating && <CreateAlbum dispatch={dispatch} onSubmit={createAlbum} onClose={() => setIsCreating(false)} />}
+      {state.current && <UpdateAlbum state={state} dispatch={dispatch} onSubmit={updateAlbum} onDelete={deleteAlbum} onClose={() => dispatch({ type: 'set_current', current: null })} />}
       <div className='flex gap-16 mt-16'>
         <div>
-          <table className="font-mono font-extralight text-sm border-separate border-spacing-2">
+          <table className='font-mono font-extralight text-sm border-separate border-spacing-2'>
             <thead>
               <tr className='text-left border-b'>
                 <th className='pr-3'>title</th>
@@ -104,7 +107,7 @@ export default function AlbumList() {
               </tr>
             </thead>
             <tbody>
-              {data.map(album => {
+              {data.map((album) => {
                 const { id, title, notes, release_date } = album;
 
                 return (
@@ -112,10 +115,11 @@ export default function AlbumList() {
                     key={id}
                     className={`relative ${!isCreating && 'cursor-pointer hover'} ${current?.id === id && 'font-bold text-orange-300'}`}
                     onClick={() => {
-                      if (isCreating) { return; }
+                      if (isCreating) {
+                        return;
+                      }
                       dispatch({ type: 'set_current', current: album });
-                    }}
-                  >
+                    }}>
                     <td className='text-nowrap pr-3'>{title}</td>
                     <td className='text-nowrap pr-3'>{notes}</td>
                     <td className='text-nowrap pr-3'>{release_date && formatReadableDate(release_date)}</td>

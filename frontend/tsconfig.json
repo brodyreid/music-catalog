@@ -4,15 +4,9 @@
     "allowUmdGlobalAccess": true,
     "baseUrl": ".",
     "jsx": "react-jsx",
-    "lib": [
-      "ES2023",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "module": "NodeNext",
     "noEmit": true,
@@ -23,13 +17,7 @@
     "strict": true,
     "target": "ES2023",
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./@types"
-    ]
+    "typeRoots": ["./node_modules/@types", "./@types"]
   },
-  "include": [
-    "src/**/*",
-    "vite.config.ts"
-  ]
+  "include": ["src/**/*", "vite.config.ts"]
 }

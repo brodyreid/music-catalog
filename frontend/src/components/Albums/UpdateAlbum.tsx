@@ -33,11 +33,16 @@ export default function UpdateAlbum({ state, dispatch, onSubmit, onClose, onDele
           <DateField value={formatNumericDate(state.release_date)} onChange={(event) => dispatch({ type: 'changed_release_date', release_date: event.target.value })} className='w-full' />
         </div>
         <div className='flex justify-between gap-4 mt-4'>
-          <Button className='bg-transparent border border-primary w-full' onClick={onClose}>cancel</Button>
-          <Button className='bg-green-700 w-full' onClick={onSubmit}>update</Button>
+          <Button className='bg-transparent border border-primary w-full' onClick={onClose}>
+            cancel
+          </Button>
+          <Button className='bg-green-700 w-full' onClick={onSubmit}>
+            update
+          </Button>
         </div>
         <Button className='bg-transparent border border-red-600 mt-2 flex gap-2 justify-center items-center text-red-600' onClick={onDelete}>
-          <Trash className='w-4' />delete
+          <Trash className='w-4' />
+          delete
         </Button>
       </div>
       <AlbumProjects state={state} dispatch={dispatch} />

@@ -26,16 +26,18 @@ export default function CatalogList() {
 
   const sortByDate = (direction: SortOptions) => {
     const newData = catalog.toSorted((a, b) => {
-      if (!a.project.date_created || !b.project.date_created) { return 0; }
+      if (!a.project.date_created || !b.project.date_created) {
+        return 0;
+      }
 
       if (direction === 'asc') {
-        return (a.project.date_created < b.project.date_created) ? -1 : ((a.project.date_created > b.project.date_created) ? 1 : 0);
+        return a.project.date_created < b.project.date_created ? -1 : a.project.date_created > b.project.date_created ? 1 : 0;
       }
       if (direction === 'desc') {
-        return (a.project.date_created < b.project.date_created) ? 1 : ((a.project.date_created > b.project.date_created) ? -1 : 0);
+        return a.project.date_created < b.project.date_created ? 1 : a.project.date_created > b.project.date_created ? -1 : 0;
       }
 
-      return (a.id < b.id) ? -1 : ((a.id > b.id) ? 1 : 0);
+      return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
     });
 
     setSortDirection(direction);
@@ -64,18 +66,19 @@ export default function CatalogList() {
         notes: state.notes,
         bpm: state.bpm,
         musical_key: state.musical_key,
-        contributor_ids: state.contributors?.map(c => c.id) ?? []
+        contributor_ids: state.contributors?.map((c) => c.id) ?? [],
       });
 
-      setFilteredCatalog(prev => prev.map(prevEntry => {
-        if (prevEntry.id === response.data.id) {
-          return {
-            ...prevEntry,
-            project: response.data
-          };
-        }
-        return prevEntry;
-      })
+      setFilteredCatalog((prev) =>
+        prev.map((prevEntry) => {
+          if (prevEntry.id === response.data.id) {
+            return {
+              ...prevEntry,
+              project: response.data,
+            };
+          }
+          return prevEntry;
+        }),
       );
       showToast(response.message);
     } catch (error) {
@@ -92,15 +95,15 @@ export default function CatalogList() {
     return (
       <>
         <div>Sorry gamer, there was an error!</div>
-        <pre className='mt-8'>{fetchError.name}: {fetchError.message}</pre>
+        <pre className='mt-8'>
+          {fetchError.name}: {fetchError.message}
+        </pre>
       </>
     );
   }
 
   if (loading) {
-    return (
-      <div>Please wait, gamer! It's loading...</div>
-    );
+    return <div>Please wait, gamer! It's loading...</div>;
   }
 
   return (
@@ -117,4 +120,4 @@ export default function CatalogList() {
       )}
     </>
   );
-};
+}

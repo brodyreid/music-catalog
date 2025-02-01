@@ -13,9 +13,9 @@ interface ProjectsTableProps {
 
 export default function ProjectsTable({ catalog, state, dispatch, sortDirection, onSort }: ProjectsTableProps) {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
-  const [showTooltip, setShowTooltip] = useState<{ show: boolean; rowId: string | null; }>({
+  const [showTooltip, setShowTooltip] = useState<{ show: boolean; rowId: string | null }>({
     show: false,
-    rowId: null
+    rowId: null,
   });
 
   const handleNotesButtonClick = (rowId: string) => {
@@ -23,7 +23,7 @@ export default function ProjectsTable({ catalog, state, dispatch, sortDirection,
   };
 
   const handleSort = () => {
-    const newDirection = sortDirection === 'asc' ? 'desc' : (sortDirection === 'desc' ? null : 'asc');
+    const newDirection = sortDirection === 'asc' ? 'desc' : sortDirection === 'desc' ? null : 'asc';
     onSort(newDirection);
   };
 
@@ -43,7 +43,7 @@ export default function ProjectsTable({ catalog, state, dispatch, sortDirection,
   }, [showTooltip]);
 
   return (
-    <table className="font-mono font-extralight text-sm border-separate border-spacing-2 mb-12">
+    <table className='font-mono font-extralight text-sm border-separate border-spacing-2 mb-12'>
       <thead>
         <tr className='text-left border-b'>
           <th className='pr-3'>title</th>
@@ -55,13 +55,13 @@ export default function ProjectsTable({ catalog, state, dispatch, sortDirection,
           <th>
             <button type='button' onClick={handleSort}>
               <span>date_created</span>
-              <span>{sortDirection === 'asc' ? '\u25B4' : (sortDirection === 'desc' ? '\u25BE' : '')}</span>
+              <span>{sortDirection === 'asc' ? '\u25B4' : sortDirection === 'desc' ? '\u25BE' : ''}</span>
             </button>
           </th>
         </tr>
       </thead>
       <tbody>
-        {catalog.map(entry => {
+        {catalog.map((entry) => {
           const { contributors, versions } = entry;
           const { id, title, release_name, folder_path, notes, date_created, bpm, musical_key } = entry.project;
           const path = folder_path && folder_path.replace(/^.*\/projects\//i, '/');
@@ -71,26 +71,35 @@ export default function ProjectsTable({ catalog, state, dispatch, sortDirection,
               <td className='text-nowrap pr-3 truncate max-w-60'>
                 {
                   <>
-                    {notes &&
+                    {notes && (
                       <>
                         <div className='inline-block'>
-                          <button type='button' className='mr-2 font-bold text-tertiary' onClick={() => handleNotesButtonClick(id)}>i</button>
+                          <button type='button' className='mr-2 font-bold text-tertiary' onClick={() => handleNotesButtonClick(id)}>
+                            i
+                          </button>
                         </div>
-                        {(showTooltip.show && showTooltip.rowId === id) &&
-                          <div ref={tooltipRef} className='absolute top-full bg-stone-300 p-2 max-w-80 whitespace-pre-wrap rounded-md text-secondary font-normal z-20'>{notes}</div>
-                        }
+                        {showTooltip.show && showTooltip.rowId === id && (
+                          <div ref={tooltipRef} className='absolute top-full bg-stone-300 p-2 max-w-80 whitespace-pre-wrap rounded-md text-secondary font-normal z-20'>
+                            {notes}
+                          </div>
+                        )}
                       </>
-                    }
-                    <button type='button' onClick={() => dispatch({ type: 'set_current', current: { ...entry.project, contributors: entry.contributors || [] } })} className='cursor-pointer hover'>{title}</button>
+                    )}
+                    <button type='button' onClick={() => dispatch({ type: 'set_current', current: { ...entry.project, contributors: entry.contributors || [] } })} className='cursor-pointer hover'>
+                      {title}
+                    </button>
                   </>
                 }
               </td>
               <td className='text-nowrap pr-3'>{release_name}</td>
               <td className='text-nowrap pr-3'>{versions?.length ?? ''}</td>
-              <td className='text-nowrap pr-3'>{bpm && bpm + ' bpm'}{musical_key && ', ' + musical_key}</td>
+              <td className='text-nowrap pr-3'>
+                {bpm && bpm + ' bpm'}
+                {musical_key && ', ' + musical_key}
+              </td>
               <td className='text-nowrap pr-3'>{path}</td>
-              <td className='text-nowrap pr-3'>{contributors?.map(c => [c.first_name]).join(', ')}</td>
-              <td className="text-nowrap">{date_created ? formatReadableDate(date_created) : ''}</td>
+              <td className='text-nowrap pr-3'>{contributors?.map((c) => [c.first_name]).join(', ')}</td>
+              <td className='text-nowrap'>{date_created ? formatReadableDate(date_created) : ''}</td>
             </tr>
           );
         })}

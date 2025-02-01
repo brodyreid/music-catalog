@@ -20,24 +20,31 @@ export const usePagination = (url: string, currentSearchTerm?: string) => {
       <div className='flex justify-center mt-16'>
         {currentPage > 2 && (
           <>
-            <button onClick={() => handlePageChange(1)} className='px-2 hover'>1</button>
+            <button onClick={() => handlePageChange(1)} className='px-2 hover'>
+              1
+            </button>
             <p>...</p>
           </>
         )}
         {currentPage > 1 && (
           <>
-            <button onClick={() => handlePageChange(currentPage - 1)} className='px-2 hover'>{currentPage - 1}</button>
-
+            <button onClick={() => handlePageChange(currentPage - 1)} className='px-2 hover'>
+              {currentPage - 1}
+            </button>
           </>
         )}
         <p className='underline underline-offset-4 px-2'>{currentPage}</p>
         {currentPage < numberOfPages && (
           <>
-            <button onClick={() => handlePageChange(currentPage + 1)} className='px-2 hover'>{currentPage + 1}</button>
-            {currentPage < (numberOfPages - 2) && (
+            <button onClick={() => handlePageChange(currentPage + 1)} className='px-2 hover'>
+              {currentPage + 1}
+            </button>
+            {currentPage < numberOfPages - 2 && (
               <>
                 <p>...</p>
-                <button onClick={() => handlePageChange(numberOfPages)} className='px-2 hover'>{numberOfPages}</button>
+                <button onClick={() => handlePageChange(numberOfPages)} className='px-2 hover'>
+                  {numberOfPages}
+                </button>
               </>
             )}
           </>
@@ -50,31 +57,49 @@ export const usePagination = (url: string, currentSearchTerm?: string) => {
     const cleanCatalog: CatalogEntry[] = catalog.map(({ project: { title, ...projectRest }, versions, ...rest }) => ({
       project: {
         title: title.replace('Project', '').trim(),
-        ...projectRest
+        ...projectRest,
       },
       versions: versions,
       ...rest,
     }));
 
-    if (!currentSearchTerm) { return cleanCatalog; }
+    if (!currentSearchTerm) {
+      return cleanCatalog;
+    }
 
-    const wordsToSearch: string[] = currentSearchTerm ? currentSearchTerm.toLowerCase().split(' ').filter(word => word.trim() !== '') : [];
+    const wordsToSearch: string[] = currentSearchTerm
+      ? currentSearchTerm
+          .toLowerCase()
+          .split(' ')
+          .filter((word) => word.trim() !== '')
+      : [];
 
-    return cleanCatalog.filter(entry =>
-      wordsToSearch.every(word =>
-        entry.project.title.toLowerCase().includes(word) ||
-        entry.project.folder_path.toLowerCase().includes(word) ||
-        entry.project.notes?.toLowerCase().includes(word) ||
-        entry.project.release_name?.toLowerCase().includes(word) ||
-        entry.contributors?.map(c => [c.first_name, c.artist_name]).join(' ').toLowerCase().includes(word) ||
-        entry.versions?.map(v => v.name).join(' ').toLowerCase().includes(word) ||
-        entry.project.date_created && formatReadableDate(entry.project.date_created).toLowerCase().includes(word)
-      )
+    return cleanCatalog.filter((entry) =>
+      wordsToSearch.every(
+        (word) =>
+          entry.project.title.toLowerCase().includes(word) ||
+          entry.project.folder_path.toLowerCase().includes(word) ||
+          entry.project.notes?.toLowerCase().includes(word) ||
+          entry.project.release_name?.toLowerCase().includes(word) ||
+          entry.contributors
+            ?.map((c) => [c.first_name, c.artist_name])
+            .join(' ')
+            .toLowerCase()
+            .includes(word) ||
+          entry.versions
+            ?.map((v) => v.name)
+            .join(' ')
+            .toLowerCase()
+            .includes(word) ||
+          (entry.project.date_created && formatReadableDate(entry.project.date_created).toLowerCase().includes(word)),
+      ),
     );
   };
 
   useEffect(() => {
-    if (!catalog.length) { return; }
+    if (!catalog.length) {
+      return;
+    }
 
     const searchedCatalog = searchCatalog(catalog);
 

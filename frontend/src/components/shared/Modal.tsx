@@ -4,7 +4,7 @@ interface ModalProps {
   isOpen: boolean;
   closeModal: () => void;
   children: ReactNode;
-  dimensions?: { w: number, h: number; };
+  dimensions?: { w: number; h: number };
 }
 
 export default function Modal({ isOpen, closeModal, children, dimensions = { w: 64, h: 64 } }: ModalProps) {
@@ -14,7 +14,7 @@ export default function Modal({ isOpen, closeModal, children, dimensions = { w: 
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       closeModal();
     }
-  };
+  }
 
   function handleKeyDown(event: KeyboardEvent) {
     if (modalRef.current && event.key === 'Escape') {

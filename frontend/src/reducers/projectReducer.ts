@@ -2,13 +2,14 @@ import { Contributor, CreateStateType, MusicalKey, ProjectWithContributors, Redu
 
 export type ProjectState = Omit<CreateStateType<ProjectWithContributors>, 'title' | 'folder_path' | 'date_created'>;
 
-export type ProjectActions = ReducerActions<ProjectWithContributors>
-  | { type: 'changed_release_name'; release_name: string; }
-  | { type: 'changed_notes'; notes: string; }
-  | { type: 'changed_bpm'; bpm: number; }
-  | { type: 'changed_musical_key'; musical_key: MusicalKey; }
-  | { type: 'added_contributor'; contributor: Contributor; }
-  | { type: 'removed_contributor'; contributorId: string; };
+export type ProjectActions =
+  | ReducerActions<ProjectWithContributors>
+  | { type: 'changed_release_name'; release_name: string }
+  | { type: 'changed_notes'; notes: string }
+  | { type: 'changed_bpm'; bpm: number }
+  | { type: 'changed_musical_key'; musical_key: MusicalKey }
+  | { type: 'added_contributor'; contributor: Contributor }
+  | { type: 'removed_contributor'; contributorId: string };
 
 export const initialState = {
   all: [],
@@ -17,7 +18,7 @@ export const initialState = {
   notes: null,
   bpm: null,
   musical_key: null,
-  contributors: []
+  contributors: [],
 };
 
 export function projectReducer(state: ProjectState, action: ProjectActions): ProjectState {
@@ -25,7 +26,7 @@ export function projectReducer(state: ProjectState, action: ProjectActions): Pro
     case 'set_all': {
       return {
         ...state,
-        all: action.all
+        all: action.all,
       };
     }
 
@@ -37,50 +38,50 @@ export function projectReducer(state: ProjectState, action: ProjectActions): Pro
         notes: action.current?.notes ?? null,
         bpm: action.current?.bpm ?? null,
         musical_key: action.current?.musical_key ?? null,
-        contributors: action.current?.contributors ?? []
+        contributors: action.current?.contributors ?? [],
       };
     }
 
     case 'changed_release_name': {
       return {
         ...state,
-        release_name: action.release_name || null
+        release_name: action.release_name || null,
       };
     }
 
     case 'changed_notes': {
       return {
         ...state,
-        notes: action.notes || null
+        notes: action.notes || null,
       };
     }
 
     case 'changed_bpm': {
       return {
         ...state,
-        bpm: action.bpm || null
+        bpm: action.bpm || null,
       };
     }
 
     case 'changed_musical_key': {
       return {
         ...state,
-        musical_key: action.musical_key || null
+        musical_key: action.musical_key || null,
       };
     }
 
     case 'added_contributor': {
       return {
         ...state,
-        contributors: [...state.contributors, action.contributor]
+        contributors: [...state.contributors, action.contributor],
       };
     }
 
     case 'removed_contributor': {
       return {
         ...state,
-        contributors: [...state.contributors.filter(c => c.id !== action.contributorId)]
+        contributors: [...state.contributors.filter((c) => c.id !== action.contributorId)],
       };
     }
   }
-};
+}

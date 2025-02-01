@@ -21,8 +21,12 @@ export default function CreateAlbum({ dispatch, onSubmit, onClose }: CreateAlbum
       <p className='mt-2'>release_date</p>
       <DateField onChange={(event) => dispatch({ type: 'changed_release_date', release_date: event.target.value })} />
       <div className='flex justify-between gap-4 mt-4'>
-        <Button className='bg-transparent border border-primary w-full' onClick={onClose}>cancel</Button>
-        <Button className='bg-green-700 w-full' onClick={onSubmit}>create</Button>
+        <Button className='bg-transparent border border-primary w-full' onClick={onClose}>
+          cancel
+        </Button>
+        <Button className='bg-green-700 w-full' onClick={onSubmit}>
+          create
+        </Button>
       </div>
     </div>
   );

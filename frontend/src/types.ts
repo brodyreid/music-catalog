@@ -3,11 +3,11 @@ export interface ReducerState<T> {
   current: T | null;
 }
 
-export type ReducerActions<T> = { type: 'set_all'; all: T[] | []; } | { type: 'set_current'; current: T | null; };
+export type ReducerActions<T> = { type: 'set_all'; all: T[] | [] } | { type: 'set_current'; current: T | null };
 
 export type CreateStateType<T> = ReducerState<T> & Omit<T, 'id'>;
 
-export type SaveDataResponse<T> = { message: string; } & { data: T; };
+export type SaveDataResponse<T> = { message: string } & { data: T };
 
 export interface CatalogEntry {
   id: string;
@@ -15,7 +15,7 @@ export interface CatalogEntry {
   contributors: Contributor[] | null;
   versions: Version[] | null;
   albums: Album[] | null;
-};
+}
 
 export interface Project {
   id: string;
@@ -81,5 +81,5 @@ export enum MusicalKey {
   A_SHARP_MAJOR = 'A# Major',
   A_SHARP_MINOR = 'A# Minor',
   B_MAJOR = 'B Major',
-  B_MINOR = 'B Minor'
+  B_MINOR = 'B Minor',
 }

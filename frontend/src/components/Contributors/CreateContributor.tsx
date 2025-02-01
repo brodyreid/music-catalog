@@ -17,8 +17,12 @@ export default function CreateContributor({ dispatch, onSubmit, onClose }: Creat
       <p className='mt-2'>artist_name</p>
       <TextField onChange={(event) => dispatch({ type: 'changed_artist_name', artist_name: event.target.value })} />
       <div className='flex justify-between gap-4 mt-4'>
-        <Button className='bg-transparent border border-primary w-full' onClick={onClose}>cancel</Button>
-        <Button className='bg-green-700 w-full' onClick={onSubmit}>create</Button>
+        <Button className='bg-transparent border border-primary w-full' onClick={onClose}>
+          cancel
+        </Button>
+        <Button className='bg-green-700 w-full' onClick={onSubmit}>
+          create
+        </Button>
       </div>
     </div>
   );
