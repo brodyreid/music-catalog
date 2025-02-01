@@ -76,7 +76,7 @@ export default function CatalogTable({ catalog, state, dispatch, sortDirection, 
                     {notes && (
                       <>
                         <div className='inline-block'>
-                          <button type='button' className='mr-2 font-bold text-tertiary' onClick={() => handleNotesButtonClick(id)}>
+                          <button type='button' className='mr-2 font-bold text-tertiary hover' onClick={() => handleNotesButtonClick(id)}>
                             i
                           </button>
                         </div>

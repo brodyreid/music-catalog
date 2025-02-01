@@ -1,3 +1,5 @@
+import { Database } from './database.types.ts';
+
 export interface ReducerState<T> {
   all: T[] | [];
   current: T | null;
@@ -9,6 +11,12 @@ export type CreateStateType<T> = ReducerState<T> & Omit<T, 'id'>;
 
 export type SaveDataResponse<T> = { message: string } & { data: T };
 
+export type Project = Database['public']['Tables']['projects']['Row'];
+export type Contributor = Database['public']['Tables']['contributors']['Row'];
+export type Album = Database['public']['Tables']['albums']['Row'];
+export type Version = Database['public']['Tables']['versions']['Row'];
+export type ProjectWithAll = Project & { contributors: Contributor[]; albums: Album[]; versions: Version[] };
+
 export interface CatalogEntry {
   id: string;
   project: Project;
@@ -17,38 +25,8 @@ export interface CatalogEntry {
   albums: Album[] | null;
 }
 
-export interface Project {
-  id: string;
-  title: string;
-  release_name: string | null;
-  folder_path: string;
-  notes: string | null;
-  bpm: number | null;
-  musical_key: MusicalKey | null;
-  date_created: string | null;
-}
-
 export interface ProjectWithContributors extends Project {
   contributors: Contributor[];
-}
-
-export interface Version {
-  id: string;
-  name: string | null;
-  date_created: string | null;
-}
-
-export interface Contributor {
-  id: string;
-  first_name: string | null;
-  artist_name: string | null;
-}
-
-export interface Album {
-  id: string;
-  title: string | null;
-  notes: string | null;
-  release_date: string | null;
 }
 
 export interface AlbumWithProjects extends Album {

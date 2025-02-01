@@ -6,7 +6,7 @@ export type ProjectActions =
   | ReducerActions<ProjectWithContributors>
   | { type: 'changed_release_name'; release_name: string }
   | { type: 'changed_notes'; notes: string }
-  | { type: 'changed_bpm'; bpm: number }
+  | { type: 'changed_bpm'; bpm: string }
   | { type: 'changed_musical_key'; musical_key: MusicalKey }
   | { type: 'added_contributor'; contributor: Contributor }
   | { type: 'removed_contributor'; contributorId: string };
