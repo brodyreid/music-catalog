@@ -1,1 +1,0 @@
-ALTER TABLE versions DROP FOREIGN KEY (project_id);

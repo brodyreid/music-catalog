@@ -1,1 +1,0 @@
-ALTER TABLE projects ADD COLUMN release_name varchar(255);

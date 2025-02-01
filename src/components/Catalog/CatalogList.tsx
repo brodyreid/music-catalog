@@ -2,6 +2,7 @@ import Search from '@/components/shared/Search.tsx';
 import { usePagination } from '@/hooks/usePagination.tsx';
 import useToast from '@/hooks/useToast.tsx';
 import { initialState, projectReducer } from '@/reducers/projectReducer.ts';
+import supabase from '@/supabase.ts';
 import { CatalogEntry, MusicalKey, Project, SortOptions } from '@/types.ts';
 import { saveData } from '@/utils.ts';
 import { useEffect, useReducer, useState } from 'react';
@@ -22,7 +23,19 @@ export default function CatalogList() {
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');
   const { showToast } = useToast();
   const [state, dispatch] = useReducer(projectReducer, initialState);
+  const [test, setTest] = useState<any[]>([]);
   const { currentData: catalog, loading, error: fetchError, refetch, PaginationNumbers, setCurrentPage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
+
+  useEffect(() => {
+    const getTest = async () => {
+      const { data } = await supabase.from('projects').select();
+      if (data?.length) {
+        setTest(data);
+      }
+    };
+
+    getTest();
+  }, []);
 
   const sortByDate = (direction: SortOptions) => {
     const newData = catalog.toSorted((a, b) => {
