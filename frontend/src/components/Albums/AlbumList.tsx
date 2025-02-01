@@ -1,6 +1,6 @@
 import useToast from '@/hooks/useToast.tsx';
 import { albumReducer, initialState } from '@/reducers/albumReducer.ts';
-import { albumService } from '@/services/index.ts';
+import { albumService } from '@/services.ts';
 import { Album, AlbumWithProjects } from '@/types.ts';
 import { deleteData, formatReadableDate, generateId, saveData } from '@/utils.ts';
 import { useEffect, useReducer, useState } from 'react';
@@ -51,7 +51,7 @@ export default function AlbumList() {
       console.error('No selected album');
       return;
     }
-    
+
     try {
       const response = await saveData<UpdateAlbumBody, AlbumWithProjects>(`http://localhost:3000/albums/${current.id}`, { title, notes, release_date, project_ids: projects.map(p => p.id) });
       showToast(response.message);
