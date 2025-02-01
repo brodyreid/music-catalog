@@ -27,14 +27,27 @@ export default function CatalogList() {
 
   useEffect(() => {
     const getCatalog = async () => {
-      const { data, error } = await supabase.from('projects').select(`
+      const { data: entries, error } = await supabase.from('projects').select(`
         *,
-        contributors ( * )
+        contributors ( * ),
+        versions ( * ),
+        albums ( * )
         `);
-      console.log({ data, error });
-      if (data?.length) {
-        setCatalog(data);
+      if (error) {
+        throw new Error(error.message);
       }
+      setCatalog(
+        entries?.map(({ id, contributors, versions, albums, ...rest }) => ({
+          id,
+          project: {
+            id,
+            ...rest,
+          },
+          contributors,
+          versions,
+          albums,
+        })),
+      );
     };
 
     getCatalog();

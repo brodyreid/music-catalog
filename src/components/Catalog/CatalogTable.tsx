@@ -3,7 +3,7 @@ import { CatalogEntry, SortOptions } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
 import { Dispatch, useEffect, useRef, useState } from 'react';
 
-interface ProjectsTableProps {
+interface CatalogTableProps {
   catalog: CatalogEntry[];
   state: ProjectState;
   dispatch: Dispatch<ProjectActions>;
@@ -11,7 +11,7 @@ interface ProjectsTableProps {
   onSort: (direction: SortOptions) => void;
 }
 
-export default function ProjectsTable({ catalog, state, dispatch, sortDirection, onSort }: ProjectsTableProps) {
+export default function CatalogTable({ catalog, state, dispatch, sortDirection, onSort }: CatalogTableProps) {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const [showTooltip, setShowTooltip] = useState<{ show: boolean; rowId: string | null }>({
     show: false,
@@ -41,6 +41,8 @@ export default function ProjectsTable({ catalog, state, dispatch, sortDirection,
       document.removeEventListener('mousedown', handlePageClick);
     };
   }, [showTooltip]);
+
+  console.log(state.current)
 
   return (
     <table className='font-mono font-extralight text-sm border-separate border-spacing-2 mb-12'>
