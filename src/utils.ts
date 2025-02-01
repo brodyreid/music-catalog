@@ -1,4 +1,4 @@
-import { SaveDataResponse } from './types.ts';
+import { SaveDataResponse } from './types/index.ts';
 
 export const formatReadableDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {

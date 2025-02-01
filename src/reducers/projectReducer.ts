@@ -1,4 +1,4 @@
-import { Contributor, CreateStateType, MusicalKey, ProjectWithContributors, ReducerActions } from '@/types.ts';
+import { Contributor, CreateStateType, MusicalKey, ProjectWithContributors, ReducerActions } from '@/types/index.ts';
 
 export type ProjectState = Omit<CreateStateType<ProjectWithContributors>, 'title' | 'folder_path' | 'date_created'>;
 

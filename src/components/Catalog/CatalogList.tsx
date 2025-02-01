@@ -1,9 +1,8 @@
 import Search from '@/components/shared/Search.tsx';
-import { usePagination } from '@/hooks/usePagination.tsx';
 import useToast from '@/hooks/useToast.tsx';
 import { initialState, projectReducer } from '@/reducers/projectReducer.ts';
 import supabase from '@/supabase.ts';
-import { CatalogEntry, MusicalKey, Project, SortOptions } from '@/types.ts';
+import { CatalogEntry, MusicalKey, Project, SortOptions } from '@/types/index.ts';
 import { saveData } from '@/utils.ts';
 import { useEffect, useReducer, useState } from 'react';
 import ProjectActions from '../Projects/ProjectActions.tsx';
@@ -23,18 +22,22 @@ export default function CatalogList() {
   const [sortDirection, setSortDirection] = useState<SortOptions>('desc');
   const { showToast } = useToast();
   const [state, dispatch] = useReducer(projectReducer, initialState);
-  const [test, setTest] = useState<any[]>([]);
-  const { currentData: catalog, loading, error: fetchError, refetch, PaginationNumbers, setCurrentPage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
+  const [catalog, setCatalog] = useState<any[]>([]);
+  // const { currentData: catalog, loading, error: fetchError, refetch, PaginationNumbers, setCurrentPage } = usePagination('http://localhost:3000/projects', currentSearchTerm);
 
   useEffect(() => {
-    const getTest = async () => {
-      const { data } = await supabase.from('projects').select();
+    const getCatalog = async () => {
+      const { data, error } = await supabase.from('projects').select(`
+        *,
+        contributors ( * )
+        `);
+      console.log({ data, error });
       if (data?.length) {
-        setTest(data);
+        setCatalog(data);
       }
     };
 
-    getTest();
+    getCatalog();
   }, []);
 
   const sortByDate = (direction: SortOptions) => {
@@ -59,12 +62,12 @@ export default function CatalogList() {
 
   const resetCatalogList = () => {
     setCurrentSearchTerm('');
-    refetch();
+    // refetch();
   };
 
   const handleSearch = (term: string) => {
     setCurrentSearchTerm(term);
-    setCurrentPage(1);
+    // setCurrentPage(1);
   };
 
   const handleUpdateProject = async () => {
@@ -103,21 +106,21 @@ export default function CatalogList() {
     setFilteredCatalog(catalog);
   }, [catalog]);
 
-  if (fetchError) {
-    console.error(fetchError);
-    return (
-      <>
-        <div>Sorry gamer, there was an error!</div>
-        <pre className='mt-8'>
-          {fetchError.name}: {fetchError.message}
-        </pre>
-      </>
-    );
-  }
+  // if (fetchError) {
+  //   console.error(fetchError);
+  //   return (
+  //     <>
+  //       <div>Sorry gamer, there was an error!</div>
+  //       <pre className='mt-8'>
+  //         {fetchError.name}: {fetchError.message}
+  //       </pre>
+  //     </>
+  //   );
+  // }
 
-  if (loading) {
-    return <div>Please wait, gamer! It's loading...</div>;
-  }
+  // if (loading) {
+  //   return <div>Please wait, gamer! It's loading...</div>;
+  // }
 
   return (
     <>
@@ -127,7 +130,7 @@ export default function CatalogList() {
       </div>
       {filteredCatalog?.length && (
         <>
-          <PaginationNumbers />
+          {/* <PaginationNumbers /> */}
           <CatalogTable catalog={filteredCatalog} state={state} dispatch={dispatch} sortDirection={sortDirection} onSort={sortByDate} />
         </>
       )}

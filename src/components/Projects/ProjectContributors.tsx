@@ -3,7 +3,7 @@ import useFetchData from '@/hooks/useFetchData.tsx';
 import Cross from '@/icons/Cross.tsx';
 import Plus from '@/icons/Plus.tsx';
 import { ProjectActions, ProjectState } from '@/reducers/projectReducer.ts';
-import { Contributor } from '@/types.ts';
+import { Contributor } from '@/types/index.ts';
 import { Dispatch, useState } from 'react';
 
 interface ProjectContributorsProps {

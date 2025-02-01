@@ -1,4 +1,4 @@
-import { AlbumWithProjects, Contributor, Project } from '@/types.ts';
+import { AlbumWithProjects, Contributor, Project } from '@/types/index.ts';
 
 type Resource = 'projects' | 'albums' | 'contributors';
 

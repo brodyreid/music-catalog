@@ -2,7 +2,7 @@ import Button from '@/components/ui/Button.tsx';
 import useToast from '@/hooks/useToast.tsx';
 import { contributorReducer, initialState } from '@/reducers/contributorReducer.ts';
 import { contributorService } from '@/services.ts';
-import { Contributor } from '@/types.ts';
+import { Contributor } from '@/types/index.ts';
 import { deleteData, generateId, saveData } from '@/utils.ts';
 import { useEffect, useReducer, useState } from 'react';
 import CreateContributor from './CreateContributor.tsx';

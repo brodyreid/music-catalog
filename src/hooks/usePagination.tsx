@@ -1,4 +1,4 @@
-import { CatalogEntry } from '@/types.ts';
+import { CatalogEntry } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
 import { useEffect, useState } from 'react';
 import useFetchData from './useFetchData.tsx';

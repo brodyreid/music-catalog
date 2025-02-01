@@ -1,4 +1,4 @@
-import { AlbumWithProjects, CreateStateType, Project, ReducerActions } from '@/types.ts';
+import { AlbumWithProjects, CreateStateType, Project, ReducerActions } from '@/types/index.ts';
 
 export type AlbumState = CreateStateType<AlbumWithProjects>;
 

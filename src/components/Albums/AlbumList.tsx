@@ -1,7 +1,7 @@
 import useToast from '@/hooks/useToast.tsx';
 import { albumReducer, initialState } from '@/reducers/albumReducer.ts';
 import { albumService } from '@/services.ts';
-import { Album, AlbumWithProjects } from '@/types.ts';
+import { Album, AlbumWithProjects } from '@/types/index.ts';
 import { deleteData, formatReadableDate, generateId, saveData } from '@/utils.ts';
 import { useEffect, useReducer, useState } from 'react';
 import Button from '../ui/Button.tsx';

@@ -1,5 +1,5 @@
 import { ProjectActions, ProjectState } from '@/reducers/projectReducer.ts';
-import { CatalogEntry, SortOptions } from '@/types.ts';
+import { CatalogEntry, SortOptions } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
 import { Dispatch, useEffect, useRef, useState } from 'react';
 

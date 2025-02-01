@@ -2,7 +2,7 @@ import SelectField from '@/components/ui/SelectField.tsx';
 import TextArea from '@/components/ui/TextArea.tsx';
 import TextField from '@/components/ui/TextField.tsx';
 import { ProjectActions, ProjectState } from '@/reducers/projectReducer.ts';
-import { MusicalKey } from '@/types.ts';
+import { MusicalKey } from '@/types/index.ts';
 import { Dispatch } from 'react';
 import ProjectContributors from './ProjectContributors.tsx';
 

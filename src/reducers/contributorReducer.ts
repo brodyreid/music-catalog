@@ -1,4 +1,4 @@
-import { Contributor, CreateStateType, ReducerActions } from '@/types.ts';
+import { Contributor, CreateStateType, ReducerActions } from '@/types/index.ts';
 
 export type ContributorState = CreateStateType<Contributor>;
 
