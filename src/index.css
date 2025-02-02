@@ -28,7 +28,7 @@
 }
 
 @utility hover {
-  @apply hover:brightness-75 duration-100 cursor-pointer;
+  @apply hover:brightness-85 duration-200 cursor-pointer;
 }
 
 @layer base {
