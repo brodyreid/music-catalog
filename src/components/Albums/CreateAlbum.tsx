@@ -1,7 +1,7 @@
-import Button from '@/components/ui/Button.tsx';
-import DateField from '@/components/ui/DateField.tsx';
-import TextArea from '@/components/ui/TextArea.tsx';
-import TextField from '@/components/ui/TextField.tsx';
+import Button from '@/components/Button.tsx';
+import DateField from '@/components/DateField.tsx';
+import TextArea from '@/components/TextArea.tsx';
+import TextField from '@/components/TextField.tsx';
 import { AlbumActions } from '@/reducers/albumReducer.ts';
 import { Dispatch } from 'react';
 

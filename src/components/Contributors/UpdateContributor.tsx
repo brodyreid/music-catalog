@@ -1,7 +1,7 @@
-import Button from '@/components/ui/Button.tsx';
-import TextField from '@/components/ui/TextField.tsx';
-import Trash from '@/icons/Trash.tsx';
+import Button from '@/components/Button.tsx';
+import TextField from '@/components/TextField.tsx';
 import { ContributorActions, ContributorState } from '@/reducers/contributorReducer.ts';
+import { Trash } from 'lucide-react';
 import { Dispatch } from 'react';
 
 interface UpdateContributorProps {

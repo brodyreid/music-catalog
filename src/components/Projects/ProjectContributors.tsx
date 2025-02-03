@@ -1,9 +1,8 @@
-import Modal from '@/components/shared/Modal.tsx';
+import Modal from '@/components/Modal.tsx';
 import useFetchData from '@/hooks/useFetchData.tsx';
-import Cross from '@/icons/Cross.tsx';
-import Plus from '@/icons/Plus.tsx';
 import { ProjectActions, ProjectState } from '@/reducers/projectReducer.ts';
 import { Contributor } from '@/types/index.ts';
+import { Plus, X } from 'lucide-react';
 import { Dispatch, useState } from 'react';
 
 interface ProjectContributorsProps {
@@ -44,7 +43,7 @@ export default function ProjectContributors({ state, dispatch }: ProjectContribu
           <li key={c.id} className='flex items-center justify-between'>
             <div className='font-bold text-accent'>{c.first_name}</div>
             <button onClick={() => handleRemoveContributor(c.id)}>
-              <Cross className='w-4' />
+              <X className='w-4' />
             </button>
           </li>
         ))}

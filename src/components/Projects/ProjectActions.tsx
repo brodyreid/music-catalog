@@ -1,6 +1,6 @@
-import SelectField from '@/components/ui/SelectField.tsx';
-import TextArea from '@/components/ui/TextArea.tsx';
-import TextField from '@/components/ui/TextField.tsx';
+import SelectField from '@/components/SelectField.tsx';
+import TextArea from '@/components/TextArea.tsx';
+import TextField from '@/components/TextField.tsx';
 import { ProjectActions, ProjectState } from '@/reducers/projectReducer.ts';
 import { MusicalKey } from '@/types/index.ts';
 import { Dispatch } from 'react';

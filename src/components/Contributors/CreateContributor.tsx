@@ -1,5 +1,5 @@
-import Button from '@/components/ui/Button.tsx';
-import TextField from '@/components/ui/TextField.tsx';
+import Button from '@/components/Button.tsx';
+import TextField from '@/components/TextField.tsx';
 import { ContributorActions } from '@/reducers/contributorReducer.ts';
 import { Dispatch } from 'react';
 

@@ -1,4 +1,4 @@
-import Button from '@/components/ui/Button.tsx';
+import Button from '@/components/Button.tsx';
 import { albumReducer, initialState } from '@/reducers/albumReducer.ts';
 import supabase from '@/supabase.ts';
 import { formatReadableDate } from '@/utils.ts';

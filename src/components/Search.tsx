@@ -1,4 +1,4 @@
-import RotateCw from '@/icons/RotateCw.tsx';
+import { RotateCw } from 'lucide-react';
 
 interface SearchProps {
   onSearch: (term: string) => void;

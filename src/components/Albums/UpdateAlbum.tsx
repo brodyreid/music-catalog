@@ -1,12 +1,11 @@
-import Button from '@/components/ui/Button.tsx';
-import DateField from '@/components/ui/DateField.tsx';
-import TextArea from '@/components/ui/TextArea.tsx';
-import TextField from '@/components/ui/TextField.tsx';
-import Trash from '@/icons/Trash.tsx';
+import Button from '@/components/Button.tsx';
+import DateField from '@/components/DateField.tsx';
+import TextArea from '@/components/TextArea.tsx';
+import TextField from '@/components/TextField.tsx';
 import { AlbumActions, AlbumState } from '@/reducers/albumReducer.ts';
 import { formatNumericDate } from '@/utils.ts';
+import { Trash } from 'lucide-react';
 import { Dispatch } from 'react';
-import AlbumProjects from './AlbumProjects.tsx';
 
 interface UpdateAlbumProps {
   state: AlbumState;
@@ -45,7 +44,6 @@ export default function UpdateAlbum({ state, dispatch, onSubmit, onClose, onDele
           delete
         </Button>
       </div>
-      <AlbumProjects state={state} dispatch={dispatch} />
     </div>
   );
 }
