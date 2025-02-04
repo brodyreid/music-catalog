@@ -4,7 +4,7 @@ export default function Button(props: HtmlHTMLAttributes<HTMLButtonElement>) {
   const { className, children, ...rest } = props;
 
   return (
-    <button type='button' className={`bg-accent px-4 py-2 rounded-sm hover ${className || ''}`} {...rest}>
+    <button type='button' className={`text-sm bg-green-700 px-2 py-1 rounded-md hover ${className || ''}`} {...rest}>
       {children}
     </button>
   );

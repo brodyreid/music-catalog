@@ -12,7 +12,7 @@ export default function App() {
         <Navbar />
         <div className='flex flex-1'>
           <Sidebar />
-          <div className='container mx-auto px-4'>
+          <div className='flex flex-col flex-1'>
             <Routes>
               <Route path='/' element={<Projects />} />
               <Route path='/projects' element={<Projects />} />

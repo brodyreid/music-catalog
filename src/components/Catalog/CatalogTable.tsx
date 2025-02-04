@@ -42,10 +42,10 @@ export default function CatalogTable({ catalog, state, dispatch, sortDirection, 
     };
   }, [showTooltip]);
 
-  console.log(state.current)
+  console.log(state.current);
 
   return (
-    <table className='font-mono font-extralight text-sm border-separate border-spacing-2 mb-12'>
+    <table className='text-sm border-separate border-spacing-2 mb-12'>
       <thead>
         <tr className='text-left border-b'>
           <th className='pr-3'>title</th>
@@ -76,7 +76,7 @@ export default function CatalogTable({ catalog, state, dispatch, sortDirection, 
                     {notes && (
                       <>
                         <div className='inline-block'>
-                          <button type='button' className='mr-2 font-bold text-tertiary hover' onClick={() => handleNotesButtonClick(id)}>
+                          <button type='button' className='mr-2 font-bold text-border hover' onClick={() => handleNotesButtonClick(id)}>
                             i
                           </button>
                         </div>

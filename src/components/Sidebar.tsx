@@ -6,7 +6,7 @@ export default function Sidebar() {
   const activeTab = (pathname: string) => (location.pathname === pathname ? 'active-tab' : 'hover:bg-gray-700/50');
 
   return (
-    <div className='w-64 border-r border-tertiary'>
+    <div className='w-64 border-r border-border'>
       <div className='flex flex-col gap-4 mt-8 m-4 text-text-muted'>
         <Link to={'/projects'} className={`rounded-md duration-300 flex gap-2 p-2 ${activeTab('/projects')}`}>
           <Library strokeWidth={1.25} /> Projects

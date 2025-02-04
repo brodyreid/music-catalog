@@ -6,9 +6,10 @@
 
   --color-primary: #e7e5e4;
   --color-secondary: #18181b;
-  --color-tertiary: #333333;
+  --color-border: #333333;
   --color-accent: #2563eb;
   --color-background: #121212;
+  --color-background-mid: #171717;
   --color-text: #f8f9fa;
   --color-text-muted: #a1a1aa;
 }
@@ -63,10 +64,27 @@
   }
 }
 
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+}
+
 @utility hover {
   @apply hover:brightness-85 duration-300 cursor-pointer;
 }
 
 @utility active-tab {
   @apply bg-gray-700 text-text;
+}
+
+@utility input-field {
+  @apply bg-border/50 border border-text-muted/50 rounded-md px-4 py-2 ring-border focus:ring-2 focus-visible:ring-text-muted/30 focus-visible:border-text/50 focus-visible:shadow-lg outline-none w-52;
+}
+
+@utility btn-green {
+  @apply text-xs bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-1 justify-center;
+}
+
+@utility btn-gray {
+  @apply text-xs bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover flex items-center gap-1 justify-center;
 }

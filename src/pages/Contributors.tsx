@@ -24,7 +24,7 @@ export default function Contributors() {
   return (
     <>
       <div className={`flex gap-16 mt-16`}>
-        <table className='font-mono font-extralight text-sm border-separate border-spacing-2'>
+        <table className='text-sm border-separate border-spacing-2'>
           <thead>
             <tr className='text-left border-b'>
               <th className='pr-3'>first_name</th>
