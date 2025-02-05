@@ -16,22 +16,7 @@ export type Contributor = Database['public']['Tables']['contributors']['Row'];
 export type Album = Database['public']['Tables']['albums']['Row'];
 export type Version = Database['public']['Tables']['versions']['Row'];
 export type ProjectWithAll = Project & { contributors: Contributor[]; albums: Album[]; versions: Version[] };
-
-export interface CatalogEntry {
-  id: string;
-  project: Project;
-  contributors: Contributor[] | null;
-  versions: Version[] | null;
-  albums: Album[] | null;
-}
-
-export interface ProjectWithContributors extends Project {
-  contributors: Contributor[];
-}
-
-export interface AlbumWithProjects extends Album {
-  projects: Project[];
-}
+export type AlbumWithProjects = Album & { projects: Project[] };
 
 export type SortOptions = 'asc' | 'desc' | null;
 

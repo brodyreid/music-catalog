@@ -15,9 +15,9 @@ export default function App() {
           <div className='flex flex-col flex-1'>
             <Routes>
               <Route path='/' element={<Projects />} />
-              <Route path='/projects' element={<Projects />} />
-              <Route path='/albums' element={<Albums />} />
-              <Route path='/contributors' element={<Contributors />} />
+              <Route path='projects' element={<Projects />} />
+              <Route path='albums' element={<Albums />} />
+              <Route path='contributors' element={<Contributors />} />
             </Routes>
           </div>
         </div>
