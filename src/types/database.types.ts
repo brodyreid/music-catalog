@@ -3,36 +3,6 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
-      album_projects: {
-        Row: {
-          album_id: string | null;
-          project_id: string | null;
-        };
-        Insert: {
-          album_id?: string | null;
-          project_id?: string | null;
-        };
-        Update: {
-          album_id?: string | null;
-          project_id?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'album_projects_album_id_fkey';
-            columns: ['album_id'];
-            isOneToOne: false;
-            referencedRelation: 'albums';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'album_projects_project_id_fkey';
-            columns: ['project_id'];
-            isOneToOne: false;
-            referencedRelation: 'projects';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
       albums: {
         Row: {
           id: string;
@@ -72,36 +42,18 @@ export type Database = {
         };
         Relationships: [];
       };
-      migrations: {
-        Row: {
-          id: number;
-          name: string;
-          run_on: string;
-        };
-        Insert: {
-          id?: number;
-          name: string;
-          run_on: string;
-        };
-        Update: {
-          id?: number;
-          name?: string;
-          run_on?: string;
-        };
-        Relationships: [];
-      };
       project_contributors: {
         Row: {
-          contributor_id: string | null;
-          project_id: string | null;
+          contributor_id: string;
+          project_id: string;
         };
         Insert: {
-          contributor_id?: string | null;
-          project_id?: string | null;
+          contributor_id: string;
+          project_id: string;
         };
         Update: {
-          contributor_id?: string | null;
-          project_id?: string | null;
+          contributor_id?: string;
+          project_id?: string;
         };
         Relationships: [
           {
@@ -122,36 +74,47 @@ export type Database = {
       };
       projects: {
         Row: {
-          bpm: string | null;
+          album_id: string | null;
+          bpm: number | null;
           date_created: string | null;
           folder_path: string | null;
           id: string;
           musical_key: Database['public']['Enums']['musical_key'] | null;
           notes: string | null;
           release_name: string | null;
-          title: string | null;
+          title: string;
         };
         Insert: {
-          bpm?: string | null;
+          album_id?: string | null;
+          bpm?: number | null;
           date_created?: string | null;
           folder_path?: string | null;
           id: string;
           musical_key?: Database['public']['Enums']['musical_key'] | null;
           notes?: string | null;
           release_name?: string | null;
-          title?: string | null;
+          title: string;
         };
         Update: {
-          bpm?: string | null;
+          album_id?: string | null;
+          bpm?: number | null;
           date_created?: string | null;
           folder_path?: string | null;
           id?: string;
           musical_key?: Database['public']['Enums']['musical_key'] | null;
           notes?: string | null;
           release_name?: string | null;
-          title?: string | null;
+          title?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'projects_album_id_fkey';
+            columns: ['album_id'];
+            isOneToOne: false;
+            referencedRelation: 'albums';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       versions: {
         Row: {
