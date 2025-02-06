@@ -10,9 +10,9 @@ In the backend (music-catalog-server), I can run
 ```
 node scripts/insertData.js "~/Music/Ableton/Projects"
 ```
-and all my worries melt away as my beautiful, normalized tables are populated with folder paths, project creation dates, version names, and more!
+and all my worries melt away as my beautiful, normalized tables are populated with folder paths, project creation dates, and more!
 
-## Populate projects and versions tables
+## Populate projects tables
 ```
 node scripts/insertData.js "/path/to/base/folder"
 ```

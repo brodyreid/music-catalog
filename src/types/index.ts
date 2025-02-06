@@ -14,8 +14,7 @@ export type SaveDataResponse<T> = { message: string } & { data: T };
 export type Project = Database['public']['Tables']['projects']['Row'];
 export type Contributor = Database['public']['Tables']['contributors']['Row'];
 export type Album = Database['public']['Tables']['albums']['Row'];
-export type Version = Database['public']['Tables']['versions']['Row'];
-export type ProjectWithAll = Project & { contributors: Contributor[]; albums: Album[]; versions: Version[] };
+export type ProjectWithAll = Project & { contributors: Contributor[]; albums: Album[]; };
 export type AlbumWithProjects = Album & { projects: Project[] };
 
 export type SortOptions = 'asc' | 'desc' | null;

@@ -10,7 +10,6 @@ export default function Projects() {
       const { data: entries, error }: { data: ProjectWithAll[] | null; error: any } = await supabase.from('projects').select(`
         *,
         contributors ( * ),
-        versions ( * ),
         albums ( * )
         `);
       if (error) {

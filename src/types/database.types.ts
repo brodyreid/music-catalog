@@ -1,260 +1,260 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   public: {
     Tables: {
       albums: {
         Row: {
-          id: string;
-          notes: string | null;
-          release_date: string | null;
-          title: string | null;
-        };
+          id: number
+          notes: string | null
+          release_date: string | null
+          title: string
+        }
         Insert: {
-          id: string;
-          notes?: string | null;
-          release_date?: string | null;
-          title?: string | null;
-        };
+          id?: number
+          notes?: string | null
+          release_date?: string | null
+          title: string
+        }
         Update: {
-          id?: string;
-          notes?: string | null;
-          release_date?: string | null;
-          title?: string | null;
-        };
-        Relationships: [];
-      };
+          id?: number
+          notes?: string | null
+          release_date?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       contributors: {
         Row: {
-          artist_name: string | null;
-          first_name: string | null;
-          id: string;
-        };
+          artist_name: string | null
+          first_name: string | null
+          id: number
+        }
         Insert: {
-          artist_name?: string | null;
-          first_name?: string | null;
-          id: string;
-        };
+          artist_name?: string | null
+          first_name?: string | null
+          id?: number
+        }
         Update: {
-          artist_name?: string | null;
-          first_name?: string | null;
-          id?: string;
-        };
-        Relationships: [];
-      };
+          artist_name?: string | null
+          first_name?: string | null
+          id?: number
+        }
+        Relationships: []
+      }
       project_contributors: {
         Row: {
-          contributor_id: string;
-          project_id: string;
-        };
+          contributor_id: number
+          project_id: string
+        }
         Insert: {
-          contributor_id: string;
-          project_id: string;
-        };
+          contributor_id: number
+          project_id: string
+        }
         Update: {
-          contributor_id?: string;
-          project_id?: string;
-        };
+          contributor_id?: number
+          project_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'project_contributors_contributor_id_fkey';
-            columns: ['contributor_id'];
-            isOneToOne: false;
-            referencedRelation: 'contributors';
-            referencedColumns: ['id'];
+            foreignKeyName: "project_contributors_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributors"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'project_contributors_project_id_fkey';
-            columns: ['project_id'];
-            isOneToOne: false;
-            referencedRelation: 'projects';
-            referencedColumns: ['id'];
+            foreignKeyName: "project_contributors_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       projects: {
         Row: {
-          album_id: string | null;
-          bpm: number | null;
-          date_created: string | null;
-          folder_path: string | null;
-          id: string;
-          musical_key: Database['public']['Enums']['musical_key'] | null;
-          notes: string | null;
-          release_name: string | null;
-          title: string;
-        };
+          album_id: number | null
+          bpm: number | null
+          date_created: string | null
+          folder_path: string | null
+          id: string
+          musical_key: Database["public"]["Enums"]["musical_key"] | null
+          notes: string | null
+          release_name: string | null
+          title: string
+        }
         Insert: {
-          album_id?: string | null;
-          bpm?: number | null;
-          date_created?: string | null;
-          folder_path?: string | null;
-          id: string;
-          musical_key?: Database['public']['Enums']['musical_key'] | null;
-          notes?: string | null;
-          release_name?: string | null;
-          title: string;
-        };
+          album_id?: number | null
+          bpm?: number | null
+          date_created?: string | null
+          folder_path?: string | null
+          id: string
+          musical_key?: Database["public"]["Enums"]["musical_key"] | null
+          notes?: string | null
+          release_name?: string | null
+          title: string
+        }
         Update: {
-          album_id?: string | null;
-          bpm?: number | null;
-          date_created?: string | null;
-          folder_path?: string | null;
-          id?: string;
-          musical_key?: Database['public']['Enums']['musical_key'] | null;
-          notes?: string | null;
-          release_name?: string | null;
-          title?: string;
-        };
+          album_id?: number | null
+          bpm?: number | null
+          date_created?: string | null
+          folder_path?: string | null
+          id?: string
+          musical_key?: Database["public"]["Enums"]["musical_key"] | null
+          notes?: string | null
+          release_name?: string | null
+          title?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'projects_album_id_fkey';
-            columns: ['album_id'];
-            isOneToOne: false;
-            referencedRelation: 'albums';
-            referencedColumns: ['id'];
+            foreignKeyName: "projects_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "albums"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-      versions: {
-        Row: {
-          date_created: string | null;
-          id: string;
-          name: string | null;
-          project_id: string | null;
-        };
-        Insert: {
-          date_created?: string | null;
-          id: string;
-          name?: string | null;
-          project_id?: string | null;
-        };
-        Update: {
-          date_created?: string | null;
-          id?: string;
-          name?: string | null;
-          project_id?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'versions_project_id_fkey';
-            columns: ['project_id'];
-            isOneToOne: false;
-            referencedRelation: 'projects';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-    };
+        ]
+      }
+    }
     Views: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Functions: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Enums: {
       musical_key:
-        | 'C Major'
-        | 'C Minor'
-        | 'C# Major'
-        | 'C# Minor'
-        | 'D Major'
-        | 'D Minor'
-        | 'D# Major'
-        | 'D# Minor'
-        | 'E Major'
-        | 'E Minor'
-        | 'F Major'
-        | 'F Minor'
-        | 'F# Major'
-        | 'F# Minor'
-        | 'G Major'
-        | 'G Minor'
-        | 'G# Major'
-        | 'G# Minor'
-        | 'A Major'
-        | 'A Minor'
-        | 'A# Major'
-        | 'A# Minor'
-        | 'B Major'
-        | 'B Minor';
-    };
+        | "C Major"
+        | "C Minor"
+        | "C# Major"
+        | "C# Minor"
+        | "D Major"
+        | "D Minor"
+        | "D# Major"
+        | "D# Minor"
+        | "E Major"
+        | "E Minor"
+        | "F Major"
+        | "F Minor"
+        | "F# Major"
+        | "F# Minor"
+        | "G Major"
+        | "G Minor"
+        | "G# Major"
+        | "G# Minor"
+        | "A Major"
+        | "A Minor"
+        | "A# Major"
+        | "A# Minor"
+        | "B Major"
+        | "B Minor"
+    }
     CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-};
+      [_ in never]: never
+    }
+  }
+}
 
-type PublicSchema = Database[Extract<keyof Database, 'public'>];
+type PublicSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views']) | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database } ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] & Database[PublicTableNameOrOptions['schema']]['Views']) : never = never,
+  PublicTableNameOrOptions extends
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions['schema']]['Tables'] & Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
-      Row: infer R;
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views'])
-    ? (PublicSchema['Tables'] & PublicSchema['Views'])[PublicTableNameOrOptions] extends {
-        Row: infer R;
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
       }
       ? R
       : never
-    : never;
+    : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database } ? keyof Database[PublicTableNameOrOptions['schema']]['Tables'] : never = never,
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
-      Insert: infer I;
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
-        Insert: infer I;
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
       }
       ? I
       : never
-    : never;
+    : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database } ? keyof Database[PublicTableNameOrOptions['schema']]['Tables'] : never = never,
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
-      Update: infer U;
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
-        Update: infer U;
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
       }
       ? U
       : never
-    : never;
+    : never
 
-export type Enums<PublicEnumNameOrOptions extends keyof PublicSchema['Enums'] | { schema: keyof Database }, EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database } ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums'] : never = never> = PublicEnumNameOrOptions extends {
-  schema: keyof Database;
-}
-  ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
-    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
-    : never;
+export type Enums<
+  PublicEnumNameOrOptions extends
+    | keyof PublicSchema["Enums"]
+    | { schema: keyof Database },
+  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = PublicEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes'] | { schema: keyof Database },
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database;
+    schema: keyof Database
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes']
-    ? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
-    : never;
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never

@@ -1,45 +1,43 @@
 import Modal from '@/components/Modal.tsx';
 import supabase from '@/supabase.ts';
 import { AlbumWithProjects } from '@/types/index.ts';
-import { formatReadableDate, generateId } from '@/utils.ts';
+import { formatReadableDate } from '@/utils.ts';
 import { ChevronDown, ChevronRight, Pencil } from 'lucide-react';
 import { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 type FormData = {
   title: string;
-  notes: string;
-  release_date: string;
+  notes: string | null;
+  release_date: string | null;
 };
 
 export default function Albums() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAlbum, setSelectedAlbum] = useState<AlbumWithProjects>();
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const [albums, setAlbums] = useState<AlbumWithProjects[]>([]);
   const {
     formState: { errors },
     register,
     handleSubmit,
-  } = useForm<FormData>({
-    defaultValues: {
-      title: selectedAlbum?.title ?? undefined,
-      notes: selectedAlbum?.notes ?? undefined,
-      release_date: selectedAlbum?.release_date ?? undefined,
-    },
-  });
+    reset,
+  } = useForm<FormData>();
 
   const handleRowClick = (id: string) => {
     setExpandedRows((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
   };
 
   const handlePencilClick = (album: AlbumWithProjects) => {
-    setSelectedAlbum(album);
+    reset({
+      title: album.title ?? undefined,
+      notes: album.notes ?? undefined,
+      release_date: album.release_date ?? undefined,
+    });
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setSelectedAlbum(undefined);
+    reset();
     setIsModalOpen(false);
   };
 
@@ -60,26 +58,24 @@ export default function Albums() {
     getAlbums();
   }, []);
 
-  const createAlbum = async (formData: FormData) => {
+  const upsertAlbum = async (formData: FormData) => {
     const { error } = await supabase
       .from('albums')
-      .insert([{ id: generateId(), title: formData.title, notes: formData.notes, release_date: formData.release_date }])
+      .upsert([{ title: formData.title, notes: formData.notes || null, release_date: formData.release_date || null }])
       .select();
 
-    setIsModalOpen(false);
+    closeModal();
 
     if (error) {
       throw error;
     }
   };
 
-  console.log(expandedRows);
-
   return (
     <div>
       {/* Form modal */}
       <Modal isOpen={isModalOpen} closeModal={closeModal}>
-        <form onSubmit={handleSubmit(createAlbum)} className='w-128'>
+        <form onSubmit={handleSubmit(upsertAlbum)} className='w-128'>
           <div className='flex justify-between items-center'>
             <label>Title</label>
             <input {...register('title', { required: 'Title is required' })} className='input-field' />
@@ -124,7 +120,7 @@ export default function Albums() {
         </thead>
         <tbody>
           {albums.map((album) => {
-            const isExpanded = expandedRows.includes(album.id);
+            const isExpanded = expandedRows.includes(album.id.toString());
             const hasProjects = !!album.projects.length;
 
             return (
@@ -133,7 +129,7 @@ export default function Albums() {
                   <td className='text-nowrap p-3 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handlePencilClick(album)}>
                     <Pencil size={12} strokeWidth={1.25} />
                   </td>
-                  <td className={`text-nowrap p-3 border border-border ${hasProjects && 'hover hover:bg-background-mid'}`} onClick={hasProjects ? () => handleRowClick(album.id) : undefined}>
+                  <td className={`text-nowrap p-3 border border-border ${hasProjects && 'hover hover:bg-background-mid'}`} onClick={hasProjects ? () => handleRowClick(album.id.toString()) : undefined}>
                     <p className='flex items-center gap-1.5'>
                       {hasProjects && (isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />)} {album.title}
                     </p>
@@ -144,7 +140,7 @@ export default function Albums() {
                 {isExpanded && (
                   <tr>
                     <td></td>
-                    <td colSpan={3}>
+                    <td colSpan={3} className='border-l border-r border-border'>
                       <ol>
                         {album.projects.map((project) => (
                           <li key={project.id} className='p-3 list-inside list-decimal'>
