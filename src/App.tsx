@@ -8,17 +8,19 @@ import Projects from './pages/Projects.tsx';
 export default function App() {
   return (
     <BrowserRouter>
-      <div className='flex flex-col min-h-screen'>
+      <div className='flex flex-col h-screen dark:[color-scheme:dark]'>
         <Navbar />
-        <div className='flex flex-1'>
+        <div className='flex overflow-hidden'>
           <Sidebar />
-          <div className='flex flex-col flex-1'>
-            <Routes>
-              <Route path='/' element={<Projects />} />
-              <Route path='projects' element={<Projects />} />
-              <Route path='albums' element={<Albums />} />
-              <Route path='contributors' element={<Contributors />} />
-            </Routes>
+          <div className='flex flex-col flex-1 overflow-hidden'>
+            <div className='overflow-auto max-h-screen'>
+              <Routes>
+                <Route path='/' element={<Projects />} />
+                <Route path='projects' element={<Projects />} />
+                <Route path='albums' element={<Albums />} />
+                <Route path='contributors' element={<Contributors />} />
+              </Routes>
+            </div>
           </div>
         </div>
       </div>
