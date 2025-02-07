@@ -1,9 +1,9 @@
 import Modal from '@/components/Modal.tsx';
-import supabase from '@/supabase.ts';
+import { useCreateAlbum, useDeleteAlbum, useGetAlbums, useUpdateAlbum } from '@/hooks/useAlbums.ts';
 import { AlbumWithProjects } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
 import { ChevronDown, ChevronRight, Minus, Pencil } from 'lucide-react';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 type FormData = {
@@ -16,13 +16,16 @@ export default function Albums() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAlbumId, setEditingId] = useState<number | null>(null);
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
-  const [albums, setAlbums] = useState<AlbumWithProjects[]>([]);
   const {
-    formState: { errors },
+    formState: { errors: formErrors },
     register,
     handleSubmit,
     reset,
   } = useForm<FormData>();
+  const { data: albums = [], isLoading, error } = useGetAlbums();
+  const createAlbum = useCreateAlbum();
+  const updateAlbum = useUpdateAlbum();
+  const deleteAlbum = useDeleteAlbum();
 
   const handleRowClick = (id: string) => {
     setExpandedRows((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
@@ -48,39 +51,16 @@ export default function Albums() {
     setIsModalOpen(false);
   };
 
-  const getAlbums = async () => {
-    const { data, error } = await supabase.from('albums').select(`*, projects ( * )`).order('id');
-    if (error) {
-      throw error;
-    }
-
-    setAlbums(data);
-  };
-
-  useEffect(() => {
-    getAlbums();
-  }, []);
-
-  const createEditAlbum = async (formData: FormData) => {
-    // Update
+  const handleSave = async (formData: FormData) => {
     if (editingAlbumId) {
-      const { error } = await supabase.from('albums').update(formData).eq('id', editingAlbumId);
-      if (error) {
-        throw error;
-      }
+      updateAlbum({ id: editingAlbumId, data: formData });
     } else {
-      // Insert
-      const { error } = await supabase.from('albums').upsert([{ title: formData.title, notes: formData.notes || null, release_date: formData.release_date || null }]);
-      if (error) {
-        throw error;
-      }
+      createAlbum(formData);
     }
-
     closeModal();
-    getAlbums();
   };
 
-  const deleteAlbum = async () => {
+  const handleDelete = () => {
     if (!editingAlbumId) {
       throw Error('Album ID cannot be null');
     }
@@ -88,24 +68,23 @@ export default function Albums() {
       return;
     }
 
-    const { error } = await supabase.from('albums').delete().eq('id', editingAlbumId);
-    if (error) {
-      throw error;
-    }
+    deleteAlbum(editingAlbumId);
     closeModal();
-    getAlbums();
   };
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div>
       {/* Form modal */}
       <Modal isOpen={isModalOpen} closeModal={closeModal}>
-        <form onSubmit={handleSubmit(createEditAlbum)} className='w-128'>
+        <form onSubmit={handleSubmit(handleSave)} className='w-128'>
           <div className='flex justify-between items-center'>
             <label>Title</label>
             <input {...register('title', { required: 'Title is required' })} className='input-field' />
           </div>
-          {errors.title && <p className='text-red-700'>{errors.title.message}</p>}
+          {formErrors.title && <p className='text-red-700'>{formErrors.title.message}</p>}
           <div className='flex justify-between mt-8'>
             <label>Notes</label>
             <textarea {...register('notes')} rows={4} className='input-field' />
@@ -115,7 +94,7 @@ export default function Albums() {
             <input {...register('release_date')} type='date' className='input-field dark:text-white dark:[color-scheme:dark]' />
           </div>
           <div className='flex justify-between mt-8 pt-4 border-t border-border'>
-            <button type='button' className='text-xs bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover flex items-center gap-2.5 justify-center' onClick={deleteAlbum}>
+            <button type='button' className='text-xs bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover flex items-center gap-2.5 justify-center' onClick={handleDelete}>
               Delete
             </button>
             <div className='flex items-center gap-4'>

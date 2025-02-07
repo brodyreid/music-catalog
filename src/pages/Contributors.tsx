@@ -1,25 +1,28 @@
-import { contributorReducer, initialState } from '@/reducers/contributorReducer.ts';
 import supabase from '@/supabase.ts';
-import { useEffect, useReducer } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Contributors() {
-  const [state, dispatch] = useReducer(contributorReducer, initialState);
-  const { all: data, current } = state;
+  const getContributors = async () => {
+    const { data, error } = await supabase.from('contributors').select(`
+      *
+      `);
+    if (error) {
+      throw error;
+    }
+    return data;
+  };
 
-  useEffect(() => {
-    const getContributors = async () => {
-      const { data, error } = await supabase.from('contributors').select(`
-        *
-        `);
-      if (error) {
-        throw error;
-      }
+  const {
+    data = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['contributors'],
+    queryFn: getContributors,
+  });
 
-      dispatch({ type: 'set_all', all: data });
-    };
-
-    getContributors();
-  }, []);
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>
@@ -35,12 +38,7 @@ export default function Contributors() {
             {data.map((contributor) => {
               const { id, first_name, artist_name } = contributor;
               return (
-                <tr
-                  key={id}
-                  className={`relative cursor-pointer hover ${current?.id === id && 'font-bold text-orange-300'}`}
-                  onClick={() => {
-                    dispatch({ type: 'set_current', current: contributor });
-                  }}>
+                <tr key={id} className={`relative cursor-pointer hover`}>
                   <td className='text-nowrap pr-3'>{first_name}</td>
                   <td className='text-nowrap pr-3'>{artist_name}</td>
                 </tr>

@@ -22,6 +22,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/rules-of-hooks': 'error',
       'react/jsx-max-props-per-line': ['off', { maximum: 1, when: 'multiline' }],
       'typescript-eslint/no-explicit-any': 'off',
     },

@@ -1,31 +1,39 @@
 import supabase from '@/supabase.ts';
 import { ProjectWithAll } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
+import { useQuery } from '@tanstack/react-query';
 import { Minus, Pencil } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function Projects() {
-  const [projects, setProjects] = useState<ProjectWithAll[]>([]);
   const [editingAlbumId, setEditingId] = useState<number | null>(null);
 
   const getProjects = async () => {
     const { data, error } = await supabase.from('projects').select(`*, contributors ( * ), albums ( * )`);
     if (error) {
-      throw new Error(error.message);
+      throw error;
     }
 
-    setProjects(data);
+    return data;
   };
 
-  useEffect(() => {
-    getProjects();
-  }, []);
+  const {
+    data: projects = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['getProjects'],
+    queryFn: getProjects,
+  });
 
   const handleEdit = (project: ProjectWithAll) => {
     console.log(project.id);
   };
 
   const nullableCell = (value: any) => value || <Minus size={16} className='text-text-muted/80' />;
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>
