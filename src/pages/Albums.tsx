@@ -1,3 +1,4 @@
+import { Loading } from '@/components/Loading.tsx';
 import Modal from '@/components/Modal.tsx';
 import { useCreateAlbum, useDeleteAlbum, useGetAlbums, useUpdateAlbum } from '@/hooks/useAlbums.ts';
 import { AlbumWithProjects } from '@/types/index.ts';
@@ -23,9 +24,10 @@ export default function Albums() {
     reset,
   } = useForm<FormData>();
   const { data: albums = [], isLoading, error } = useGetAlbums();
-  const createAlbum = useCreateAlbum();
-  const updateAlbum = useUpdateAlbum();
-  const deleteAlbum = useDeleteAlbum();
+  const { createAlbum, isCreating } = useCreateAlbum();
+  const { updateAlbum, isUpdating } = useUpdateAlbum();
+  const { deleteAlbum, isDeleting } = useDeleteAlbum();
+  const isMutating = isCreating || isUpdating || isDeleting;
 
   const handleRowClick = (id: string) => {
     setExpandedRows((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
@@ -72,7 +74,7 @@ export default function Albums() {
     closeModal();
   };
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading || isMutating) return <Loading />;
   if (error) return <p>Error: {error.message}</p>;
 
   return (

@@ -1,3 +1,4 @@
+import { Loading } from '@/components/Loading.tsx';
 import supabase from '@/supabase.ts';
 import { ProjectWithAll } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
@@ -32,7 +33,7 @@ export default function Projects() {
 
   const nullableCell = (value: any) => value || <Minus size={16} className='text-text-muted/80' />;
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Loading />
   if (error) return <p>Error: {error.message}</p>;
 
   return (

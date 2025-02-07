@@ -1,3 +1,4 @@
+import { Loading } from '@/components/Loading.tsx';
 import supabase from '@/supabase.ts';
 import { useQuery } from '@tanstack/react-query';
 
@@ -21,7 +22,7 @@ export default function Contributors() {
     queryFn: getContributors,
   });
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Loading />;
   if (error) return <p>Error: {error.message}</p>;
 
   return (

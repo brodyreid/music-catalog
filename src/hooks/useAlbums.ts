@@ -6,32 +6,38 @@ export const useGetAlbums = () => useQuery({ queryKey: ['albums'], queryFn: fetc
 export const useCreateAlbum = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createAlbum,
-    onSuccess: (data) => {
-      queryClient.setQueryData(['albums'], data);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['albums'] });
     },
-  }).mutate;
+  });
+
+  return { createAlbum: mutate, isCreating: isPending };
 };
 
 export const useUpdateAlbum = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: updateAlbum,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['albums'] });
     },
-  }).mutate;
+  });
+
+  return { updateAlbum: mutate, isUpdating: isPending };
 };
 
 export const useDeleteAlbum = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: deleteAlbum,
-    onSuccess: (data) => {
-      queryClient.setQueryData(['albums'], data);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['albums'] });
     },
-  }).mutate;
+  });
+
+  return { deleteAlbum: mutate, isDeleting: isPending };
 };
