@@ -41,6 +41,16 @@ export const deleteData = async <T>(url: string): Promise<SaveDataResponse<T>> =
   return response.json();
 };
 
+export const generateHash = async (key: string) => {
+  const encoder = new TextEncoder();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(key));
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+
+  return hashHex;
+};
+
+// Deprecated
 export const generateId = () => {
   const array = new Uint8Array(8);
   window.crypto.getRandomValues(array);

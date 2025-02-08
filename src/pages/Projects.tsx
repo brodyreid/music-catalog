@@ -1,4 +1,4 @@
-import { updateProject } from '@/api/projectQueries.ts';
+import { deleteProject, updateProject } from '@/api/projectQueries.ts';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
 import { useGetProjects } from '@/hooks/useProjects.ts';
@@ -58,6 +58,18 @@ export default function Projects() {
     closeModal();
   };
 
+  const handleDelete = () => {
+    if (!selected) {
+      throw Error('No project selected');
+    }
+    if (!window.confirm('Are you sure you want to delete this project?')) {
+      return;
+    }
+
+    deleteProject(selected.id);
+    closeModal();
+  };
+
   if (isLoading) return <LoadingBars />;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -88,7 +100,7 @@ export default function Projects() {
                 </option>
               ))}
             </select>
-            <ChevronDown className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ' size={20} />
+            <ChevronDown strokeWidth={1.5} className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none' size={20} />
           </div>
           {formErrors.title && <p className='text-red-700'>{formErrors.title.message}</p>}
           <div className='flex justify-between mt-8'>
@@ -101,7 +113,7 @@ export default function Projects() {
           </div>
           <div className='flex mt-8 pt-4 border-t border-border'>
             {selected && (
-              <button type='button' className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover'>
+              <button type='button' className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover' onClick={handleDelete}>
                 Delete
               </button>
             )}
