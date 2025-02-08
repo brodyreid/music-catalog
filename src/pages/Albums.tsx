@@ -32,8 +32,8 @@ export default function Albums() {
   const handleEdit = (album: AlbumWithProjects) => {
     reset({
       title: album.title,
-      notes: album.notes ?? null,
-      release_date: album.release_date ?? null,
+      notes: album.notes,
+      release_date: album.release_date,
     });
     setEditingId(album.id);
     setIsModalOpen(true);
@@ -74,7 +74,7 @@ export default function Albums() {
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div>
+    <>
       {/* Form modal */}
       <Modal isOpen={isModalOpen} closeModal={closeModal}>
         <form onSubmit={handleSubmit(handleSave)} className='w-128'>
@@ -92,14 +92,14 @@ export default function Albums() {
             <input {...register('release_date')} type='date' className='input-field dark:text-white dark:[color-scheme:dark]' />
           </div>
           <div className='flex justify-between mt-8 pt-4 border-t border-border'>
-            <button type='button' disabled={isMutating} className='text-xs bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover flex items-center gap-2.5 justify-center' onClick={handleDelete}>
+            <button type='button' disabled={isMutating} className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover flex items-center gap-2.5 justify-center' onClick={handleDelete}>
               Delete
             </button>
             <div className='flex items-center gap-4'>
-              <button type='button' disabled={isMutating} className='text-xs bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover flex items-center gap-2.5 justify-center' onClick={closeModal}>
+              <button type='button' disabled={isMutating} className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover flex items-center gap-2.5 justify-center' onClick={closeModal}>
                 Cancel
               </button>
-              <button type='submit' disabled={isMutating} className='text-xs bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
+              <button type='submit' disabled={isMutating} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
                 Save
               </button>
             </div>
@@ -109,7 +109,7 @@ export default function Albums() {
 
       {/* Topbar */}
       <div className='h-16 flex items-center px-4 border-b border-border'>
-        <button type='button' onClick={() => setIsModalOpen(true)} className='text-xs bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
+        <button type='button' onClick={() => setIsModalOpen(true)} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
           <ChevronDown size={16} strokeWidth={1.25} />
           <p>New Album</p>
         </button>
@@ -119,10 +119,10 @@ export default function Albums() {
       <table className='text-sm table-auto border-collapse border-spacing-0'>
         <thead>
           <tr className='text-left bg-background-mid'>
-            <th className='p-3 font-bold border border-t-0 border-l-0 border-border'></th>
-            <th className='p-3 font-bold border border-t-0 border-border'>title</th>
-            <th className='p-3 font-bold border border-t-0 border-border'>notes</th>
-            <th className='p-3 font-bold border border-t-0 border-border'>release_date</th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-l-0 border-border'></th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Title</th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Notes</th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Release Date</th>
           </tr>
         </thead>
         <tbody>
@@ -133,16 +133,16 @@ export default function Albums() {
             return (
               <Fragment key={album.id}>
                 <tr key={album.id}>
-                  <td className='text-nowrap p-3 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(album)}>
+                  <td className='text-nowrap p-2 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(album)}>
                     <Pencil size={12} strokeWidth={1.25} />
                   </td>
-                  <td className={`text-nowrap p-3 border border-border ${hasProjects && 'hover hover:bg-background-mid'}`} onClick={hasProjects ? () => handleRowClick(album.id.toString()) : undefined}>
+                  <td className={`text-nowrap p-2 border border-border ${hasProjects && 'hover hover:bg-background-mid'}`} onClick={hasProjects ? () => handleRowClick(album.id.toString()) : undefined}>
                     <p className='flex items-center gap-1.5'>
                       {hasProjects && (isExpanded ? <ChevronDown size={14} strokeWidth={1.25} /> : <ChevronRight size={14} strokeWidth={1.25} />)} {album.title}
                     </p>
                   </td>
-                  <td className='text-nowrap p-3 border border-border max-w-128 truncate'>{album.notes || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
-                  <td className='text-nowrap p-3 border border-border'>{album.release_date ? formatReadableDate(album.release_date) : <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+                  <td className='text-nowrap p-2 border border-border max-w-128 truncate'>{album.notes || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+                  <td className='text-nowrap p-2 border border-border'>{album.release_date ? formatReadableDate(album.release_date) : <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
                 </tr>
                 {isExpanded && (
                   <tr>
@@ -150,7 +150,7 @@ export default function Albums() {
                     <td colSpan={3} className='border-r border-b border-border'>
                       <ol>
                         {album.projects.map((project) => (
-                          <li key={project.id} className='p-3 list-inside list-decimal'>
+                          <li key={project.id} className='p-2 list-inside list-decimal'>
                             {project.title}
                           </li>
                         ))}
@@ -163,6 +163,6 @@ export default function Albums() {
           })}
         </tbody>
       </table>
-    </div>
+    </>
   );
 }

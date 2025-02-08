@@ -26,6 +26,7 @@ export default function Projects() {
     reset({});
     setEditingId(null);
   };
+
   if (isLoading) return <Loading />;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -40,25 +41,25 @@ export default function Projects() {
       <table className='w-full h-full text-sm table-auto border-collapse border-spacing-0'>
         <thead>
           <tr className='text-left bg-background-mid'>
-            <th className='p-3 font-bold border border-t-0 border-l-0 border-border'></th>
-            <th className='p-3 font-bold border border-t-0 border-border'>title</th>
-            <th className='p-3 font-bold border border-t-0 border-border'>folder_path</th>
-            <th className='p-3 font-bold border border-t-0 border-border'>release_name</th>
-            <th className='p-3 font-bold border border-t-0 border-border'>notes</th>
-            <th className='p-3 font-bold border border-t-0 border-border'>date_created</th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-l-0 border-border'></th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Title</th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Folder Path</th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Release Name</th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Notes</th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Date Created</th>
           </tr>
         </thead>
         <tbody>
           {projects.map((project) => (
             <tr key={project.id}>
-              <td className='text-nowrap p-3 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(project)}>
+              <td className='text-nowrap p-2 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(project)}>
                 <Pencil size={12} strokeWidth={1.25} />
               </td>
-              <td className='text-nowrap p-3 border border-border'>{project.title}</td>
-              <td className='text-nowrap p-3 border border-border'>{project.folder_path || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
-              <td className='text-nowrap p-3 border border-border'>{project.release_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
-              <td className='text-nowrap p-3 border border-border max-w-128 truncate'>{project.notes || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
-              <td className='text-nowrap p-3 border border-border'>{project.date_created ? formatReadableDate(project.date_created) : <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+              <td className='text-nowrap p-2 border border-border'>{project.title}</td>
+              <td className='text-nowrap p-2 border border-border'>{project.folder_path || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+              <td className='text-nowrap p-2 border border-border'>{project.release_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+              <td className='text-nowrap p-2 border border-border max-w-128 truncate'>{project.notes || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+              <td className='text-nowrap p-2 border border-border'>{project.date_created ? formatReadableDate(project.date_created) : <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
             </tr>
           ))}
         </tbody>

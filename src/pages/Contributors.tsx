@@ -1,53 +1,100 @@
 import { Loading } from '@/components/Loading.tsx';
-import supabase from '@/supabase.ts';
-import { useQuery } from '@tanstack/react-query';
+import Modal from '@/components/Modal.tsx';
+import { useGetContributors } from '@/hooks/useContributors.ts';
+import { Contributor } from '@/types/index.ts';
+import { Minus, Pencil } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
+type FormData = Omit<Contributor, 'id'>;
 
 export default function Contributors() {
-  const getContributors = async () => {
-    const { data, error } = await supabase.from('contributors').select(`
-      *
-      `);
-    if (error) {
-      throw error;
-    }
-    return data;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const {
+    formState: { errors: formErrors },
+    register,
+    handleSubmit,
+    reset,
+  } = useForm<FormData>();
+  const { data: contributors = [], isLoading, error } = useGetContributors();
+
+  const handleEdit = (contributor: Contributor) => {
+    reset({
+      artist_name: contributor.artist_name,
+      first_name: contributor.first_name,
+    });
+    setEditingId(contributor.id);
+    setIsModalOpen(true);
   };
 
-  const {
-    data = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['contributors'],
-    queryFn: getContributors,
-  });
+  const closeModal = () => {
+    reset({
+      artist_name: '',
+      first_name: null,
+    });
+    setEditingId(null);
+    setIsModalOpen(false);
+  };
+
+  const handleSave = (data: FormData) => {
+    console.log(data);
+  };
 
   if (isLoading) return <Loading />;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>
-      <div className={`flex gap-16 mt-16`}>
-        <table className='text-sm border-separate border-spacing-2'>
-          <thead>
-            <tr className='text-left border-b'>
-              <th className='pr-3'>first_name</th>
-              <th className='pr-3'>artist_name</th>
+      {/* Form modal */}
+      <Modal isOpen={isModalOpen} closeModal={closeModal}>
+        <form onSubmit={handleSubmit(handleSave)} className='w-128'>
+          <div className='flex justify-between items-center'>
+            <label>Artist Name</label>
+            <input {...register('artist_name', { required: 'A contributor needs an Artist Name' })} className='input-field' />
+          </div>
+          {formErrors.artist_name && <p className='text-red-700'>{formErrors.artist_name.message}</p>}
+          <div className='flex justify-between items-center mt-8'>
+            <label>First Name</label>
+            <input {...register('first_name')} className='input-field' />
+          </div>
+          <div className='flex justify-between mt-8 pt-4 border-t border-border'>
+            <button type='button' className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover flex items-center gap-2.5 justify-center'>
+              Delete
+            </button>
+            <div className='flex items-center gap-4'>
+              <button type='button' className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover flex items-center gap-2.5 justify-center' onClick={closeModal}>
+                Cancel
+              </button>
+              <button type='submit' className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
+                Save
+              </button>
+            </div>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Table */}
+      <table className='text-sm table-auto border-collapse border-spacing-0'>
+        <thead>
+          <tr className='text-left bg-background-mid'>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-l-0 border-border'></th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Artist Name</th>
+            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>First Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {contributors.map((contributor) => (
+            <tr key={contributor.id}>
+              <td className='text-nowrap p-2 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(contributor)}>
+                <Pencil size={12} strokeWidth={1.25} />
+              </td>
+              <td className='text-nowrap p-2 border border-border'>{contributor.artist_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+              <td className='text-nowrap p-2 border border-border'>{contributor.first_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
             </tr>
-          </thead>
-          <tbody>
-            {data.map((contributor) => {
-              const { id, first_name, artist_name } = contributor;
-              return (
-                <tr key={id} className={`relative cursor-pointer hover`}>
-                  <td className='text-nowrap pr-3'>{first_name}</td>
-                  <td className='text-nowrap pr-3'>{artist_name}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </>
   );
 }

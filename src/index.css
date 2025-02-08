@@ -9,7 +9,7 @@
   --color-border: #333333;
   --color-accent: #2563eb;
   --color-background: #121212;
-  --color-background-mid: #1D1D1D;
+  --color-background-mid: #1d1d1d;
   --color-text: #f8f9fa;
   --color-text-muted: #a1a1aa;
 }
@@ -21,20 +21,6 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
-  }
-
-  @font-face {
-    font-family: 'NotoSansDisplay';
-    src: url('/NotoSansDisplay-VariableFont_wdth,wght.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'NotoSansDisplay';
-    src: url('/NotoSansDisplay-Italic-VariableFont_wdth,wght.ttf') format('truetype');
-    font-weight: normal;
-    font-style: italic;
   }
 
   @font-face {
@@ -62,6 +48,10 @@
     font-family: 'Inter', 'Helvetica', sans-serif;
     font-weight: 100;
   }
+
+  html {
+    font-size: 14px;
+  }
 }
 
 @utility container {
@@ -78,5 +68,5 @@
 }
 
 @utility input-field {
-  @apply bg-border/50 border border-text-muted/50 rounded-md px-4 py-2 ring-border focus:ring-2 focus-visible:ring-text-muted/30 focus-visible:border-text/50 focus-visible:shadow-lg outline-none w-64 text-sm;
+  @apply bg-border/50 border border-text-muted/50 rounded-md px-4 py-2 ring-border focus:ring-2 focus-visible:ring-text-muted/30 focus-visible:border-text/50 focus-visible:shadow-lg outline-none w-64;
 }
