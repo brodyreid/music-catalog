@@ -1,17 +1,18 @@
+import { updateProject } from '@/api/projectQueries.ts';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
 import { useGetProjects } from '@/hooks/useProjects.ts';
-import { Project, ProjectWithAll } from '@/types/index.ts';
-import { formatReadableDate } from '@/utils.ts';
-import { Minus, Pencil } from 'lucide-react';
+import { Project } from '@/types/index.ts';
+import { formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
+import { ChevronDown, Minus, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-type FormData = Partial<Omit<Project, 'id'>>;
+type FormData = Pick<Project, 'title' | 'release_name' | 'bpm' | 'musical_key' | 'notes' | 'date_created'>;
 
 export default function Projects() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Project | null>(null);
   const { data: projects = [], isLoading, error } = useGetProjects();
   const {
     register,
@@ -22,22 +23,37 @@ export default function Projects() {
   const isMutating = false;
 
   const closeModal = () => {
-    reset();
-    setEditingId(null);
+    reset({
+      title: '',
+      release_name: null,
+      bpm: null,
+      musical_key: null,
+      notes: null,
+      date_created: null,
+    });
+    setSelected(null);
     setIsModalOpen(false);
   };
 
-  const handleEdit = (project: ProjectWithAll) => {
-    reset({});
-    setEditingId(project.id);
+  const handleEdit = (project: Project) => {
+    reset({
+      title: project.title,
+      release_name: project.release_name,
+      bpm: project.bpm,
+      musical_key: project.musical_key,
+      notes: project.notes,
+      date_created: project.date_created,
+    });
+    setSelected(project);
     setIsModalOpen(true);
   };
 
   const handleSave = async (formData: FormData) => {
-    if (editingId) {
-      updateProject({ id: editingId, data: formData });
+    if (selected) {
+      updateProject({ id: selected.id, data: formData });
     } else {
-      createProject(formData);
+      // need to hash the folder_path for folder_path_hash col as it is required
+      // createProject(formData);
     }
     closeModal();
   };
@@ -54,6 +70,26 @@ export default function Projects() {
             <label>Title</label>
             <input {...register('title', { required: 'Title is required' })} className='input-field' />
           </div>
+          <div className='flex justify-between items-center mt-8'>
+            <label>Release Name</label>
+            <input {...register('release_name')} className='input-field' />
+          </div>
+          <div className='flex justify-between items-center mt-8'>
+            <label>BPM</label>
+            <input {...register('bpm')} type='number' min='0' className='input-field' />
+          </div>
+          <div className='relative flex justify-between items-center mt-8'>
+            <label>Key</label>
+            <select {...register('musical_key')} className='input-field appearance-none'>
+              <option value=''></option>
+              {MUSICAL_KEYS.map((key) => (
+                <option key={key} value='key'>
+                  {key}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ' size={20} />
+          </div>
           {formErrors.title && <p className='text-red-700'>{formErrors.title.message}</p>}
           <div className='flex justify-between mt-8'>
             <label>Notes</label>
@@ -64,7 +100,7 @@ export default function Projects() {
             <input {...register('date_created')} type='date' className='input-field dark:text-white dark:[color-scheme:dark]' />
           </div>
           <div className='flex mt-8 pt-4 border-t border-border'>
-            {editingId && (
+            {selected && (
               <button type='button' className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover'>
                 Delete
               </button>
@@ -82,9 +118,12 @@ export default function Projects() {
       </Modal>
 
       {/* Topbar */}
-      {/* <div className='h-16 flex items-center px-4 border-b border-border'>
-        <ProjectsScanner />
-      </div> */}
+      <div className='h-16 flex items-center px-4 border-b border-border'>
+        <button type='button' onClick={() => setIsModalOpen(true)} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-1.5 justify-center'>
+          <Plus size={16} strokeWidth={1.25} />
+          <p>New Project</p>
+        </button>
+      </div>
 
       {/* Table */}
       <table className='w-full h-full text-sm table-auto border-collapse border-spacing-0'>
