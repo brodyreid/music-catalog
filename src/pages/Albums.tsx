@@ -1,17 +1,13 @@
 import { Loading } from '@/components/Loading.tsx';
 import Modal from '@/components/Modal.tsx';
 import { useCreateAlbum, useDeleteAlbum, useGetAlbums, useUpdateAlbum } from '@/hooks/useAlbums.ts';
-import { AlbumWithProjects } from '@/types/index.ts';
+import { Album, AlbumWithProjects } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
 import { ChevronDown, ChevronRight, Minus, Pencil } from 'lucide-react';
 import { Fragment, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-type FormData = {
-  title: string;
-  notes: string | null;
-  release_date: string | null;
-};
+type FormData = Omit<Album, 'id'>;
 
 export default function Albums() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,14 +92,14 @@ export default function Albums() {
             <input {...register('release_date')} type='date' className='input-field dark:text-white dark:[color-scheme:dark]' />
           </div>
           <div className='flex justify-between mt-8 pt-4 border-t border-border'>
-            <button type='button' className='text-xs bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover flex items-center gap-2.5 justify-center' onClick={handleDelete}>
+            <button type='button' disabled={isMutating} className='text-xs bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover flex items-center gap-2.5 justify-center' onClick={handleDelete}>
               Delete
             </button>
             <div className='flex items-center gap-4'>
-              <button type='button' className='text-xs bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover flex items-center gap-2.5 justify-center' onClick={closeModal}>
+              <button type='button' disabled={isMutating} className='text-xs bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover flex items-center gap-2.5 justify-center' onClick={closeModal}>
                 Cancel
               </button>
-              <button type='submit' className='text-xs bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
+              <button type='submit' disabled={isMutating} className='text-xs bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
                 Save
               </button>
             </div>
@@ -142,11 +138,11 @@ export default function Albums() {
                   </td>
                   <td className={`text-nowrap p-3 border border-border ${hasProjects && 'hover hover:bg-background-mid'}`} onClick={hasProjects ? () => handleRowClick(album.id.toString()) : undefined}>
                     <p className='flex items-center gap-1.5'>
-                      {hasProjects && (isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />)} {album.title}
+                      {hasProjects && (isExpanded ? <ChevronDown size={14} strokeWidth={1.25} /> : <ChevronRight size={14} strokeWidth={1.25} />)} {album.title}
                     </p>
                   </td>
-                  <td className='text-nowrap p-3 border border-border max-w-128 truncate'>{album.notes || <Minus size={16} className='text-text-muted/80' />}</td>
-                  <td className='text-nowrap p-3 border border-border'>{album.release_date ? formatReadableDate(album.release_date) : <Minus size={16} className='text-text-muted/80' />}</td>
+                  <td className='text-nowrap p-3 border border-border max-w-128 truncate'>{album.notes || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+                  <td className='text-nowrap p-3 border border-border'>{album.release_date ? formatReadableDate(album.release_date) : <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
                 </tr>
                 {isExpanded && (
                   <tr>
