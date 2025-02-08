@@ -3,7 +3,7 @@ import Modal from '@/components/Modal.tsx';
 import { useCreateAlbum, useDeleteAlbum, useGetAlbums, useUpdateAlbum } from '@/hooks/useAlbums.ts';
 import { Album, AlbumWithProjects } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
-import { ChevronDown, ChevronRight, Minus, Pencil } from 'lucide-react';
+import { ChevronDown, ChevronRight, Minus, Pencil, Plus } from 'lucide-react';
 import { Fragment, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -11,7 +11,7 @@ type FormData = Omit<Album, 'id'>;
 
 export default function Albums() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAlbumId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const {
     formState: { errors: formErrors },
@@ -50,8 +50,8 @@ export default function Albums() {
   };
 
   const handleSave = async (formData: FormData) => {
-    if (editingAlbumId) {
-      updateAlbum({ id: editingAlbumId, data: formData });
+    if (editingId) {
+      updateAlbum({ id: editingId, data: formData });
     } else {
       createAlbum(formData);
     }
@@ -59,14 +59,14 @@ export default function Albums() {
   };
 
   const handleDelete = () => {
-    if (!editingAlbumId) {
+    if (!editingId) {
       throw Error('Album ID cannot be null');
     }
     if (!window.confirm('Are you sure you want to delete this album?')) {
       return;
     }
 
-    deleteAlbum(editingAlbumId);
+    deleteAlbum(editingId);
     closeModal();
   };
 
@@ -109,8 +109,8 @@ export default function Albums() {
 
       {/* Topbar */}
       <div className='h-16 flex items-center px-4 border-b border-border'>
-        <button type='button' onClick={() => setIsModalOpen(true)} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
-          <ChevronDown size={16} strokeWidth={1.25} />
+        <button type='button' onClick={() => setIsModalOpen(true)} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-1.5 justify-center'>
+          <Plus size={16} strokeWidth={1.25} />
           <p>New Album</p>
         </button>
       </div>

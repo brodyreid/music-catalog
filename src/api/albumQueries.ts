@@ -9,20 +9,20 @@ export const fetchAlbums = async () => {
   return data;
 };
 
+export type InsertAlbumData = Database['public']['Tables']['albums']['Insert'];
+export const createAlbum = async (data: InsertAlbumData) => {
+  const { error } = await supabase.from('albums').insert(data);
+  if (error) {
+    throw error;
+  }
+};
+
 export type UpdateAlbumData = {
   id: number;
   data: Database['public']['Tables']['albums']['Update'];
 };
 export const updateAlbum = async ({ id, data }: UpdateAlbumData) => {
   const { error } = await supabase.from('albums').update(data).eq('id', id);
-  if (error) {
-    throw error;
-  }
-};
-
-export type InsertAlbumData = Database['public']['Tables']['albums']['Insert'];
-export const createAlbum = async (data: InsertAlbumData) => {
-  const { error } = await supabase.from('albums').insert({ title: data.title, notes: data.notes || null, release_date: data.release_date || null });
   if (error) {
     throw error;
   }

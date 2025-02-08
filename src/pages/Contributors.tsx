@@ -1,8 +1,8 @@
 import { Loading } from '@/components/Loading.tsx';
 import Modal from '@/components/Modal.tsx';
-import { useGetContributors } from '@/hooks/useContributors.ts';
+import { useCreateContributor, useGetContributors, useUpdateContributor } from '@/hooks/useContributors.ts';
 import { Contributor } from '@/types/index.ts';
-import { Minus, Pencil } from 'lucide-react';
+import { Minus, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -18,6 +18,9 @@ export default function Contributors() {
     reset,
   } = useForm<FormData>();
   const { data: contributors = [], isLoading, error } = useGetContributors();
+  const { createContributor, isCreating } = useCreateContributor();
+  const { updateContributor, isUpdating } = useUpdateContributor();
+  const isMutating = isCreating || isUpdating;
 
   const handleEdit = (contributor: Contributor) => {
     reset({
@@ -37,8 +40,13 @@ export default function Contributors() {
     setIsModalOpen(false);
   };
 
-  const handleSave = (data: FormData) => {
-    console.log(data);
+  const handleSave = async (formData: FormData) => {
+    if (editingId) {
+      updateContributor({ id: editingId, data: formData });
+    } else {
+      createContributor(formData);
+    }
+    closeModal();
   };
 
   if (isLoading) return <Loading />;
@@ -73,6 +81,14 @@ export default function Contributors() {
           </div>
         </form>
       </Modal>
+
+      {/* Topbar */}
+      <div className='h-16 flex items-center px-4 border-b border-border'>
+        <button type='button' onClick={() => setIsModalOpen(true)} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-1.5 justify-center'>
+          <Plus size={16} strokeWidth={1.25} />
+          <p>New Contributor</p>
+        </button>
+      </div>
 
       {/* Table */}
       <table className='text-sm table-auto border-collapse border-spacing-0'>
