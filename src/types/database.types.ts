@@ -32,17 +32,17 @@ export type Database = {
       }
       contributors: {
         Row: {
-          artist_name: string | null
+          artist_name: string
           first_name: string | null
           id: number
         }
         Insert: {
-          artist_name?: string | null
+          artist_name: string
           first_name?: string | null
           id?: number
         }
         Update: {
-          artist_name?: string | null
+          artist_name?: string
           first_name?: string | null
           id?: number
         }
@@ -51,15 +51,15 @@ export type Database = {
       project_contributors: {
         Row: {
           contributor_id: number
-          project_id: string
+          project_id: number
         }
         Insert: {
           contributor_id: number
-          project_id: string
+          project_id: number
         }
         Update: {
           contributor_id?: number
-          project_id?: string
+          project_id?: number
         }
         Relationships: [
           {
@@ -84,7 +84,8 @@ export type Database = {
           bpm: number | null
           date_created: string | null
           folder_path: string | null
-          id: string
+          folder_path_hash: string
+          id: number
           musical_key: Database["public"]["Enums"]["musical_key"] | null
           notes: string | null
           release_name: string | null
@@ -95,7 +96,8 @@ export type Database = {
           bpm?: number | null
           date_created?: string | null
           folder_path?: string | null
-          id: string
+          folder_path_hash: string
+          id?: number
           musical_key?: Database["public"]["Enums"]["musical_key"] | null
           notes?: string | null
           release_name?: string | null
@@ -106,7 +108,8 @@ export type Database = {
           bpm?: number | null
           date_created?: string | null
           folder_path?: string | null
-          id?: string
+          folder_path_hash?: string
+          id?: number
           musical_key?: Database["public"]["Enums"]["musical_key"] | null
           notes?: string | null
           release_name?: string | null

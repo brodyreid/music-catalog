@@ -1,6 +1,6 @@
-import { Loading } from '@/components/Loading.tsx';
+import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
-import { useCreateContributor, useGetContributors, useUpdateContributor } from '@/hooks/useContributors.ts';
+import { useCreateContributor, useDeleteContributor, useGetContributors, useUpdateContributor } from '@/hooks/useContributors.ts';
 import { Contributor } from '@/types/index.ts';
 import { Minus, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -20,16 +20,8 @@ export default function Contributors() {
   const { data: contributors = [], isLoading, error } = useGetContributors();
   const { createContributor, isCreating } = useCreateContributor();
   const { updateContributor, isUpdating } = useUpdateContributor();
-  const isMutating = isCreating || isUpdating;
-
-  const handleEdit = (contributor: Contributor) => {
-    reset({
-      artist_name: contributor.artist_name,
-      first_name: contributor.first_name,
-    });
-    setEditingId(contributor.id);
-    setIsModalOpen(true);
-  };
+  const { deleteContributor, isDeleting } = useDeleteContributor();
+  const isMutating = isCreating || isUpdating || isDeleting;
 
   const closeModal = () => {
     reset({
@@ -38,6 +30,15 @@ export default function Contributors() {
     });
     setEditingId(null);
     setIsModalOpen(false);
+  };
+
+  const handleEdit = (contributor: Contributor) => {
+    reset({
+      artist_name: contributor.artist_name,
+      first_name: contributor.first_name,
+    });
+    setEditingId(contributor.id);
+    setIsModalOpen(true);
   };
 
   const handleSave = async (formData: FormData) => {
@@ -49,13 +50,25 @@ export default function Contributors() {
     closeModal();
   };
 
-  if (isLoading) return <Loading />;
+  const handleDelete = async () => {
+    if (!editingId) {
+      throw Error('Contributor ID cannot be null');
+    }
+    if (!window.confirm('Are you sure you want to delete this contributor?')) {
+      return;
+    }
+
+    deleteContributor(editingId);
+    closeModal();
+  };
+
+  if (isLoading) return <LoadingBars />;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>
       {/* Form modal */}
-      <Modal isOpen={isModalOpen} closeModal={closeModal}>
+      <Modal isOpen={isModalOpen} closeModal={closeModal} isMutating={isMutating}>
         <form onSubmit={handleSubmit(handleSave)} className='w-128'>
           <div className='flex justify-between items-center'>
             <label>Artist Name</label>
@@ -66,15 +79,17 @@ export default function Contributors() {
             <label>First Name</label>
             <input {...register('first_name')} className='input-field' />
           </div>
-          <div className='flex justify-between mt-8 pt-4 border-t border-border'>
-            <button type='button' className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover flex items-center gap-2.5 justify-center'>
-              Delete
-            </button>
-            <div className='flex items-center gap-4'>
-              <button type='button' className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover flex items-center gap-2.5 justify-center' onClick={closeModal}>
+          <div className='flex mt-8 pt-4 border-t border-border'>
+            {editingId && (
+              <button type='button' disabled={isMutating} className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover' onClick={handleDelete}>
+                Delete
+              </button>
+            )}
+            <div className='flex items-center gap-4 ml-auto'>
+              <button type='button' disabled={isMutating} className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover' onClick={closeModal}>
                 Cancel
               </button>
-              <button type='submit' className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
+              <button type='submit' disabled={isMutating} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover'>
                 Save
               </button>
             </div>

@@ -27,3 +27,10 @@ export const updateContributor = async ({ id, data }: UpdateContributorData) => 
     throw error;
   }
 };
+
+export const deleteContributor = async (id: number) => {
+  const { error } = await supabase.from('contributors').delete().eq('id', id);
+  if (error) {
+    throw error;
+  }
+};

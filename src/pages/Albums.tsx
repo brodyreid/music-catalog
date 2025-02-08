@@ -1,4 +1,4 @@
-import { Loading } from '@/components/Loading.tsx';
+import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
 import { useCreateAlbum, useDeleteAlbum, useGetAlbums, useUpdateAlbum } from '@/hooks/useAlbums.ts';
 import { Album, AlbumWithProjects } from '@/types/index.ts';
@@ -70,13 +70,13 @@ export default function Albums() {
     closeModal();
   };
 
-  if (isLoading || isMutating) return <Loading />;
+  if (isLoading || isMutating) return <LoadingBars />;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>
       {/* Form modal */}
-      <Modal isOpen={isModalOpen} closeModal={closeModal}>
+      <Modal isOpen={isModalOpen} closeModal={closeModal} isMutating={isMutating}>
         <form onSubmit={handleSubmit(handleSave)} className='w-128'>
           <div className='flex justify-between items-center'>
             <label>Title</label>
@@ -91,15 +91,17 @@ export default function Albums() {
             <label>Release Date</label>
             <input {...register('release_date')} type='date' className='input-field dark:text-white dark:[color-scheme:dark]' />
           </div>
-          <div className='flex justify-between mt-8 pt-4 border-t border-border'>
-            <button type='button' disabled={isMutating} className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover flex items-center gap-2.5 justify-center' onClick={handleDelete}>
-              Delete
-            </button>
-            <div className='flex items-center gap-4'>
-              <button type='button' disabled={isMutating} className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover flex items-center gap-2.5 justify-center' onClick={closeModal}>
+          <div className='flex mt-8 pt-4 border-t border-border'>
+            {editingId && (
+              <button type='button' disabled={isMutating} className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover' onClick={handleDelete}>
+                Delete
+              </button>
+            )}
+            <div className='flex items-center gap-4 ml-auto'>
+              <button type='button' disabled={isMutating} className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover' onClick={closeModal}>
                 Cancel
               </button>
-              <button type='submit' disabled={isMutating} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'>
+              <button type='submit' disabled={isMutating} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover'>
                 Save
               </button>
             </div>

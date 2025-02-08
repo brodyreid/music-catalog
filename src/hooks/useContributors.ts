@@ -1,4 +1,4 @@
-import { createContributor, fetchContributors, updateContributor } from '@/api/contributorQueries.ts';
+import { createContributor, deleteContributor, fetchContributors, updateContributor } from '@/api/contributorQueries.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useGetContributors = () => useQuery({ queryKey: ['contributors'], queryFn: fetchContributors });
@@ -25,4 +25,16 @@ export const useUpdateContributor = () => {
     },
   });
   return { updateContributor: mutate, isUpdating: isPending };
+};
+
+export const useDeleteContributor = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteContributor,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contributors'] });
+    },
+  });
+  return { deleteContributor: mutate, isDeleting: isPending };
 };

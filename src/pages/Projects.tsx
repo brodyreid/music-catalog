@@ -1,4 +1,5 @@
-import { Loading } from '@/components/Loading.tsx';
+import LoadingBars from '@/components/LoadingBars.tsx';
+import Modal from '@/components/Modal.tsx';
 import { useGetProjects } from '@/hooks/useProjects.ts';
 import { Project, ProjectWithAll } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
@@ -6,32 +7,80 @@ import { Minus, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-type FormData = Omit<Project, 'id'>;
+type FormData = Partial<Omit<Project, 'id'>>;
 
 export default function Projects() {
-  const [editingAlbumId, setEditingId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const { data: projects = [], isLoading, error } = useGetProjects();
   const {
     register,
-    formState: { errors },
+    handleSubmit,
+    formState: { errors: formErrors },
     reset,
   } = useForm<FormData>();
+  const isMutating = false;
+
+  const closeModal = () => {
+    reset();
+    setEditingId(null);
+    setIsModalOpen(false);
+  };
 
   const handleEdit = (project: ProjectWithAll) => {
     reset({});
     setEditingId(project.id);
+    setIsModalOpen(true);
   };
 
-  const closeModal = () => {
-    reset({});
-    setEditingId(null);
+  const handleSave = async (formData: FormData) => {
+    if (editingId) {
+      updateProject({ id: editingId, data: formData });
+    } else {
+      createProject(formData);
+    }
+    closeModal();
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <LoadingBars />;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>
+      {/* Form modal */}
+      <Modal isOpen={isModalOpen} closeModal={closeModal} isMutating={isMutating}>
+        <form onSubmit={handleSubmit(handleSave)} className='w-128'>
+          <div className='flex justify-between items-center'>
+            <label>Title</label>
+            <input {...register('title', { required: 'Title is required' })} className='input-field' />
+          </div>
+          {formErrors.title && <p className='text-red-700'>{formErrors.title.message}</p>}
+          <div className='flex justify-between mt-8'>
+            <label>Notes</label>
+            <textarea {...register('notes')} rows={4} className='input-field' />
+          </div>
+          <div className='flex justify-between items-center mt-8'>
+            <label>Date Created</label>
+            <input {...register('date_created')} type='date' className='input-field dark:text-white dark:[color-scheme:dark]' />
+          </div>
+          <div className='flex mt-8 pt-4 border-t border-border'>
+            {editingId && (
+              <button type='button' className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover'>
+                Delete
+              </button>
+            )}
+            <div className='flex items-center gap-4 ml-auto'>
+              <button type='button' className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover' onClick={closeModal}>
+                Cancel
+              </button>
+              <button type='submit' className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover'>
+                Save
+              </button>
+            </div>
+          </div>
+        </form>
+      </Modal>
+
       {/* Topbar */}
       {/* <div className='h-16 flex items-center px-4 border-b border-border'>
         <ProjectsScanner />

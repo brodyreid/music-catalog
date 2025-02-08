@@ -1,13 +1,14 @@
 import { ReactNode, useEffect, useRef } from 'react';
+import { LoadingDots } from './LoadingDots.tsx';
 
 interface ModalProps {
   isOpen: boolean;
+  isMutating: boolean;
   closeModal: () => void;
   children: ReactNode;
-  dimensions?: { w: number; h: number };
 }
 
-export default function Modal({ isOpen, closeModal, children }: ModalProps) {
+export default function Modal({ isOpen, isMutating, closeModal, children }: ModalProps) {
   const modalRef = useRef<HTMLDivElement | null>(null);
 
   function handlePageClick(event: MouseEvent) {
@@ -39,8 +40,13 @@ export default function Modal({ isOpen, closeModal, children }: ModalProps) {
       {isOpen && (
         <>
           <div className='absolute inset-0 w-full h-full bg-black/65 z-40'></div>
-          <div ref={modalRef} className='z-50 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 p-4 bg-background rounded-lg shadow-lg text-text border border-border'>
-            {children}
+          <div ref={modalRef} className={`z-50 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 `}>
+            {isMutating && (
+              <div className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-60'>
+                <LoadingDots color='var(--color-text)' height={72} width={72} />
+              </div>
+            )}
+            <div className={`p-4 bg-background rounded-lg shadow-lg text-text border border-border ${isMutating && 'opacity-50'}`}>{children}</div>
           </div>
         </>
       )}
