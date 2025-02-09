@@ -106,26 +106,28 @@ export default function Contributors() {
       </div>
 
       {/* Table */}
-      <table className='text-sm table-auto border-collapse border-spacing-0'>
-        <thead>
-          <tr className='text-left bg-background-mid'>
-            <th className='p-2 font-bold text-nowrap border border-t-0 border-l-0 border-border'></th>
-            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Artist Name</th>
-            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>First Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {contributors.map((contributor) => (
-            <tr key={contributor.id}>
-              <td className='text-nowrap p-2 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(contributor)}>
-                <Pencil size={12} strokeWidth={1.25} />
-              </td>
-              <td className='text-nowrap p-2 border border-border'>{contributor.artist_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
-              <td className='text-nowrap p-2 border border-border'>{contributor.first_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+      <div className='overflow-auto max-h-screen'>
+        <table className='text-sm table-auto border-collapse border-spacing-0'>
+          <thead>
+            <tr className='text-left bg-background-mid'>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-l-0 border-border'></th>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Artist Name</th>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>First Name</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {contributors.map((contributor) => (
+              <tr key={contributor.id}>
+                <td className='text-nowrap p-2 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(contributor)}>
+                  <Pencil size={12} strokeWidth={1.25} />
+                </td>
+                <td className='text-nowrap p-2 border border-border'>{contributor.artist_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+                <td className='text-nowrap p-2 border border-border'>{contributor.first_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

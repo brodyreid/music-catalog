@@ -163,13 +163,14 @@ export default function Projects() {
 
       {/* Table */}
       <div className='overflow-auto max-h-screen'>
-        <table className='w-full h-full text-sm table-auto border-collapse border-spacing-0'>
+        <table className='text-sm table-auto border-collapse border-spacing-0'>
           <thead>
             <tr className='text-left bg-background-mid sticky top-0'>
               <th className='p-2 font-bold text-nowrap border border-t-0 border-l-0 border-border'></th>
               <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Title</th>
               <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Folder Path</th>
               <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Release Name</th>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Contributors</th>
               <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Notes</th>
               <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Date Created</th>
             </tr>
@@ -183,6 +184,7 @@ export default function Projects() {
                 <td className='text-nowrap p-2 border border-border'>{project.title}</td>
                 <td className='text-nowrap p-2 border border-border'>{project.folder_path || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
                 <td className='text-nowrap p-2 border border-border'>{project.release_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+                <td className='text-nowrap p-2 border border-border'>{project.contributors.length ? project.contributors.map((c) => c.artist_name).join(', ') : <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
                 <td className='text-nowrap p-2 border border-border max-w-128 truncate'>{project.notes || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
                 <td className='text-nowrap p-2 border border-border'>{project.date_created ? formatReadableDate(project.date_created) : <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
               </tr>

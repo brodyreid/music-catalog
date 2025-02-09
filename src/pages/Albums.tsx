@@ -118,53 +118,55 @@ export default function Albums() {
       </div>
 
       {/* Table */}
-      <table className='text-sm table-auto border-collapse border-spacing-0'>
-        <thead>
-          <tr className='text-left bg-background-mid'>
-            <th className='p-2 font-bold text-nowrap border border-t-0 border-l-0 border-border'></th>
-            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Title</th>
-            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Notes</th>
-            <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Release Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {albums.map((album) => {
-            const isExpanded = expandedRows.includes(album.id.toString());
-            const hasProjects = !!album.projects.length;
+      <div className='overflow-auto max-h-screen'>
+        <table className='text-sm table-auto border-collapse border-spacing-0'>
+          <thead>
+            <tr className='text-left bg-background-mid'>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-l-0 border-border'></th>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Title</th>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Notes</th>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Release Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {albums.map((album) => {
+              const isExpanded = expandedRows.includes(album.id.toString());
+              const hasProjects = !!album.projects.length;
 
-            return (
-              <Fragment key={album.id}>
-                <tr key={album.id}>
-                  <td className='text-nowrap p-2 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(album)}>
-                    <Pencil size={12} strokeWidth={1.25} />
-                  </td>
-                  <td className={`text-nowrap p-2 border border-border ${hasProjects && 'hover hover:bg-background-mid'}`} onClick={hasProjects ? () => handleRowClick(album.id.toString()) : undefined}>
-                    <p className='flex items-center gap-1.5'>
-                      {hasProjects && (isExpanded ? <ChevronDown size={14} strokeWidth={1.25} /> : <ChevronRight size={14} strokeWidth={1.25} />)} {album.title}
-                    </p>
-                  </td>
-                  <td className='text-nowrap p-2 border border-border max-w-128 truncate'>{album.notes || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
-                  <td className='text-nowrap p-2 border border-border'>{album.release_date ? formatReadableDate(album.release_date) : <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
-                </tr>
-                {isExpanded && (
-                  <tr>
-                    <td className='border-b border-border'></td>
-                    <td colSpan={3} className='border-r border-b border-border'>
-                      <ol>
-                        {album.projects.map((project) => (
-                          <li key={project.id} className='p-2 list-inside list-decimal'>
-                            {project.title}
-                          </li>
-                        ))}
-                      </ol>
+              return (
+                <Fragment key={album.id}>
+                  <tr key={album.id}>
+                    <td className='text-nowrap p-2 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(album)}>
+                      <Pencil size={12} strokeWidth={1.25} />
                     </td>
+                    <td className={`text-nowrap p-2 border border-border ${hasProjects && 'hover hover:bg-background-mid'}`} onClick={hasProjects ? () => handleRowClick(album.id.toString()) : undefined}>
+                      <p className='flex items-center gap-1.5'>
+                        {hasProjects && (isExpanded ? <ChevronDown size={14} strokeWidth={1.25} /> : <ChevronRight size={14} strokeWidth={1.25} />)} {album.title}
+                      </p>
+                    </td>
+                    <td className='text-nowrap p-2 border border-border max-w-128 truncate'>{album.notes || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+                    <td className='text-nowrap p-2 border border-border'>{album.release_date ? formatReadableDate(album.release_date) : <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
                   </tr>
-                )}
-              </Fragment>
-            );
-          })}
-        </tbody>
-      </table>
+                  {isExpanded && (
+                    <tr>
+                      <td className='border-b border-border'></td>
+                      <td colSpan={3} className='border-r border-b border-border'>
+                        <ol>
+                          {album.projects.map((project) => (
+                            <li key={project.id} className='p-2 list-inside list-decimal'>
+                              {project.title}
+                            </li>
+                          ))}
+                        </ol>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }
