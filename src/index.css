@@ -68,9 +68,10 @@
 }
 
 @utility input-field {
-  @apply bg-border/50 border border-text-muted/50 rounded-md px-4 py-2 ring-border focus:ring-2 focus-visible:ring-text-muted/30 focus-visible:border-text/50 focus-visible:shadow-lg outline-none w-64;
+  @apply bg-border/50 border border-text-muted/50 rounded-sm px-4 py-2 ring-border focus:ring-2 focus-visible:ring-text-muted/30 focus-visible:border-text/50 focus-visible:shadow-lg outline-none w-64;
 }
 
+/* Loading Skeleton */
 @keyframes react-loading-skeleton {
   100% {
     transform: translateX(100%);
@@ -105,15 +106,7 @@
   right: 0;
   height: 100%;
   background-repeat: no-repeat;
-  background-image: var(
-    --custom-highlight-background,
-    linear-gradient(
-      90deg,
-      var(--base-color) 0%,
-      var(--highlight-color) 50%,
-      var(--base-color) 100%
-    )
-  );
+  background-image: var(--custom-highlight-background, linear-gradient(90deg, var(--base-color) 0%, var(--highlight-color) 50%, var(--base-color) 100%));
   transform: translateX(-100%);
 
   animation-name: react-loading-skeleton;
@@ -127,4 +120,45 @@
   .react-loading-skeleton {
     --pseudo-element-display: none; /* Disable animation */
   }
+}
+
+/* React Select overrides */
+.rs__control {
+  @apply bg-border/50 w-88 border border-text-muted/50 rounded-sm px-3 ring-border focus:ring-2 focus-visible:ring-text-muted/30 focus-visible:border-text/50 focus-visible:shadow-lg outline-none;
+}
+
+.rs__value-container {
+  @apply px-2 py-1 gap-1;
+}
+
+.rs__multi-value {
+  @apply bg-background-mid rounded-sm text-text text-sm;
+}
+
+.rs__multi-value__remove {
+  @apply hover:bg-red-700/50 rounded-sm;
+}
+
+.rs__menu {
+  @apply shadow-lg border border-border rounded-sm mt-1;
+}
+
+.rs__option {
+  @apply px-4 py-2 hover:bg-text-muted/20 duration-300 hover:cursor-pointer;
+}
+
+.rs__input {
+  @apply text-text caret-text;
+}
+
+.rs__single-value {
+  @apply text-inherit;
+}
+
+.rs__menu-list {
+  @apply bg-background-mid rounded-sm;
+}
+
+.rs__multi-value__remove {
+  @apply hover:bg-red-700/70 p-0.5 ml-0.5 mr-1.5 cursor-pointer duration-300;
 }

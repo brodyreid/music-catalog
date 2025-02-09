@@ -10,7 +10,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src'),
+      // eslint-disable-next-line no-undef
+      '@': path.resolve(__dirname, 'src'),
     },
   },
 });

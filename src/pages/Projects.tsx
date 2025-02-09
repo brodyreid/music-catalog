@@ -1,12 +1,14 @@
 import { PAGE_SIZE } from '@/api/projectQueries.ts';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
+import { useGetContributors } from '@/hooks/useContributors.ts';
 import { useCreateProject, useDeleteProject, useGetProjects, useUpdateProject } from '@/hooks/useProjects.ts';
 import { Project } from '@/types/index.ts';
 import { formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
-import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Plus, X } from 'lucide-react';
+import { DetailedHTMLProps, HTMLAttributes, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import CreatableSelect from 'react-select/creatable';
 
 type FormData = Pick<Project, 'title' | 'release_name' | 'folder_path' | 'bpm' | 'musical_key' | 'notes' | 'date_created'>;
 
@@ -14,17 +16,34 @@ export default function Projects() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selected, setSelected] = useState<Project | null>(null);
   const [page, setPage] = useState(0);
-  const { data: { projects, count, hasMore } = { projects: [], count: null, hasMore: false }, isLoading, error, isPlaceholderData } = useGetProjects(page);
   const {
     register,
     handleSubmit,
     formState: { errors: formErrors },
     reset,
   } = useForm<FormData>();
+  const { data: contributors = [] } = useGetContributors();
+  const { data: { projects, count, hasMore } = { projects: [], count: null, hasMore: false }, isLoading, error } = useGetProjects(page);
   const { createProject, isCreating } = useCreateProject();
   const { updateProject, isUpdating } = useUpdateProject();
   const { deleteProject, isDeleting } = useDeleteProject();
   const isMutating = isCreating || isUpdating || isDeleting;
+
+  const CustomClearIndicator = ({ innerProps }: { innerProps: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> }) => (
+    <div
+      {...innerProps}
+      className='rounded-sm p-1 hover:bg-text-muted/20 duration-300 hover:cursor-pointer'
+      onClick={(e) => {
+        e.stopPropagation();
+        innerProps.onClick?.(e);
+      }}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+        innerProps.onMouseDown?.(e);
+      }}>
+      <X strokeWidth={1.5} size={16} />
+    </div>
+  );
 
   const closeModal = () => {
     reset({
@@ -102,6 +121,7 @@ export default function Projects() {
             <label>Title</label>
             <input {...register('title', { required: 'Title is required' })} className='input-field w-88' />
           </div>
+          {formErrors.title && <p className='text-red-700'>{formErrors.title.message}</p>}
           <div className='flex justify-between items-center mt-8'>
             <label>Release Name</label>
             <input {...register('release_name')} className='input-field w-88' />
@@ -126,7 +146,22 @@ export default function Projects() {
             </select>
             <ChevronDown strokeWidth={1.5} className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none' size={20} />
           </div>
-          {formErrors.title && <p className='text-red-700'>{formErrors.title.message}</p>}
+          <div className='flex justify-between items-center mt-8'>
+            <label>Contributors</label>
+            <CreatableSelect
+              isMulti
+              options={contributors.map((c) => ({ value: c.id, label: c.artist_name }))}
+              unstyled
+              closeMenuOnSelect={false}
+              classNamePrefix='rs'
+              components={{
+                DropdownIndicator: () => <ChevronDown strokeWidth={1.5} size={20} />,
+                ClearIndicator: ({ innerProps }) => <CustomClearIndicator innerProps={innerProps} />,
+                IndicatorSeparator: () => <Minus strokeWidth={0.75} className='rotate-90 -ml-1 -mr-1.5' />,
+                CrossIcon: () => <Minus />,
+              }}
+            />
+          </div>
           <div className='flex justify-between items-center mt-8'>
             <label>Date Created</label>
             <input {...register('date_created')} type='date' className='input-field w-44 dark:text-white dark:[color-scheme:dark]' />
