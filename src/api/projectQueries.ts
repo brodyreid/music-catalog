@@ -1,12 +1,18 @@
 import supabase from '@/supabase.ts';
 import { Database } from '@/types/database.types.ts';
 
-export const fetchProjects = async () => {
-  const { data, error } = await supabase.from('projects').select(`*, contributors ( * ), albums ( * )`);
+export const PAGE_SIZE = 100;
+
+export const fetchProjects = async (page: number) => {
+  const from = page * PAGE_SIZE;
+  const to = page * PAGE_SIZE + (PAGE_SIZE - 1);
+
+  const { data, error, count } = await supabase.from('projects').select(`*, contributors ( * ), albums ( * )`, { count: 'exact' }).range(from, to);
   if (error) {
     throw error;
   }
-  return data;
+
+  return { projects: data, count, hasMore: count ? count > to : false };
 };
 
 export type InsertProjectData = Database['public']['Tables']['projects']['Insert'];

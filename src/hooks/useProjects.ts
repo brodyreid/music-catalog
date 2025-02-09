@@ -1,7 +1,7 @@
 import { createProject, deleteProject, fetchProjects, updateProject } from '@/api/projectQueries.ts';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export const useGetProjects = () => useQuery({ queryKey: ['projects'], queryFn: fetchProjects });
+export const useGetProjects = (page: number) => useQuery({ queryKey: ['projects', page], queryFn: () => fetchProjects(page), placeholderData: keepPreviousData });
 
 export const useCreateProject = () => {
   const queryClient = useQueryClient();

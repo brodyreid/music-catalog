@@ -17,14 +17,12 @@ export default function App() {
           <div className='flex flex-1 overflow-hidden'>
             <Sidebar />
             <div className='flex flex-col flex-1 overflow-hidden'>
-              <div className='overflow-auto max-h-screen'>
-                <Routes>
-                  <Route path='/' element={<Projects />} />
-                  <Route path='projects' element={<Projects />} />
-                  <Route path='albums' element={<Albums />} />
-                  <Route path='contributors' element={<Contributors />} />
-                </Routes>
-              </div>
+              <Routes>
+                <Route path='/' element={<Projects />} />
+                <Route path='projects' element={<Projects />} />
+                <Route path='albums' element={<Albums />} />
+                <Route path='contributors' element={<Contributors />} />
+              </Routes>
             </div>
           </div>
         </div>
