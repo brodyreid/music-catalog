@@ -124,19 +124,15 @@
 
 /* React Select overrides */
 .rs__control {
-  @apply bg-border/50 w-88 border border-text-muted/50 rounded-sm px-3 ring-border focus:ring-2 focus-visible:ring-text-muted/30 focus-visible:border-text/50 focus-visible:shadow-lg outline-none;
+  @apply bg-border/50 w-88 border border-text-muted/50 rounded-sm pl-1 pr-3 ring-border focus:ring-2 focus-visible:ring-text-muted/30 focus-visible:border-text/50 focus-visible:shadow-lg outline-none;
 }
 
 .rs__value-container {
-  @apply px-2 py-1 gap-1;
+  @apply px-2 py-1 gap-2.5;
 }
 
 .rs__multi-value {
-  @apply bg-background-mid rounded-sm text-text text-sm;
-}
-
-.rs__multi-value__remove {
-  @apply hover:bg-red-700/50 rounded-sm;
+  @apply bg-text-muted/30 rounded-sm pl-1 text-text text-sm;
 }
 
 .rs__menu {
@@ -151,14 +147,10 @@
   @apply text-text caret-text;
 }
 
-.rs__single-value {
-  @apply text-inherit;
-}
-
 .rs__menu-list {
   @apply bg-background-mid rounded-sm;
 }
 
 .rs__multi-value__remove {
-  @apply hover:bg-red-700/70 p-0.5 ml-0.5 mr-1.5 cursor-pointer duration-300;
+  @apply hover:bg-red-700/70 ml-0.5 rounded-sm cursor-pointer duration-300;
 }

@@ -3,24 +3,26 @@ import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
 import { useGetContributors } from '@/hooks/useContributors.ts';
 import { useCreateProject, useDeleteProject, useGetProjects, useUpdateProject } from '@/hooks/useProjects.ts';
-import { Project } from '@/types/index.ts';
+import { ProjectWithAll } from '@/types/index.ts';
 import { formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
 import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Plus, X } from 'lucide-react';
 import { DetailedHTMLProps, HTMLAttributes, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import CreatableSelect from 'react-select/creatable';
 
-type FormData = Pick<Project, 'title' | 'release_name' | 'folder_path' | 'bpm' | 'musical_key' | 'notes' | 'date_created'>;
+type FormData = Pick<ProjectWithAll, 'title' | 'release_name' | 'folder_path' | 'bpm' | 'musical_key' | 'notes' | 'date_created' | 'contributors'>;
 
 export default function Projects() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selected, setSelected] = useState<Project | null>(null);
+  const [selected, setSelected] = useState<ProjectWithAll | null>(null);
+  const [selectedContributors, setSelectedContributors] = useState<{ value: number; label: string }[]>([]);
   const [page, setPage] = useState(0);
   const {
     register,
     handleSubmit,
     formState: { errors: formErrors },
     reset,
+    control,
   } = useForm<FormData>();
   const { data: contributors = [] } = useGetContributors();
   const { data: { projects, count, hasMore } = { projects: [], count: null, hasMore: false }, isLoading, error } = useGetProjects(page);
@@ -56,10 +58,11 @@ export default function Projects() {
       date_created: null,
     });
     setSelected(null);
+    setSelectedContributors([]);
     setIsModalOpen(false);
   };
 
-  const handleEdit = (project: Project) => {
+  const handleEdit = (project: ProjectWithAll) => {
     reset({
       title: project.title,
       release_name: project.release_name,
@@ -68,8 +71,10 @@ export default function Projects() {
       musical_key: project.musical_key,
       notes: project.notes,
       date_created: project.date_created,
+      contributors: project.contributors,
     });
     setSelected(project);
+    setSelectedContributors(project.contributors.map((c) => ({ value: c.id, label: c.artist_name })));
     setIsModalOpen(true);
   };
 
@@ -148,19 +153,25 @@ export default function Projects() {
           </div>
           <div className='flex justify-between items-center mt-8'>
             <label>Contributors</label>
-            <CreatableSelect
-              isMulti
-              options={contributors.map((c) => ({ value: c.id, label: c.artist_name }))}
-              unstyled
-              closeMenuOnSelect={false}
-              classNamePrefix='rs'
-              components={{
-                DropdownIndicator: () => <ChevronDown strokeWidth={1.5} size={20} />,
-                ClearIndicator: ({ innerProps }) => <CustomClearIndicator innerProps={innerProps} />,
-                IndicatorSeparator: () => <Minus strokeWidth={0.75} className='rotate-90 -ml-1 -mr-1.5' />,
-                CrossIcon: () => <Minus />,
-              }}
-            />
+            <Controller
+              name='contributors'
+              control={control}
+              render={() => (
+                <CreatableSelect
+                  isMulti
+                  defaultValue={selectedContributors}
+                  options={contributors.map((c) => ({ value: c.id, label: c.artist_name }))}
+                  unstyled
+                  closeMenuOnSelect={false}
+                  classNamePrefix='rs'
+                  components={{
+                    DropdownIndicator: () => <ChevronDown strokeWidth={1.5} size={20} />,
+                    ClearIndicator: ({ innerProps }) => <CustomClearIndicator innerProps={innerProps} />,
+                    IndicatorSeparator: () => <Minus strokeWidth={0.75} className='rotate-90 -ml-1 -mr-1.5' />,
+                    CrossIcon: () => <Minus />,
+                  }}
+                />
+              )}></Controller>
           </div>
           <div className='flex justify-between items-center mt-8'>
             <label>Date Created</label>
