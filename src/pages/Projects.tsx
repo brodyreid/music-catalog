@@ -1,14 +1,14 @@
 import { PAGE_SIZE } from '@/api/projectQueries.ts';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
+import Select from '@/components/Select.tsx';
 import { useGetContributors } from '@/hooks/useContributors.ts';
-import { useCreateProject, useDeleteProject, useGetProjects, useUpdateProject } from '@/hooks/useProjects.ts';
+import { useDeleteProject, useGetProjects, useUpdateProject } from '@/hooks/useProjects.ts';
 import { ProjectWithAll } from '@/types/index.ts';
 import { formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
-import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Plus, X } from 'lucide-react';
-import { DetailedHTMLProps, HTMLAttributes, useState } from 'react';
+import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Plus } from 'lucide-react';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import CreatableSelect from 'react-select/creatable';
 
 type FormData = Pick<ProjectWithAll, 'title' | 'release_name' | 'folder_path' | 'bpm' | 'musical_key' | 'notes' | 'date_created' | 'contributors'>;
 
@@ -26,26 +26,9 @@ export default function Projects() {
   } = useForm<FormData>();
   const { data: contributors = [] } = useGetContributors();
   const { data: { projects, count, hasMore } = { projects: [], count: null, hasMore: false }, isLoading, error } = useGetProjects(page);
-  const { createProject, isCreating } = useCreateProject();
   const { updateProject, isUpdating } = useUpdateProject();
   const { deleteProject, isDeleting } = useDeleteProject();
-  const isMutating = isCreating || isUpdating || isDeleting;
-
-  const CustomClearIndicator = ({ innerProps }: { innerProps: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> }) => (
-    <div
-      {...innerProps}
-      className='rounded-sm p-1 hover:bg-text-muted/20 duration-300 hover:cursor-pointer'
-      onClick={(e) => {
-        e.stopPropagation();
-        innerProps.onClick?.(e);
-      }}
-      onMouseDown={(e) => {
-        e.stopPropagation();
-        innerProps.onMouseDown?.(e);
-      }}>
-      <X strokeWidth={1.5} size={16} />
-    </div>
-  );
+  const isMutating = isUpdating || isDeleting;
 
   const closeModal = () => {
     reset({
@@ -153,25 +136,7 @@ export default function Projects() {
           </div>
           <div className='flex justify-between items-center mt-8'>
             <label>Contributors</label>
-            <Controller
-              name='contributors'
-              control={control}
-              render={() => (
-                <CreatableSelect
-                  isMulti
-                  defaultValue={selectedContributors}
-                  options={contributors.map((c) => ({ value: c.id, label: c.artist_name }))}
-                  unstyled
-                  closeMenuOnSelect={false}
-                  classNamePrefix='rs'
-                  components={{
-                    DropdownIndicator: () => <ChevronDown strokeWidth={1.5} size={20} />,
-                    ClearIndicator: ({ innerProps }) => <CustomClearIndicator innerProps={innerProps} />,
-                    IndicatorSeparator: () => <Minus strokeWidth={0.75} className='rotate-90 -ml-1 -mr-1.5' />,
-                    CrossIcon: () => <Minus />,
-                  }}
-                />
-              )}></Controller>
+            <Controller name='contributors' control={control} render={() => <Select contributors={contributors} selectedContributors={selectedContributors} />} />
           </div>
           <div className='flex justify-between items-center mt-8'>
             <label>Date Created</label>
