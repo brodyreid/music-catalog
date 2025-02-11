@@ -1,3 +1,4 @@
+import { FormData } from '@/pages/Projects.tsx';
 import supabase from '@/supabase.ts';
 import { Database } from '@/types/database.types.ts';
 
@@ -7,7 +8,7 @@ export const fetchProjects = async (page: number) => {
   const from = page * PAGE_SIZE;
   const to = page * PAGE_SIZE + (PAGE_SIZE - 1);
 
-  const { data, error, count } = await supabase.from('projects').select(`*, contributors ( * ), albums ( * )`, { count: 'exact' }).range(from, to);
+  const { data, error, count } = await supabase.from('projects').select(`*, contributors ( * ), albums ( * )`, { count: 'exact' }).order('id').range(from, to);
   if (error) {
     throw error;
   }
@@ -15,7 +16,7 @@ export const fetchProjects = async (page: number) => {
   return { projects: data, count, hasMore: count ? count > to : false };
 };
 
-export type InsertProjectData = Database['public']['Tables']['projects']['Insert'];
+type InsertProjectData = Database['public']['Tables']['projects']['Insert'];
 export const createProject = async (data: InsertProjectData) => {
   const { error } = await supabase.from('projects').insert(data);
   if (error) {
@@ -23,14 +24,32 @@ export const createProject = async (data: InsertProjectData) => {
   }
 };
 
-export type UpdateProjectData = {
-  id: number;
-  data: Database['public']['Tables']['projects']['Update'];
-};
-export const updateProject = async ({ id, data }: UpdateProjectData) => {
-  const { error } = await supabase.from('projects').update(data).eq('id', id);
-  if (error) {
-    throw error;
+export const updateProject = async ({ id, data }: { id: number; data: FormData }) => {
+  const { contributors, ...projectData } = data;
+  const contributorData = contributors.map((c) => ({ project_id: id, contributor_id: c.id }));
+  console.log({ id, data, contributorData, projectData });
+
+  const { data: updateData, error: updateError } = await supabase.from('projects').update(projectData).eq('id', id).select();
+  console.log('update: ', updateData);
+  if (updateError) {
+    throw updateError;
+  }
+
+  const { data: deleteData, error: deleteError } = await supabase.from('project_contributors').delete().eq('project_id', id).select();
+  console.log('delete: ', deleteData);
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  if (!contributorData.length) {
+    console.log('failed with length: ', contributorData.length);
+    return;
+  }
+
+  const { data: insertData, error: insertError } = await supabase.from('project_contributors').insert(contributorData).select();
+  console.log('insert: ', insertData);
+  if (insertError) {
+    throw insertError;
   }
 };
 

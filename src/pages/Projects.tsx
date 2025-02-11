@@ -10,12 +10,12 @@ import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Plus } from 'lucide-
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-type FormData = Pick<ProjectWithAll, 'title' | 'release_name' | 'folder_path' | 'bpm' | 'musical_key' | 'notes' | 'date_created' | 'contributors'>;
+export type FormData = Pick<ProjectWithAll, 'title' | 'release_name' | 'folder_path' | 'bpm' | 'musical_key' | 'notes' | 'date_created' | 'contributors'>;
 
 export default function Projects() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selected, setSelected] = useState<ProjectWithAll | null>(null);
-  const [selectedContributors, setSelectedContributors] = useState<{ value: number; label: string }[]>([]);
+  // const [selectedContributors, setSelectedContributors] = useState<{ value: number; label: string }[]>([]);
   const [page, setPage] = useState(0);
   const {
     register,
@@ -41,7 +41,7 @@ export default function Projects() {
       date_created: null,
     });
     setSelected(null);
-    setSelectedContributors([]);
+    // setSelectedContributors([]);
     setIsModalOpen(false);
   };
 
@@ -57,17 +57,16 @@ export default function Projects() {
       contributors: project.contributors,
     });
     setSelected(project);
-    setSelectedContributors(project.contributors.map((c) => ({ value: c.id, label: c.artist_name })));
+    // setSelectedContributors(project.contributors.map((c) => ({ value: c.id, label: c.artist_name })));
     setIsModalOpen(true);
   };
 
   const handleSave = async (formData: FormData) => {
+    console.log({ formData });
     if (selected) {
       updateProject({ id: selected.id, data: formData });
-    } else {
-      // need to hash the folder_path for folder_path_hash col as it is required
-      // createProject(formData);
     }
+
     closeModal();
   };
 
@@ -136,7 +135,7 @@ export default function Projects() {
           </div>
           <div className='flex justify-between items-center mt-8'>
             <label>Contributors</label>
-            <Controller name='contributors' control={control} render={() => <Select contributors={contributors} selectedContributors={selectedContributors} />} />
+            <Controller name='contributors' control={control} render={({ field }) => <Select {...field} contributors={contributors} />} />
           </div>
           <div className='flex justify-between items-center mt-8'>
             <label>Date Created</label>

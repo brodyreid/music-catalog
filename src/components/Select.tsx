@@ -1,12 +1,12 @@
 import { Contributor } from '@/types/index.ts';
 import { ChevronDown, Minus, X } from 'lucide-react';
-import { DetailedHTMLProps, HTMLAttributes } from 'react';
+import { DetailedHTMLProps, forwardRef, HTMLAttributes } from 'react';
+import { ControllerRenderProps } from 'react-hook-form';
 import CreatableSelect from 'react-select/creatable';
 
 type SelectProps = {
   contributors: Contributor[];
-  selectedContributors: { value: number; label: string }[];
-};
+} & ControllerRenderProps;
 
 const CustomClearIndicator = ({ innerProps }: { innerProps: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> }) => (
   <div
@@ -24,14 +24,18 @@ const CustomClearIndicator = ({ innerProps }: { innerProps: DetailedHTMLProps<HT
   </div>
 );
 
-const Select = ({ selectedContributors, contributors }: SelectProps) => {
+const Select = forwardRef<any, SelectProps>(({ contributors, ...field }, ref) => {
   return (
     <CreatableSelect
+      ref={ref}
+      {...field}
       isMulti
-      defaultValue={selectedContributors}
-      options={contributors.map((c) => ({ value: c.id, label: c.artist_name }))}
+      options={contributors}
+      getOptionValue={(option: Contributor) => option.id.toString()}
+      getOptionLabel={(option: Contributor) => option.artist_name}
+      onCreateOption={(inputValue) => console.log({ id: inputValue, name: inputValue })}
       unstyled
-      closeMenuOnSelect={false}
+      closeMenuOnSelect={true}
       classNamePrefix='rs'
       components={{
         DropdownIndicator: () => <ChevronDown strokeWidth={1.5} size={20} />,
@@ -41,6 +45,6 @@ const Select = ({ selectedContributors, contributors }: SelectProps) => {
       }}
     />
   );
-};
+});
 
 export default Select;
