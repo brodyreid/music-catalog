@@ -1,20 +1,23 @@
 import { FormData } from '@/pages/Projects.tsx';
 import supabase from '@/supabase.ts';
 import { Database } from '@/types/database.types.ts';
-import { Contributor } from '@/types/index.ts';
+import { Contributor, ProjectWithAll } from '@/types/index.ts';
 
 export const PAGE_SIZE = 100;
 
-export const fetchProjects = async (page: number) => {
+export const fetchProjects = async ({ page, searchTerm }: { page: number; searchTerm: string }) => {
   const from = page * PAGE_SIZE;
   const to = page * PAGE_SIZE + (PAGE_SIZE - 1);
+  console.log('search: ', searchTerm);
 
-  const { data, error, count } = await supabase.from('projects').select(`*, contributors ( * ), albums ( * )`, { count: 'exact' }).order('id').range(from, to);
+  const query = searchTerm ? supabase.from('projects_with_all').select('*').filter('title', 'ilike', `%${searchTerm}%`) : supabase.from('projects_with_all').select('*', { count: 'exact' });
+
+  const { data, error, count } = await query.order('id').range(from, to);
   if (error) {
     throw error;
   }
 
-  return { projects: data, count, hasMore: count ? count > to : false };
+  return { projects: data as ProjectWithAll[], count, hasMore: count ? count > to : false };
 };
 
 type InsertProjectData = Database['public']['Tables']['projects']['Insert'];

@@ -6,7 +6,7 @@ import { useGetContributors } from '@/hooks/useContributors.ts';
 import { useDeleteProject, useGetProjects, useUpdateProject } from '@/hooks/useProjects.ts';
 import { ProjectWithAll } from '@/types/index.ts';
 import { formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
-import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Plus } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -15,8 +15,8 @@ export type FormData = Pick<ProjectWithAll, 'title' | 'release_name' | 'folder_p
 export default function Projects() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selected, setSelected] = useState<ProjectWithAll | null>(null);
-  // const [selectedContributors, setSelectedContributors] = useState<{ value: number; label: string }[]>([]);
   const [page, setPage] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
   const {
     register,
     handleSubmit,
@@ -25,7 +25,7 @@ export default function Projects() {
     control,
   } = useForm<FormData>();
   const { data: contributors = [] } = useGetContributors();
-  const { data: { projects, count, hasMore } = { projects: [], count: null, hasMore: false }, isLoading, error } = useGetProjects(page);
+  const { data: { projects, count, hasMore } = { projects: [], count: null, hasMore: false }, isLoading, error } = useGetProjects(page, searchTerm);
   const { updateProject, isUpdating } = useUpdateProject();
   const { deleteProject, isDeleting } = useDeleteProject();
   const isMutating = isUpdating || isDeleting;
@@ -41,7 +41,6 @@ export default function Projects() {
       date_created: null,
     });
     setSelected(null);
-    // setSelectedContributors([]);
     setIsModalOpen(false);
   };
 
@@ -57,7 +56,6 @@ export default function Projects() {
       contributors: project.contributors,
     });
     setSelected(project);
-    // setSelectedContributors(project.contributors.map((c) => ({ value: c.id, label: c.artist_name })));
     setIsModalOpen(true);
   };
 
@@ -169,6 +167,14 @@ export default function Projects() {
           <Plus size={16} strokeWidth={1.25} />
           <p>New Project</p>
         </button>
+        <div className='ml-auto'>
+          <div className='border ring-border has-focus:ring-2 has-focus-visible:ring-text-muted/30 has-focus-visible:border-text/50 has-focus-visible:shadow-lg outline-none w-56 py-1.5 pl-1.5 border-border flex items-center gap-1 rounded-md bg-background-mid/65'>
+            <span>
+              <Search className='text-text-muted/50' strokeWidth={1.25} width={16} height={16} />
+            </span>
+            <input type='text' onChange={(event) => setSearchTerm(event.target.value)} placeholder='Search projects...' className='text-sm focus:ring-0 focus:outline-none' />
+          </div>
+        </div>
       </div>
 
       {/* Table */}
@@ -204,18 +210,20 @@ export default function Projects() {
       </div>
 
       {/* Pagination */}
-      <div className='flex items-center gap-4 bg-background-mid py-4 px-4'>
-        <button className='p-1 rounded-md border border-text-muted/35 hover:not-disabled:border-text-muted/60 duration-300 cursor-pointer disabled:cursor-default disabled:opacity-50' disabled={page < 1} onClick={handlePageDecrement}>
-          <ArrowLeft size={16} strokeWidth={2} className='text-text-muted/80' />
-        </button>
-        <p className='text-text-muted text-sm'>
-          Page {page + 1} of {count ? Math.ceil(count / PAGE_SIZE) : '{`count` is possibly null}'}
-        </p>
-        <button className='p-1 rounded-md border border-text-muted/35 hover:not-disabled:border-text-muted/60 duration-300 cursor-pointer disabled:cursor-default disabled:opacity-50' disabled={!hasMore} onClick={handlePageIncrement}>
-          <ArrowRight size={16} strokeWidth={2} className='text-text-muted/80' />
-        </button>
-        <p className='ml-4 text-text-muted font-bold text-sm'>{count} projects</p>
-      </div>
+      {count ? (
+        <div className='flex items-center gap-4 bg-background-mid py-4 px-4'>
+          <button className='p-1 rounded-md border border-text-muted/35 hover:not-disabled:border-text-muted/60 duration-300 cursor-pointer disabled:cursor-default disabled:opacity-50' disabled={page < 1} onClick={handlePageDecrement}>
+            <ArrowLeft size={16} strokeWidth={2} className='text-text-muted/80' />
+          </button>
+          <p className='text-text-muted text-sm'>
+            Page {page + 1} of {Math.ceil(count / PAGE_SIZE)}
+          </p>
+          <button className='p-1 rounded-md border border-text-muted/35 hover:not-disabled:border-text-muted/60 duration-300 cursor-pointer disabled:cursor-default disabled:opacity-50' disabled={!hasMore} onClick={handlePageIncrement}>
+            <ArrowRight size={16} strokeWidth={2} className='text-text-muted/80' />
+          </button>
+          <p className='ml-4 text-text-muted font-bold text-sm'>{count} projects</p>
+        </div>
+      ) : null}
     </>
   );
 }
