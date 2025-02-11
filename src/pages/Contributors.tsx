@@ -1,6 +1,11 @@
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
-import { useCreateContributor, useDeleteContributor, useGetContributors, useUpdateContributor } from '@/hooks/useContributors.ts';
+import {
+  useCreateContributor,
+  useDeleteContributor,
+  useGetContributors,
+  useUpdateContributor,
+} from '@/hooks/useContributors.ts';
 import { Contributor } from '@/types/index.ts';
 import { Minus, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -72,24 +77,42 @@ export default function Contributors() {
         <form onSubmit={handleSubmit(handleSave)} className='w-128'>
           <div className='flex justify-between items-center'>
             <label>Artist Name</label>
-            <input {...register('artist_name', { required: 'A contributor needs an Artist Name' })} className='input-field' />
+            <input
+              {...register('artist_name', {
+                required: 'A contributor needs an Artist Name',
+              })}
+              className='input-field'
+            />
           </div>
-          {formErrors.artist_name && <p className='text-red-700'>{formErrors.artist_name.message}</p>}
+          {formErrors.artist_name && (
+            <p className='text-red-700'>{formErrors.artist_name.message}</p>
+          )}
           <div className='flex justify-between items-center mt-8'>
             <label>First Name</label>
             <input {...register('first_name')} className='input-field' />
           </div>
           <div className='flex mt-8 pt-4 border-t border-border'>
             {editingId && (
-              <button type='button' disabled={isMutating} className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover' onClick={handleDelete}>
+              <button
+                type='button'
+                disabled={isMutating}
+                className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover'
+                onClick={handleDelete}>
                 Delete
               </button>
             )}
             <div className='flex items-center gap-4 ml-auto'>
-              <button type='button' disabled={isMutating} className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover' onClick={closeModal}>
+              <button
+                type='button'
+                disabled={isMutating}
+                className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover'
+                onClick={closeModal}>
                 Cancel
               </button>
-              <button type='submit' disabled={isMutating} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover'>
+              <button
+                type='submit'
+                disabled={isMutating}
+                className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover'>
                 Save
               </button>
             </div>
@@ -99,7 +122,10 @@ export default function Contributors() {
 
       {/* Topbar */}
       <div className='h-16 flex items-center px-4 border-b border-border'>
-        <button type='button' onClick={() => setIsModalOpen(true)} className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-1.5 justify-center'>
+        <button
+          type='button'
+          onClick={() => setIsModalOpen(true)}
+          className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-1.5 justify-center'>
           <Plus size={16} strokeWidth={1.25} />
           <p>New Contributor</p>
         </button>
@@ -111,18 +137,32 @@ export default function Contributors() {
           <thead>
             <tr className='text-left bg-background-mid'>
               <th className='p-2 font-bold text-nowrap border border-t-0 border-l-0 border-border'></th>
-              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>Artist Name</th>
-              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>First Name</th>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>
+                Artist Name
+              </th>
+              <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>
+                First Name
+              </th>
             </tr>
           </thead>
           <tbody>
             {contributors.map((contributor) => (
               <tr key={contributor.id}>
-                <td className='text-nowrap p-2 border border-l-0 border-border hover hover:bg-background-mid' onClick={() => handleEdit(contributor)}>
+                <td
+                  className='text-nowrap p-2 border border-l-0 border-border hover hover:bg-background-mid'
+                  onClick={() => handleEdit(contributor)}>
                   <Pencil size={12} strokeWidth={1.25} />
                 </td>
-                <td className='text-nowrap p-2 border border-border'>{contributor.artist_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
-                <td className='text-nowrap p-2 border border-border'>{contributor.first_name || <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />}</td>
+                <td className='text-nowrap p-2 border border-border'>
+                  {contributor.artist_name || (
+                    <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />
+                  )}
+                </td>
+                <td className='text-nowrap p-2 border border-border'>
+                  {contributor.first_name || (
+                    <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

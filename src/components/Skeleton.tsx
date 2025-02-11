@@ -33,7 +33,8 @@ function styleOptionsToCssProperties({
   enableAnimation = defaultEnableAnimation,
 
   customHighlightBackground,
-}: SkeletonStyleProps & { circle: boolean }): CSSProperties & Record<`--${string}`, string> {
+}: SkeletonStyleProps & { circle: boolean }): CSSProperties &
+  Record<`--${string}`, string> {
   const style: ReturnType<typeof styleOptionsToCssProperties> = {};
 
   if (direction === 'rtl') style['--animation-direction'] = 'reverse';
@@ -43,14 +44,16 @@ function styleOptionsToCssProperties({
   if (typeof width === 'string' || typeof width === 'number') style.width = width;
   if (typeof height === 'string' || typeof height === 'number') style.height = height;
 
-  if (typeof borderRadius === 'string' || typeof borderRadius === 'number') style.borderRadius = borderRadius;
+  if (typeof borderRadius === 'string' || typeof borderRadius === 'number')
+    style.borderRadius = borderRadius;
 
   if (circle) style.borderRadius = '50%';
 
   if (typeof baseColor !== 'undefined') style['--base-color'] = baseColor;
   if (typeof highlightColor !== 'undefined') style['--highlight-color'] = highlightColor;
 
-  if (typeof customHighlightBackground === 'string') style['--custom-highlight-background'] = customHighlightBackground;
+  if (typeof customHighlightBackground === 'string')
+    style['--custom-highlight-background'] = customHighlightBackground;
 
   return style;
 }
@@ -113,7 +116,10 @@ export function Skeleton({
 
       const fractionalPart = count % 1;
 
-      const fractionalWidth = typeof width === 'number' ? width * fractionalPart : `calc(${width} * ${fractionalPart})`;
+      const fractionalWidth =
+        typeof width === 'number'
+          ? width * fractionalPart
+          : `calc(${width} * ${fractionalPart})`;
 
       thisStyle = { ...thisStyle, width: fractionalWidth };
     }
@@ -133,7 +139,11 @@ export function Skeleton({
   }
 
   return (
-    <span className={containerClassName} data-testid={containerTestId} aria-live='polite' aria-busy={defaultEnableAnimation}>
+    <span
+      className={containerClassName}
+      data-testid={containerTestId}
+      aria-live='polite'
+      aria-busy={defaultEnableAnimation}>
       {Wrapper ? elements.map((el, i) => <Wrapper key={i}>{el}</Wrapper>) : elements}
     </span>
   );

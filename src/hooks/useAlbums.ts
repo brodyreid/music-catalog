@@ -1,7 +1,13 @@
-import { createAlbum, deleteAlbum, fetchAlbums, updateAlbum } from '@/api/albumQueries.ts';
+import {
+  createAlbum,
+  deleteAlbum,
+  fetchAlbums,
+  updateAlbum,
+} from '@/api/albumQueries.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export const useGetAlbums = () => useQuery({ queryKey: ['albums'], queryFn: fetchAlbums });
+export const useGetAlbums = () =>
+  useQuery({ queryKey: ['albums'], queryFn: fetchAlbums });
 
 export const useCreateAlbum = () => {
   const queryClient = useQueryClient();

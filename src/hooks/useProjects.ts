@@ -1,7 +1,22 @@
-import { createProject, deleteProject, fetchProjects, updateProject } from '@/api/projectQueries.ts';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  createProject,
+  deleteProject,
+  fetchProjects,
+  updateProject,
+} from '@/api/projectQueries.ts';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
-export const useGetProjects = (page: number, searchTerm: string) => useQuery({ queryKey: ['projects', page, searchTerm], queryFn: () => fetchProjects({ page, searchTerm }), placeholderData: keepPreviousData });
+export const useGetProjects = (page: number, searchTerm: string) =>
+  useQuery({
+    queryKey: ['projects', page, searchTerm],
+    queryFn: () => fetchProjects({ page, searchTerm }),
+    placeholderData: keepPreviousData,
+  });
 
 export const useCreateProject = () => {
   const queryClient = useQueryClient();

@@ -5,19 +5,33 @@ import { Contributor, ProjectWithAll } from '@/types/index.ts';
 
 export const PAGE_SIZE = 100;
 
-export const fetchProjects = async ({ page, searchTerm }: { page: number; searchTerm: string }) => {
+export const fetchProjects = async ({
+  page,
+  searchTerm,
+}: {
+  page: number;
+  searchTerm: string;
+}) => {
   const from = page * PAGE_SIZE;
   const to = page * PAGE_SIZE + (PAGE_SIZE - 1);
-  console.log('search: ', searchTerm);
 
-  const query = searchTerm ? supabase.from('projects_with_all').select('*').filter('title', 'ilike', `%${searchTerm}%`) : supabase.from('projects_with_all').select('*', { count: 'exact' });
+  const query = searchTerm
+    ? supabase
+        .from('projects_with_all')
+        .select('*')
+        .filter('title', 'ilike', `%${searchTerm}%`)
+    : supabase.from('projects_with_all').select('*', { count: 'exact' });
 
   const { data, error, count } = await query.order('id').range(from, to);
   if (error) {
     throw error;
   }
 
-  return { projects: data as ProjectWithAll[], count, hasMore: count ? count > to : false };
+  return {
+    projects: data as ProjectWithAll[],
+    count,
+    hasMore: count ? count > to : false,
+  };
 };
 
 type InsertProjectData = Database['public']['Tables']['projects']['Insert'];
@@ -31,12 +45,18 @@ export const createProject = async (data: InsertProjectData) => {
 export const updateProject = async ({ id, data }: { id: number; data: FormData }) => {
   const { contributors, ...projectData } = data;
 
-  const { error: updateError } = await supabase.from('projects').update(projectData).eq('id', id);
+  const { error: updateError } = await supabase
+    .from('projects')
+    .update(projectData)
+    .eq('id', id);
   if (updateError) {
     throw updateError;
   }
 
-  const { error: deleteError } = await supabase.from('project_contributors').delete().eq('project_id', id);
+  const { error: deleteError } = await supabase
+    .from('project_contributors')
+    .delete()
+    .eq('project_id', id);
   if (deleteError) {
     throw deleteError;
   }
@@ -44,7 +64,10 @@ export const updateProject = async ({ id, data }: { id: number; data: FormData }
   const newContributors = contributors.filter((c) => !c.id);
   let insertedContributors: Contributor[] = [];
   if (newContributors.length) {
-    const { data: newData, error: newError } = await supabase.from('contributors').insert(newContributors).select();
+    const { data: newData, error: newError } = await supabase
+      .from('contributors')
+      .insert(newContributors)
+      .select();
     if (newError) {
       throw newError;
     }
@@ -52,9 +75,13 @@ export const updateProject = async ({ id, data }: { id: number; data: FormData }
     insertedContributors = newData;
   }
 
-  const allContributors = contributors.map((c) => (c.id ? c : insertedContributors.find((ic) => ic.artist_name === c.artist_name))) as Contributor[];
+  const allContributors = contributors.map((c) =>
+    c.id ? c : insertedContributors.find((ic) => ic.artist_name === c.artist_name),
+  ) as Contributor[];
 
-  const { error: insertError } = await supabase.from('project_contributors').insert(allContributors.map((c) => ({ project_id: id, contributor_id: c.id })));
+  const { error: insertError } = await supabase
+    .from('project_contributors')
+    .insert(allContributors.map((c) => ({ project_id: id, contributor_id: c.id })));
   if (insertError) {
     throw insertError;
   }

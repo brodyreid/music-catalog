@@ -19,7 +19,10 @@ export const ProjectsScanner = () => {
       }
       // If it's an AbortError (user cancelled) or SecurityError (permission denied),
       // the API is actually working
-      if (error instanceof Error && (error.name === 'AbortError' || error.name === 'SecurityError')) {
+      if (
+        error instanceof Error &&
+        (error.name === 'AbortError' || error.name === 'SecurityError')
+      ) {
         return 'abort or security';
       }
       // For any other errors, assume the API isn't working properly
@@ -33,7 +36,9 @@ export const ProjectsScanner = () => {
     try {
       const isDirectoryPickerSupported = await checkDirectoryPickerSupport();
       console.log(isDirectoryPickerSupported);
-      const dirHandle: FileSystemDirectoryHandle = await (window as any).showDirectoryPicker({
+      const dirHandle: FileSystemDirectoryHandle = await (
+        window as any
+      ).showDirectoryPicker({
         mode: 'read',
       });
       // const subDir = currentDirHandle.getDirectoryHandle(dirName, { create: true });
@@ -50,7 +55,11 @@ export const ProjectsScanner = () => {
   if (error) return <div className='text-red-600'>{error}</div>;
 
   return (
-    <button type='button' disabled={isScanning} className='text-xs bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center' onClick={handleScan}>
+    <button
+      type='button'
+      disabled={isScanning}
+      className='text-xs bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-2.5 justify-center'
+      onClick={handleScan}>
       Scan
     </button>
   );

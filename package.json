@@ -56,6 +56,6 @@
     "singleQuote": true,
     "jsxSingleQuote": true,
     "bracketSameLine": true,
-    "printWidth": 300
+    "printWidth": 90
   }
 }

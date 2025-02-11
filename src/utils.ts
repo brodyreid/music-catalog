@@ -15,7 +15,10 @@ export const formatNumericDate = (dateString: string | null) => {
   return new Date(dateString).toISOString().split('T')[0];
 };
 
-export const saveData = async <TBody, TResponse>(url: string, body: Omit<TBody, 'id'>): Promise<SaveDataResponse<TResponse>> => {
+export const saveData = async <TBody, TResponse>(
+  url: string,
+  body: Omit<TBody, 'id'>,
+): Promise<SaveDataResponse<TResponse>> => {
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

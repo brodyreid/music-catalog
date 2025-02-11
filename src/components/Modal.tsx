@@ -40,13 +40,18 @@ export default function Modal({ isOpen, isMutating, closeModal, children }: Moda
       {isOpen && (
         <>
           <div className='absolute inset-0 w-full h-full bg-black/65 z-40'></div>
-          <div ref={modalRef} className={`z-50 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 `}>
+          <div
+            ref={modalRef}
+            className={`z-50 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 `}>
             {isMutating && (
               <div className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-60'>
                 <LoadingDots color='var(--color-text)' height={72} width={72} />
               </div>
             )}
-            <div className={`p-4 bg-background rounded-lg shadow-lg text-text border border-border ${isMutating && 'opacity-50'}`}>{children}</div>
+            <div
+              className={`p-4 bg-background rounded-lg shadow-lg text-text border border-border ${isMutating && 'opacity-50'}`}>
+              {children}
+            </div>
           </div>
         </>
       )}

@@ -2,14 +2,18 @@ import supabase from '@/supabase.ts';
 import { Database } from '@/types/database.types.ts';
 
 export const fetchContributors = async () => {
-  const { data, error } = await supabase.from('contributors').select(`*`).order('first_name');
+  const { data, error } = await supabase
+    .from('contributors')
+    .select(`*`)
+    .order('first_name');
   if (error) {
     throw error;
   }
   return data;
 };
 
-export type InsertContributorData = Database['public']['Tables']['contributors']['Insert'];
+export type InsertContributorData =
+  Database['public']['Tables']['contributors']['Insert'];
 export const createContributor = async (data: InsertContributorData) => {
   const { error } = await supabase.from('contributors').insert(data);
   if (error) {

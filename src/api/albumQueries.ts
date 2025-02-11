@@ -2,7 +2,10 @@ import supabase from '@/supabase.ts';
 import { Database } from '@/types/database.types.ts';
 
 export const fetchAlbums = async () => {
-  const { data, error } = await supabase.from('albums').select(`*, projects ( * )`).order('id');
+  const { data, error } = await supabase
+    .from('albums')
+    .select(`*, projects ( * )`)
+    .order('id');
   if (error) {
     throw error;
   }

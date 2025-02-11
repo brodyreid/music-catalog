@@ -106,7 +106,15 @@
   right: 0;
   height: 100%;
   background-repeat: no-repeat;
-  background-image: var(--custom-highlight-background, linear-gradient(90deg, var(--base-color) 0%, var(--highlight-color) 50%, var(--base-color) 100%));
+  background-image: var(
+    --custom-highlight-background,
+    linear-gradient(
+      90deg,
+      var(--base-color) 0%,
+      var(--highlight-color) 50%,
+      var(--base-color) 100%
+    )
+  );
   transform: translateX(-100%);
 
   animation-name: react-loading-skeleton;

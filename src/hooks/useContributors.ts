@@ -1,7 +1,13 @@
-import { createContributor, deleteContributor, fetchContributors, updateContributor } from '@/api/contributorQueries.ts';
+import {
+  createContributor,
+  deleteContributor,
+  fetchContributors,
+  updateContributor,
+} from '@/api/contributorQueries.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export const useGetContributors = () => useQuery({ queryKey: ['contributors'], queryFn: fetchContributors });
+export const useGetContributors = () =>
+  useQuery({ queryKey: ['contributors'], queryFn: fetchContributors });
 
 export const useCreateContributor = () => {
   const queryClient = useQueryClient();
