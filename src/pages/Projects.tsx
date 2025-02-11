@@ -57,6 +57,7 @@ export default function Projects() {
     },
     isLoading,
     error,
+    isFetching,
   } = useGetProjects(page, debouncedSearchTerm);
   const { updateProject, isUpdating } = useUpdateProject();
   const { deleteProject, isDeleting } = useDeleteProject();

@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 
-const DEFAULT_COLOR = '#4fa94d';
 const DEFAULT_WAI_ARIA_ATTRIBUTE = {
   'aria-busy': true,
   role: 'progressbar',
@@ -39,7 +38,6 @@ export const LoadingDots = ({
   height = 80,
   width = 80,
   radius = 12.5,
-  color = DEFAULT_COLOR,
   ariaLabel = 'grid-loading',
   visible = true,
 }: GridProps) => (
@@ -52,7 +50,7 @@ export const LoadingDots = ({
       width={width}
       height={height}
       viewBox='0 0 105 105'
-      fill={color}
+      fill='var(--color-text)'
       data-testid='grid-svg'>
       <circle cx='12.5' cy='12.5' r={`${radius}`}>
         <animate

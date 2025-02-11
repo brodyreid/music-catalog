@@ -14,13 +14,16 @@ export const fetchProjects = async ({
 }) => {
   const from = page * PAGE_SIZE;
   const to = page * PAGE_SIZE + (PAGE_SIZE - 1);
+  const words = searchTerm?.split(' ');
+  const columns = ['title', 'release_name', 'folder_path'];
 
-  const query = searchTerm
-    ? supabase
-        .from('projects_with_all')
-        .select('*')
-        .filter('title', 'ilike', `%${searchTerm}%`)
-    : supabase.from('projects_with_all').select('*', { count: 'exact' });
+  let query = supabase.from('projects_with_all').select('*', { count: 'exact' });
+
+  if (words.length) {
+    words.map((word) => {
+      query = query.or(columns.map((col) => `${col}.ilike.%${word}%`).join(','));
+    });
+  }
 
   const { data, error, count } = await query.order('id').range(from, to);
   if (error) {
