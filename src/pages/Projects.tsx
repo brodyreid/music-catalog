@@ -9,6 +9,7 @@ import { formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
 import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useDebounce } from 'use-debounce';
 
 export type FormData = Pick<ProjectWithAll, 'title' | 'release_name' | 'folder_path' | 'bpm' | 'musical_key' | 'notes' | 'date_created' | 'contributors'>;
 
@@ -17,6 +18,7 @@ export default function Projects() {
   const [selected, setSelected] = useState<ProjectWithAll | null>(null);
   const [page, setPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const {
     register,
     handleSubmit,
@@ -25,7 +27,7 @@ export default function Projects() {
     control,
   } = useForm<FormData>();
   const { data: contributors = [] } = useGetContributors();
-  const { data: { projects, count, hasMore } = { projects: [], count: null, hasMore: false }, isLoading, error } = useGetProjects(page, searchTerm);
+  const { data: { projects, count, hasMore } = { projects: [], count: null, hasMore: false }, isLoading, error } = useGetProjects(page, debouncedSearchTerm);
   const { updateProject, isUpdating } = useUpdateProject();
   const { deleteProject, isDeleting } = useDeleteProject();
   const isMutating = isUpdating || isDeleting;
