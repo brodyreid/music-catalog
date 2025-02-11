@@ -1,6 +1,7 @@
 import { FormData } from '@/pages/Projects.tsx';
 import supabase from '@/supabase.ts';
 import { Database } from '@/types/database.types.ts';
+import { Contributor } from '@/types/index.ts';
 
 export const PAGE_SIZE = 100;
 
@@ -26,28 +27,31 @@ export const createProject = async (data: InsertProjectData) => {
 
 export const updateProject = async ({ id, data }: { id: number; data: FormData }) => {
   const { contributors, ...projectData } = data;
-  const contributorData = contributors.map((c) => ({ project_id: id, contributor_id: c.id }));
-  console.log({ id, data, contributorData, projectData });
 
-  const { data: updateData, error: updateError } = await supabase.from('projects').update(projectData).eq('id', id).select();
-  console.log('update: ', updateData);
+  const { error: updateError } = await supabase.from('projects').update(projectData).eq('id', id);
   if (updateError) {
     throw updateError;
   }
 
-  const { data: deleteData, error: deleteError } = await supabase.from('project_contributors').delete().eq('project_id', id).select();
-  console.log('delete: ', deleteData);
+  const { error: deleteError } = await supabase.from('project_contributors').delete().eq('project_id', id);
   if (deleteError) {
     throw deleteError;
   }
 
-  if (!contributorData.length) {
-    console.log('failed with length: ', contributorData.length);
-    return;
+  const newContributors = contributors.filter((c) => !c.id);
+  let insertedContributors: Contributor[] = [];
+  if (newContributors.length) {
+    const { data: newData, error: newError } = await supabase.from('contributors').insert(newContributors).select();
+    if (newError) {
+      throw newError;
+    }
+
+    insertedContributors = newData;
   }
 
-  const { data: insertData, error: insertError } = await supabase.from('project_contributors').insert(contributorData).select();
-  console.log('insert: ', insertData);
+  const allContributors = contributors.map((c) => (c.id ? c : insertedContributors.find((ic) => ic.artist_name === c.artist_name))) as Contributor[];
+
+  const { error: insertError } = await supabase.from('project_contributors').insert(allContributors.map((c) => ({ project_id: id, contributor_id: c.id })));
   if (insertError) {
     throw insertError;
   }

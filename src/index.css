@@ -128,7 +128,7 @@
 }
 
 .rs__value-container {
-  @apply px-2 py-1 gap-2.5;
+  @apply px-2 py-1 gap-2.5 hover:cursor-text;
 }
 
 .rs__multi-value {
@@ -153,4 +153,8 @@
 
 .rs__multi-value__remove {
   @apply hover:bg-red-700/70 ml-0.5 rounded-sm cursor-pointer duration-300;
+}
+
+.rs__placeholder {
+  @apply text-text-muted/50;
 }

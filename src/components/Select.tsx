@@ -2,6 +2,7 @@ import { Contributor } from '@/types/index.ts';
 import { ChevronDown, Minus, X } from 'lucide-react';
 import { DetailedHTMLProps, forwardRef, HTMLAttributes } from 'react';
 import { ControllerRenderProps } from 'react-hook-form';
+import { SelectInstance } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 type SelectProps = {
@@ -24,16 +25,18 @@ const CustomClearIndicator = ({ innerProps }: { innerProps: DetailedHTMLProps<HT
   </div>
 );
 
-const Select = forwardRef<any, SelectProps>(({ contributors, ...field }, ref) => {
+const Select = forwardRef<SelectInstance<Contributor, true>, SelectProps>(({ contributors, ...field }, ref) => {
   return (
     <CreatableSelect
       ref={ref}
       {...field}
       isMulti
       options={contributors}
-      getOptionValue={(option: Contributor) => option.id.toString()}
-      getOptionLabel={(option: Contributor) => option.artist_name}
-      onCreateOption={(inputValue) => console.log({ id: inputValue, name: inputValue })}
+      getOptionValue={(option) => option.id?.toString()}
+      getOptionLabel={(option) => option.artist_name}
+      getNewOptionData={(inputValue, _optionLabel) => ({ artist_name: inputValue })}
+      formatCreateLabel={(inputValue) => `Create new contributor "${inputValue}"`}
+      onChange={(value) => field.onChange(value)}
       unstyled
       closeMenuOnSelect={true}
       classNamePrefix='rs'
