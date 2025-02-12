@@ -14,12 +14,13 @@ import {
   ArrowLeft,
   ArrowRight,
   ChevronDown,
+  LoaderCircle,
   Minus,
   Pencil,
   Plus,
   Search,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 
@@ -40,7 +41,8 @@ export default function Projects() {
   const [selected, setSelected] = useState<ProjectWithAll | null>(null);
   const [page, setPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
+  const [isSearching, setIsSearching] = useState(false);
+  const [debouncedSearchTerm, { isPending }] = useDebounce(searchTerm, 500);
   const {
     register,
     handleSubmit,
@@ -57,11 +59,14 @@ export default function Projects() {
     },
     isLoading,
     error,
-    isFetching,
   } = useGetProjects(page, debouncedSearchTerm);
   const { updateProject, isUpdating } = useUpdateProject();
   const { deleteProject, isDeleting } = useDeleteProject();
   const isMutating = isUpdating || isDeleting;
+
+  useEffect(() => {
+    setIsSearching(isPending());
+  }, [searchTerm, debouncedSearchTerm]);
 
   const closeModal = () => {
     reset({
@@ -236,12 +241,21 @@ export default function Projects() {
         <div className='ml-auto'>
           <div className='border ring-border has-focus:ring-2 has-focus-visible:ring-text-muted/30 has-focus-visible:border-text/50 has-focus-visible:shadow-lg outline-none w-56 py-1.5 pl-1.5 border-border flex items-center gap-1 rounded-md bg-background-mid/65'>
             <span>
-              <Search
-                className='text-text-muted/50'
-                strokeWidth={1.25}
-                width={16}
-                height={16}
-              />
+              {isSearching ? (
+                <LoaderCircle
+                  className='text-text-muted/75 animate-spin'
+                  strokeWidth={1.25}
+                  width={16}
+                  height={16}
+                />
+              ) : (
+                <Search
+                  className='text-text-muted/50'
+                  strokeWidth={1.25}
+                  width={16}
+                  height={16}
+                />
+              )}
             </span>
             <input
               type='text'
