@@ -1,3 +1,4 @@
+import { AlbumFormData } from '@/pages/Albums.tsx';
 import supabase from '@/supabase.ts';
 import { Database } from '@/types/database.types.ts';
 
@@ -20,14 +21,27 @@ export const createAlbum = async (data: InsertAlbumData) => {
   }
 };
 
-export type UpdateAlbumData = {
-  id: number;
-  data: Database['public']['Tables']['albums']['Update'];
-};
-export const updateAlbum = async ({ id, data }: UpdateAlbumData) => {
-  const { error } = await supabase.from('albums').update(data).eq('id', id);
-  if (error) {
-    throw error;
+export const updateAlbum = async ({ id, data }: { id: number; data: AlbumFormData }) => {
+  const { projects, ...albumData } = data;
+
+  const { error: projectsError } = await supabase
+    .from('projects')
+    .update({ album_id: id })
+    .in(
+      'id',
+      projects.map((p) => p.id),
+    );
+
+  if (projectsError) {
+    throw projectsError;
+  }
+
+  const { error: albumError } = await supabase
+    .from('albums')
+    .update(albumData)
+    .eq('id', id);
+  if (albumError) {
+    throw albumError;
   }
 };
 

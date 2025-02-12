@@ -1,4 +1,4 @@
-import { FormData } from '@/pages/Projects.tsx';
+import { ProjectFormData } from '@/pages/Projects.tsx';
 import supabase from '@/supabase.ts';
 import { Database } from '@/types/database.types.ts';
 import { Contributor, ProjectWithAll } from '@/types/index.ts';
@@ -7,13 +7,13 @@ export const PAGE_SIZE = 100;
 
 export const fetchProjects = async ({
   page,
+  limit,
   searchTerm,
 }: {
-  page: number;
+  page?: number;
+  limit?: number;
   searchTerm: string;
 }) => {
-  const from = page * PAGE_SIZE;
-  const to = page * PAGE_SIZE + (PAGE_SIZE - 1);
   const words = searchTerm?.split(' ');
   const columns = ['title', 'release_name', 'folder_path'];
 
@@ -25,7 +25,15 @@ export const fetchProjects = async ({
     });
   }
 
-  const { data, error, count } = await query.order('id').range(from, to);
+  if (page) {
+    query = query.range(page * PAGE_SIZE, page * PAGE_SIZE + (PAGE_SIZE - 1));
+  }
+
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const { data, error, count } = await query;
   if (error) {
     throw error;
   }
@@ -33,7 +41,7 @@ export const fetchProjects = async ({
   return {
     projects: data as ProjectWithAll[],
     count,
-    hasMore: count ? count > to : false,
+    hasMore: count && page ? count > page * PAGE_SIZE + (PAGE_SIZE - 1) : false,
   };
 };
 
@@ -45,7 +53,13 @@ export const createProject = async (data: InsertProjectData) => {
   }
 };
 
-export const updateProject = async ({ id, data }: { id: number; data: FormData }) => {
+export const updateProject = async ({
+  id,
+  data,
+}: {
+  id: number;
+  data: ProjectFormData;
+}) => {
   const { contributors, ...projectData } = data;
 
   const { error: updateError } = await supabase

@@ -1,4 +1,5 @@
 import { PAGE_SIZE } from '@/api/projectQueries.ts';
+import ErrorMessage from '@/components/ErrorMessage.tsx';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
 import Select from '@/components/Select.tsx';
@@ -24,7 +25,7 @@ import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 
-export type FormData = Pick<
+export type ProjectFormData = Pick<
   ProjectWithAll,
   | 'title'
   | 'release_name'
@@ -49,7 +50,7 @@ export default function Projects() {
     formState: { errors: formErrors },
     reset,
     control,
-  } = useForm<FormData>();
+  } = useForm<ProjectFormData>();
   const { data: contributors = [] } = useGetContributors();
   const {
     data: { projects, count, hasMore } = {
@@ -59,7 +60,7 @@ export default function Projects() {
     },
     isLoading,
     error,
-  } = useGetProjects(page, debouncedSearchTerm);
+  } = useGetProjects({ page, searchTerm: debouncedSearchTerm });
   const { updateProject, isUpdating } = useUpdateProject();
   const { deleteProject, isDeleting } = useDeleteProject();
   const isMutating = isUpdating || isDeleting;
@@ -97,7 +98,7 @@ export default function Projects() {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (formData: FormData) => {
+  const handleSave = async (formData: ProjectFormData) => {
     console.log({ formData });
     if (selected) {
       updateProject({ id: selected.id, data: formData });
@@ -133,7 +134,7 @@ export default function Projects() {
   };
 
   if (isLoading) return <LoadingBars />;
-  if (error) return <p>Error: {error.message}</p>;
+  if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>
@@ -244,7 +245,7 @@ export default function Projects() {
               {isSearching ? (
                 <LoaderCircle
                   className='text-text-muted/75 animate-spin'
-                  strokeWidth={1.25}
+                  strokeWidth={2}
                   width={16}
                   height={16}
                 />

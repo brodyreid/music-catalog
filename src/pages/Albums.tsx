@@ -1,18 +1,20 @@
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
+import ProjectSelector from '@/components/ProjectSelector.tsx';
 import {
   useCreateAlbum,
   useDeleteAlbum,
   useGetAlbums,
   useUpdateAlbum,
 } from '@/hooks/useAlbums.ts';
-import { Album, AlbumWithProjects } from '@/types/index.ts';
+import { useGetProjects } from '@/hooks/useProjects.ts';
+import { AlbumWithProjects } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
 import { ChevronDown, ChevronRight, Minus, Pencil, Plus } from 'lucide-react';
 import { Fragment, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
-type FormData = Omit<Album, 'id'>;
+export type AlbumFormData = Omit<AlbumWithProjects, 'id'>;
 
 export default function Albums() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,8 +25,14 @@ export default function Albums() {
     register,
     handleSubmit,
     reset,
-  } = useForm<FormData>();
+    control,
+  } = useForm<AlbumFormData>();
   const { data: albums = [], isLoading, error } = useGetAlbums();
+  const {
+    data: { projects } = {
+      projects: [],
+    },
+  } = useGetProjects({ page: 0, searchTerm: '' });
   const { createAlbum, isCreating } = useCreateAlbum();
   const { updateAlbum, isUpdating } = useUpdateAlbum();
   const { deleteAlbum, isDeleting } = useDeleteAlbum();
@@ -41,6 +49,7 @@ export default function Albums() {
       title: album.title,
       notes: album.notes,
       release_date: album.release_date,
+      projects: album.projects,
     });
     setEditingId(album.id);
     setIsModalOpen(true);
@@ -51,12 +60,13 @@ export default function Albums() {
       title: '',
       notes: null,
       release_date: null,
+      projects: [],
     });
     setEditingId(null);
     setIsModalOpen(false);
   };
 
-  const handleSave = async (formData: FormData) => {
+  const handleSave = async (formData: AlbumFormData) => {
     if (editingId) {
       updateAlbum({ id: editingId, data: formData });
     } else {
@@ -97,6 +107,16 @@ export default function Albums() {
             <label>Notes</label>
             <textarea {...register('notes')} rows={4} className='input-field' />
           </div>
+          <div className='flex justify-between mt-8'>
+            <label>Projects</label>
+            <Controller
+              name='projects'
+              control={control}
+              defaultValue={[]}
+              render={({ field }) => <ProjectSelector {...field} projects={projects} />}
+            />
+          </div>
+
           <div className='flex justify-between items-center mt-8'>
             <label>Release Date</label>
             <input

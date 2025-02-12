@@ -13,11 +13,11 @@ export type SaveDataResponse<T> = { message: string } & { data: T };
 export type Project = Tables<'projects'>;
 export type Contributor = Tables<'contributors'>;
 export type Album = Tables<'albums'>;
+export type AlbumWithProjects = Album & { projects: Project[] };
 export type ProjectWithAll = Project & {
   contributors: Contributor[];
   album: Album | null;
 };
-export type AlbumWithProjects = Album & { projects: Project[] };
 
 export type MusicalKey = Enums<'musical_key'>;
 

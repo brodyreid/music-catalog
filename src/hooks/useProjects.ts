@@ -11,10 +11,18 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-export const useGetProjects = (page: number, searchTerm: string) =>
+export const useGetProjects = ({
+  page,
+  limit,
+  searchTerm,
+}: {
+  page?: number;
+  limit?: number;
+  searchTerm: string;
+}) =>
   useQuery({
-    queryKey: ['projects', page, searchTerm],
-    queryFn: () => fetchProjects({ page, searchTerm }),
+    queryKey: ['projects', page, limit, searchTerm],
+    queryFn: () => fetchProjects({ page, limit, searchTerm }),
     placeholderData: keepPreviousData,
   });
 
