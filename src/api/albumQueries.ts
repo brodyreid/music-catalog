@@ -1,6 +1,5 @@
 import { AlbumFormData } from '@/pages/Albums.tsx';
 import supabase from '@/supabase.ts';
-import { Database } from '@/types/database.types.ts';
 
 export const fetchAlbums = async () => {
   const { data, error } = await supabase
@@ -13,28 +12,35 @@ export const fetchAlbums = async () => {
   return data;
 };
 
-export type InsertAlbumData = Database['public']['Tables']['albums']['Insert'];
-export const createAlbum = async (data: InsertAlbumData) => {
-  const { error } = await supabase.from('albums').insert(data);
-  if (error) {
-    throw error;
+export const createAlbum = async (data: AlbumFormData) => {
+  const { projects, ...albumData } = data;
+
+  const { data: newAlbum, error: albumError } = await supabase
+    .from('albums')
+    .insert(albumData)
+    .select()
+    .single();
+  if (albumError) {
+    throw albumError;
+  }
+
+  if (projects.length) {
+    const projectsData = projects.map((p) => ({
+      album_id: newAlbum.id,
+      project_id: p.id,
+    }));
+
+    const { error: projectsError } = await supabase
+      .from('album_projects')
+      .insert(projectsData);
+    if (projectsError) {
+      throw projectsError;
+    }
   }
 };
 
 export const updateAlbum = async ({ id, data }: { id: number; data: AlbumFormData }) => {
   const { projects, ...albumData } = data;
-
-  const { error: projectsError } = await supabase
-    .from('projects')
-    .update({ album_id: id })
-    .in(
-      'id',
-      projects.map((p) => p.id),
-    );
-
-  if (projectsError) {
-    throw projectsError;
-  }
 
   const { error: albumError } = await supabase
     .from('albums')
@@ -42,6 +48,27 @@ export const updateAlbum = async ({ id, data }: { id: number; data: AlbumFormDat
     .eq('id', id);
   if (albumError) {
     throw albumError;
+  }
+
+  const { error: deleteError } = await supabase
+    .from('album_projects')
+    .delete()
+    .eq('album_id', id);
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  if (!projects.length) {
+    return;
+  }
+
+  const projectsData = projects.map((p) => ({ album_id: id, project_id: p.id }));
+
+  const { error: projectsError } = await supabase
+    .from('album_projects')
+    .insert(projectsData);
+  if (projectsError) {
+    throw projectsError;
   }
 };
 

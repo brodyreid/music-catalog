@@ -16,6 +16,8 @@
     "prestart": "node --version | grep -q '^v22\\.' || (echo 'Please use Node version 22.x. Run `nvm use` to automatically switch to the correct version.' && exit 1)"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
     "@supabase/supabase-js": "^2.48.1",
     "@tailwindcss/vite": "^4.0.2",
     "@tanstack/react-query": "^5.66.0",
@@ -41,7 +43,7 @@
     "eslint": "^9.13.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.14",
+    "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.11.0",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",

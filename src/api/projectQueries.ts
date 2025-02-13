@@ -87,6 +87,10 @@ export const updateProject = async ({
     c.id ? c : insertedContributors.find((ic) => ic.artist_name === c.artist_name),
   ) as Contributor[];
 
+  if (!allContributors.length) {
+    return;
+  }
+
   const { error: insertError } = await supabase
     .from('project_contributors')
     .insert(allContributors.map((c) => ({ project_id: id, contributor_id: c.id })));

@@ -1,11 +1,25 @@
 import { useGetProjects } from '@/hooks/useProjects.ts';
 import { Project, ProjectWithAll } from '@/types/index.ts';
-import { Dot, LoaderCircle, Search } from 'lucide-react';
-import { forwardRef, useEffect, useState } from 'react';
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { Dot, LoaderCircle, Search, X } from 'lucide-react';
+import { forwardRef, Fragment, useEffect, useState } from 'react';
 import { ControllerRenderProps } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 import ErrorMessage from './ErrorMessage.tsx';
 import { Skeleton } from './Skeleton.tsx';
+import SortableItem from './SortableItem.tsx';
 
 type ProjectSelectorProps = ControllerRenderProps;
 
@@ -16,14 +30,19 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
     const [debouncedSearchTerm, { isPending }] = useDebounce(searchTerm, 500);
     const [isAddProjectsOpen, setIsAddProjectsOpen] = useState(false);
     const {
-      data: { projects: eligibleProjects } = {
+      data: { projects } = {
         projects: [],
       },
       isLoading,
       error,
     } = useGetProjects({ page: 0, searchTerm: debouncedSearchTerm });
+    const sensors = useSensors(useSensor(PointerSensor));
 
     const selectedProjects = value as Project[];
+
+    const eligibleProjects = projects.filter(
+      (p) => !selectedProjects.map((sp) => sp.id).includes(p.id),
+    );
 
     useEffect(() => {
       setIsSearching(isPending());
@@ -32,8 +51,27 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
     const handleClick = (project: ProjectWithAll) => {
       const { contributors, album, ...rest } = project;
       const newProject = rest as Project;
-      setIsAddProjectsOpen(false);
       onChange([...selectedProjects, newProject]);
+    };
+
+    const handleRemoveProject = (id: number) => {
+      onChange(selectedProjects.filter((p) => p.id !== id));
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+      const { active, over } = event;
+      console.log({ event, selectedProjects });
+      if (!over) {
+        return;
+      }
+
+      if (active.id !== over.id) {
+        const oldIndex = selectedProjects.map((p) => p.id).indexOf(Number(active.id));
+        const newIndex = selectedProjects.map((p) => p.id).indexOf(Number(over.id));
+        const newOrder = arrayMove(selectedProjects, oldIndex, newIndex);
+        console.log({ oldIndex, newIndex, newOrder });
+        onChange(newOrder);
+      }
     };
 
     if (isLoading) return <Skeleton />;
@@ -89,7 +127,7 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
                       <span>
                         <Dot size={16} className='inline' />
                         {project.contributors.map((c) => (
-                          <span className='text-sm text-text-muted/80'>
+                          <span key={c.id} className='text-sm text-text-muted/80'>
                             {c.artist_name}
                           </span>
                         ))}
@@ -101,11 +139,35 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
             </div>
           </div>
         )}
-        <ol className='list-decimal list-inside space-y-1.5 w-64'>
+        <ol className='list-decimal space-y-2.5 w-64'>
           {selectedProjects.map((project) => (
-            <li key={project.id}>{project.release_name || project.title}</li>
+            <li key={project.id} className='list-outside ml-4'>
+              <div className='flex justify-between items-center w-full'>
+                <p>{project.release_name || project.title}</p>
+                <button
+                  type='button'
+                  className='duration-300 cursor-pointer hover:bg-border p-1 rounded'
+                  onClick={() => handleRemoveProject(project.id)}>
+                  <X size={16} />
+                </button>
+              </div>
+            </li>
           ))}
         </ol>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}>
+          <SortableContext
+            items={selectedProjects.map((p) => p.id)}
+            strategy={verticalListSortingStrategy}>
+            {selectedProjects.map((project) => (
+              <Fragment key={project.id}>
+                <SortableItem item={project} />
+              </Fragment>
+            ))}
+          </SortableContext>
+        </DndContext>
       </div>
     );
   },
