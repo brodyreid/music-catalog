@@ -8,6 +8,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import {
   arrayMove,
   SortableContext,
@@ -67,7 +68,7 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
 
     const handleDragEnd = (event: DragEndEvent) => {
       const { active, over } = event;
-      console.log({ event, selectedProjects });
+
       if (!over) {
         return;
       }
@@ -148,6 +149,7 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
         )}
         <DndContext
           sensors={sensors}
+          modifiers={[restrictToWindowEdges]}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}>
           <SortableContext

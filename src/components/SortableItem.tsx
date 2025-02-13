@@ -31,7 +31,7 @@ const SortableItem = <
       <div
         ref={setNodeRef}
         style={styles}
-        className='hover:cursor-grab active:cursor-grabbing'
+        className='hover:cursor-grab active:cursor-grabbing flex-shrink-0 min-w-[200px]'
         {...attributes}
         {...listeners}>
         <p>{item.release_name || item.title}</p>

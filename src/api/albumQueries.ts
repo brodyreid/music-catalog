@@ -25,9 +25,10 @@ export const createAlbum = async (data: AlbumFormData) => {
   }
 
   if (projects.length) {
-    const projectsData = projects.map((p) => ({
+    const projectsData = projects.map((p, index) => ({
       album_id: newAlbum.id,
       project_id: p.id,
+      position: index,
     }));
 
     const { error: projectsError } = await supabase
@@ -62,7 +63,11 @@ export const updateAlbum = async ({ id, data }: { id: number; data: AlbumFormDat
     return;
   }
 
-  const projectsData = projects.map((p) => ({ album_id: id, project_id: p.id }));
+  const projectsData = projects.map((p, index) => ({
+    album_id: id,
+    project_id: p.id,
+    position: index,
+  }));
 
   const { error: projectsError } = await supabase
     .from('album_projects')
