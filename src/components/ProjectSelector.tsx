@@ -13,8 +13,8 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Dot, LoaderCircle, Search, X } from 'lucide-react';
-import { forwardRef, Fragment, useEffect, useState } from 'react';
+import { Dot, LoaderCircle, Search } from 'lucide-react';
+import { forwardRef, MouseEvent, useEffect, useState } from 'react';
 import { ControllerRenderProps } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 import ErrorMessage from './ErrorMessage.tsx';
@@ -54,7 +54,14 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
       onChange([...selectedProjects, newProject]);
     };
 
-    const handleRemoveProject = (id: number) => {
+    const handleRemoveProject = ({
+      id,
+      event,
+    }: {
+      id: number;
+      event: MouseEvent<HTMLButtonElement>;
+    }) => {
+      event.stopPropagation();
       onChange(selectedProjects.filter((p) => p.id !== id));
     };
 
@@ -139,21 +146,6 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
             </div>
           </div>
         )}
-        <ol className='list-decimal space-y-2.5 w-64'>
-          {selectedProjects.map((project) => (
-            <li key={project.id} className='list-outside ml-4'>
-              <div className='flex justify-between items-center w-full'>
-                <p>{project.release_name || project.title}</p>
-                <button
-                  type='button'
-                  className='duration-300 cursor-pointer hover:bg-border p-1 rounded'
-                  onClick={() => handleRemoveProject(project.id)}>
-                  <X size={16} />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ol>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -161,11 +153,13 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
           <SortableContext
             items={selectedProjects.map((p) => p.id)}
             strategy={verticalListSortingStrategy}>
-            {selectedProjects.map((project) => (
-              <Fragment key={project.id}>
-                <SortableItem item={project} />
-              </Fragment>
-            ))}
+            <ol className='list-decimal space-y-2.5 w-64'>
+              {selectedProjects.map((project) => (
+                <li key={project.id}>
+                  <SortableItem item={project} onRemoveItem={handleRemoveProject} />
+                </li>
+              ))}
+            </ol>
           </SortableContext>
         </DndContext>
       </div>
