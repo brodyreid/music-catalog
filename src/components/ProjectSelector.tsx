@@ -7,12 +7,10 @@ import { useDebounce } from 'use-debounce';
 import ErrorMessage from './ErrorMessage.tsx';
 import { Skeleton } from './Skeleton.tsx';
 
-type ProjectSelectorProps = {
-  projects: ProjectWithAll[];
-} & ControllerRenderProps;
+type ProjectSelectorProps = ControllerRenderProps;
 
 const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
-  ({ projects, value, onChange, ...rest }, ref) => {
+  ({ value, onChange, ...rest }, ref) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [debouncedSearchTerm, { isPending }] = useDebounce(searchTerm, 500);
@@ -23,7 +21,7 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
       },
       isLoading,
       error,
-    } = useGetProjects({ limit: 25, searchTerm: debouncedSearchTerm });
+    } = useGetProjects({ page: 0, searchTerm: debouncedSearchTerm });
 
     const selectedProjects = value as Project[];
 
@@ -34,6 +32,7 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
     const handleClick = (project: ProjectWithAll) => {
       const { contributors, album, ...rest } = project;
       const newProject = rest as Project;
+      setIsAddProjectsOpen(false);
       onChange([...selectedProjects, newProject]);
     };
 
@@ -41,20 +40,15 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
     if (error) return <ErrorMessage message={error.message} />;
 
     return (
-      <div ref={ref} {...rest}>
-        <ol className='list-decimal mb-2 space-y-1'>
-          {selectedProjects.map((project) => (
-            <li key={project.id}>{project.title}</li>
-          ))}
-        </ol>
+      <div ref={ref} className='relative' {...rest}>
         <button
           type='button'
           onClick={() => setIsAddProjectsOpen((prev) => !prev)}
-          className='px-3 py-1 bg-border/25 border border-border rounded-sm cursor-pointer hover:border-text-muted/30 text-text-muted/60 hover:text-text-muted/90 duration-300'>
+          className='px-3 py-1 bg-border/25 border border-border rounded-sm cursor-pointer hover:border-text-muted/30 text-text-muted/60 hover:text-text-muted/90 duration-300 mb-3'>
           Add project...
         </button>
         {isAddProjectsOpen && (
-          <div className='absolute rounded-md border border-border right-0 mt-2 bg-background-mid'>
+          <div className='absolute rounded-md border border-border right-1/2 mr-1 mt-2 bg-background-mid'>
             <div className='border-b w-full ring-border  outline-none py-3 pl-1.5 border-border flex items-center gap-1'>
               <span>
                 {isSearching ? (
@@ -107,6 +101,11 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
             </div>
           </div>
         )}
+        <ol className='list-decimal list-inside space-y-1.5 w-64'>
+          {selectedProjects.map((project) => (
+            <li key={project.id}>{project.release_name || project.title}</li>
+          ))}
+        </ol>
       </div>
     );
   },

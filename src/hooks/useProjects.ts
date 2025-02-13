@@ -13,16 +13,14 @@ import {
 
 export const useGetProjects = ({
   page,
-  limit,
   searchTerm,
 }: {
-  page?: number;
-  limit?: number;
+  page: number;
   searchTerm: string;
 }) =>
   useQuery({
-    queryKey: ['projects', page, limit, searchTerm],
-    queryFn: () => fetchProjects({ page, limit, searchTerm }),
+    queryKey: ['projects', page, searchTerm],
+    queryFn: () => fetchProjects({ page, searchTerm }),
     placeholderData: keepPreviousData,
   });
 

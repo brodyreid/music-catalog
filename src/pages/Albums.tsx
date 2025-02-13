@@ -7,7 +7,6 @@ import {
   useGetAlbums,
   useUpdateAlbum,
 } from '@/hooks/useAlbums.ts';
-import { useGetProjects } from '@/hooks/useProjects.ts';
 import { AlbumWithProjects } from '@/types/index.ts';
 import { formatReadableDate } from '@/utils.ts';
 import { ChevronDown, ChevronRight, Minus, Pencil, Plus } from 'lucide-react';
@@ -28,11 +27,6 @@ export default function Albums() {
     control,
   } = useForm<AlbumFormData>();
   const { data: albums = [], isLoading, error } = useGetAlbums();
-  const {
-    data: { projects } = {
-      projects: [],
-    },
-  } = useGetProjects({ page: 0, searchTerm: '' });
   const { createAlbum, isCreating } = useCreateAlbum();
   const { updateAlbum, isUpdating } = useUpdateAlbum();
   const { deleteAlbum, isDeleting } = useDeleteAlbum();
@@ -113,10 +107,9 @@ export default function Albums() {
               name='projects'
               control={control}
               defaultValue={[]}
-              render={({ field }) => <ProjectSelector {...field} projects={projects} />}
+              render={({ field }) => <ProjectSelector {...field} />}
             />
           </div>
-
           <div className='flex justify-between items-center mt-8'>
             <label>Release Date</label>
             <input
@@ -240,7 +233,7 @@ export default function Albums() {
                         <ol>
                           {album.projects.map((project) => (
                             <li key={project.id} className='p-2 list-inside list-decimal'>
-                              {project.title}
+                              {project.release_name || project.title}
                             </li>
                           ))}
                         </ol>

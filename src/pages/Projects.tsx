@@ -2,6 +2,7 @@ import { PAGE_SIZE } from '@/api/projectQueries.ts';
 import ErrorMessage from '@/components/ErrorMessage.tsx';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
+import { ProjectsScanner } from '@/components/ProjectsScanner.tsx';
 import Select from '@/components/Select.tsx';
 import { useGetContributors } from '@/hooks/useContributors.ts';
 import {
@@ -239,6 +240,7 @@ export default function Projects() {
           <Plus size={16} strokeWidth={1.25} />
           <p>New Project</p>
         </button>
+        <ProjectsScanner />
         <div className='ml-auto'>
           <div className='border ring-border has-focus:ring-2 has-focus-visible:ring-text-muted/30 has-focus-visible:border-text/50 has-focus-visible:shadow-lg outline-none w-56 py-1.5 pl-1.5 border-border flex items-center gap-1 rounded-md bg-background-mid/65'>
             <span>

@@ -9,6 +9,46 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      album_projects: {
+        Row: {
+          album_id: number;
+          position: number | null;
+          project_id: number;
+        };
+        Insert: {
+          album_id: number;
+          position?: number | null;
+          project_id: number;
+        };
+        Update: {
+          album_id?: number;
+          position?: number | null;
+          project_id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'album_projects_album_id_fkey';
+            columns: ['album_id'];
+            isOneToOne: false;
+            referencedRelation: 'albums';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'album_projects_project_id_fkey';
+            columns: ['project_id'];
+            isOneToOne: false;
+            referencedRelation: 'projects';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'album_projects_project_id_fkey';
+            columns: ['project_id'];
+            isOneToOne: false;
+            referencedRelation: 'projects_with_all';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       albums: {
         Row: {
           id: number;
@@ -87,7 +127,6 @@ export type Database = {
       };
       projects: {
         Row: {
-          album_id: number | null;
           bpm: number | null;
           date_created: string | null;
           folder_path: string | null;
@@ -99,7 +138,6 @@ export type Database = {
           title: string;
         };
         Insert: {
-          album_id?: number | null;
           bpm?: number | null;
           date_created?: string | null;
           folder_path?: string | null;
@@ -111,7 +149,6 @@ export type Database = {
           title: string;
         };
         Update: {
-          album_id?: number | null;
           bpm?: number | null;
           date_created?: string | null;
           folder_path?: string | null;
@@ -122,22 +159,13 @@ export type Database = {
           release_name?: string | null;
           title?: string;
         };
-        Relationships: [
-          {
-            foreignKeyName: 'projects_album_id_fkey';
-            columns: ['album_id'];
-            isOneToOne: false;
-            referencedRelation: 'albums';
-            referencedColumns: ['id'];
-          },
-        ];
+        Relationships: [];
       };
     };
     Views: {
       projects_with_all: {
         Row: {
           album: Json | null;
-          album_id: number | null;
           bpm: number | null;
           contributors: Json | null;
           date_created: string | null;
@@ -149,15 +177,7 @@ export type Database = {
           release_name: string | null;
           title: string | null;
         };
-        Relationships: [
-          {
-            foreignKeyName: 'projects_album_id_fkey';
-            columns: ['album_id'];
-            isOneToOne: false;
-            referencedRelation: 'albums';
-            referencedColumns: ['id'];
-          },
-        ];
+        Relationships: [];
       };
     };
     Functions: {

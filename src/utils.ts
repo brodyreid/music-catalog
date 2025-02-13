@@ -1,4 +1,4 @@
-import { MusicalKey, SaveDataResponse } from './types/index.ts';
+import { MusicalKey } from './types/index.ts';
 
 export const formatReadableDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -15,40 +15,11 @@ export const formatNumericDate = (dateString: string | null) => {
   return new Date(dateString).toISOString().split('T')[0];
 };
 
-export const saveData = async <TBody, TResponse>(
-  url: string,
-  body: Omit<TBody, 'id'>,
-): Promise<SaveDataResponse<TResponse>> => {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body), // "that's fine, right?" - alex
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
-};
-
-export const deleteData = async <T>(url: string): Promise<SaveDataResponse<T>> => {
-  const response = await fetch(url, {
-    method: 'DELETE',
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
-};
-
 export const generateHash = async (key: string) => {
   const encoder = new TextEncoder();
   const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(key));
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, '0')).join('');
 
   return hashHex;
 };

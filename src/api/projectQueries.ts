@@ -7,11 +7,9 @@ export const PAGE_SIZE = 100;
 
 export const fetchProjects = async ({
   page,
-  limit,
   searchTerm,
 }: {
-  page?: number;
-  limit?: number;
+  page: number;
   searchTerm: string;
 }) => {
   const words = searchTerm?.split(' ');
@@ -24,16 +22,9 @@ export const fetchProjects = async ({
       query = query.or(columns.map((col) => `${col}.ilike.%${word}%`).join(','));
     });
   }
-
-  if (page) {
-    query = query.range(page * PAGE_SIZE, page * PAGE_SIZE + (PAGE_SIZE - 1));
-  }
-
-  if (limit) {
-    query = query.limit(limit);
-  }
-
-  const { data, error, count } = await query;
+  const { data, error, count } = await query
+    .order('id')
+    .range(page * PAGE_SIZE, page * PAGE_SIZE + (PAGE_SIZE - 1));
   if (error) {
     throw error;
   }
