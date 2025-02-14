@@ -129,33 +129,33 @@ export type Database = {
         Row: {
           bpm: number | null;
           date_created: string | null;
-          folder_path: string | null;
           folder_path_hash: string;
           id: number;
           musical_key: Database['public']['Enums']['musical_key'] | null;
           notes: string | null;
+          path: string | null;
           release_name: string | null;
           title: string;
         };
         Insert: {
           bpm?: number | null;
           date_created?: string | null;
-          folder_path?: string | null;
           folder_path_hash: string;
           id?: number;
           musical_key?: Database['public']['Enums']['musical_key'] | null;
           notes?: string | null;
+          path?: string | null;
           release_name?: string | null;
           title: string;
         };
         Update: {
           bpm?: number | null;
           date_created?: string | null;
-          folder_path?: string | null;
           folder_path_hash?: string;
           id?: number;
           musical_key?: Database['public']['Enums']['musical_key'] | null;
           notes?: string | null;
+          path?: string | null;
           release_name?: string | null;
           title?: string;
         };
@@ -169,11 +169,11 @@ export type Database = {
           bpm: number | null;
           contributors: Json | null;
           date_created: string | null;
-          folder_path: string | null;
           folder_path_hash: string | null;
           id: number | null;
           musical_key: Database['public']['Enums']['musical_key'] | null;
           notes: string | null;
+          path: string | null;
           release_name: string | null;
           title: string | null;
         };

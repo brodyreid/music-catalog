@@ -13,7 +13,7 @@ export const fetchProjects = async ({
   searchTerm: string;
 }) => {
   const words = searchTerm?.split(' ');
-  const columns = ['title', 'release_name', 'folder_path'];
+  const columns = ['title', 'release_name', 'path'];
 
   let query = supabase.from('projects_with_all').select('*', { count: 'exact' });
 
@@ -32,7 +32,7 @@ export const fetchProjects = async ({
   return {
     projects: data as ProjectWithAll[],
     count,
-    hasMore: count && page ? count > page * PAGE_SIZE + (PAGE_SIZE - 1) : false,
+    hasMore: count ? count > page * PAGE_SIZE + (PAGE_SIZE - 1) : false,
   };
 };
 

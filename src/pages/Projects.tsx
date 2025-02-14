@@ -30,7 +30,7 @@ export type ProjectFormData = Pick<
   ProjectWithAll,
   | 'title'
   | 'release_name'
-  | 'folder_path'
+  | 'path'
   | 'bpm'
   | 'musical_key'
   | 'notes'
@@ -74,7 +74,7 @@ export default function Projects() {
     reset({
       title: '',
       release_name: null,
-      folder_path: null,
+      path: null,
       bpm: null,
       musical_key: null,
       notes: null,
@@ -88,7 +88,7 @@ export default function Projects() {
     reset({
       title: project.title,
       release_name: project.release_name,
-      folder_path: project.folder_path,
+      path: project.path,
       bpm: project.bpm,
       musical_key: project.musical_key,
       notes: project.notes,
@@ -156,7 +156,7 @@ export default function Projects() {
           </div>
           <div className='flex justify-between items-center mt-8'>
             <label>Folder Path</label>
-            <input {...register('folder_path')} className='input-field w-88' />
+            <input {...register('path')} className='input-field w-88' />
           </div>
           <div className='flex justify-between items-center mt-8'>
             <label>BPM</label>
@@ -306,7 +306,7 @@ export default function Projects() {
                 </td>
                 <td className='text-nowrap p-2 border border-border'>{project.title}</td>
                 <td className='text-nowrap p-2 border border-border'>
-                  {project.folder_path || (
+                  {project.path || (
                     <Minus strokeWidth={1.25} size={16} className='text-text-muted/75' />
                   )}
                 </td>
