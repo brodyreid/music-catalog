@@ -1,4 +1,4 @@
-import { PAGE_SIZE } from '@/api/projectQueries.ts';
+import { getAllProjects, PAGE_SIZE } from '@/api/projectQueries.ts';
 import ErrorMessage from '@/components/ErrorMessage.tsx';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';

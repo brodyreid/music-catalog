@@ -1,7 +1,32 @@
 import { ProjectFormData } from '@/pages/Projects.tsx';
 import supabase from '@/supabase.ts';
-import { Database } from '@/types/database.types.ts';
+import { Json, Database as Smeg } from '@/types/database.types.ts';
 import { Contributor, ProjectWithAll } from '@/types/index.ts';
+import Database from '@tauri-apps/plugin-sql';
+
+export type DataTyper =
+  | {
+      album: Json | null;
+      bpm: number | null;
+      contributors: Json | null;
+      date_created: string | null;
+      folder_path_hash: string | null;
+      id: number | null;
+      musical_key: Smeg['public']['Enums']['musical_key'] | null;
+      notes: string | null;
+      path: string | null;
+      release_name: string | null;
+      title: string | null;
+    }[]
+  | null;
+
+// Example query function
+export async function getAllProjects() {
+  const db: Database | null = await Database.load('sqlite:music_catalog.db');
+  const result = (await db.select('SELECT * FROM projects_with_all')) as DataTyper;
+  console.log({ db, result });
+  return result;
+}
 
 export const PAGE_SIZE = 100;
 
@@ -36,7 +61,7 @@ export const fetchProjects = async ({
   };
 };
 
-type InsertProjectData = Database['public']['Tables']['projects']['Insert'];
+type InsertProjectData = Smeg['public']['Tables']['projects']['Insert'];
 export const createProject = async (data: InsertProjectData) => {
   const { error } = await supabase.from('projects').insert(data);
   if (error) {
