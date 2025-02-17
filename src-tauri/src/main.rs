@@ -1,14 +1,47 @@
-use log::log;
 use tauri::Manager;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
+// ~/Library/Application Support/com.music.catalog/music_catalog.db
+
 fn main() {
-    let migrations = vec![Migration {
-        version: 1,
-        description: "create_initial_tables",
-        sql: include_str!("../migrations/0001_initial.sql"),
-        kind: MigrationKind::Up,
-    }];
+    let migrations = vec![
+        Migration {
+            version: 1,
+            description: "create_initial_tables",
+            sql: include_str!("../migrations/0001_initial.up.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 1,
+            description: "undo create_initial_tables",
+            sql: include_str!("../migrations/0001_intial.down.sql"),
+            kind: MigrationKind::Down,
+        },
+        Migration {
+            version: 2,
+            description: "add_id_to_album_projects",
+            sql: include_str!("../migrations/0002_add_id_to_album_projects.up.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 2,
+            description: "undo add_id_to_album_projects",
+            sql: include_str!("../migrations/0002_add_id_to_album_projects.down.sql"),
+            kind: MigrationKind::Down,
+        },
+        Migration {
+            version: 3,
+            description: "create_projects_with_all_view",
+            sql: include_str!("../migrations/0003_create_projects_with_all_view.up.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 3,
+            description: "undo create_projects_with_all_view",
+            sql: include_str!("../migrations/0003_create_projects_with_all_view.down.sql"),
+            kind: MigrationKind::Down,
+        },
+    ];
 
     tauri::Builder::default()
         .plugin(

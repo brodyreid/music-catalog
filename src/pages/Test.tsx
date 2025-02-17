@@ -12,5 +12,5 @@ export default function Test() {
 
     getData();
   }, []);
-  return <div>{!data ? 'no data babbbyyy' : JSON.stringify(data)}</div>;
+  return <div>{!data ? 'no data babbbyyy' : JSON.stringify(data.length)}</div>;
 }

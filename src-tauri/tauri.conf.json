@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "music-catalog",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.music.catalog",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "music-catalog",
-        "width": 800,
-        "height": 600,
+        "width": 1000,
+        "height": 800,
         "resizable": true,
         "fullscreen": false
       }
