@@ -2,6 +2,7 @@ import {
   createProject,
   deleteProject,
   fetchProjects,
+  testFetchProjects,
   updateProject,
 } from '@/api/projectQueries.ts';
 import {
@@ -10,6 +11,13 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+
+export const useTestFetch = () =>
+  useQuery({
+    queryKey: ['projects'],
+    queryFn: () => testFetchProjects(),
+    placeholderData: keepPreviousData,
+  });
 
 export const useGetProjects = ({
   page,

@@ -1,16 +1,15 @@
-import { DataTyper, getAllProjects } from '@/api/projectQueries.ts';
-import { useEffect, useState } from 'react';
+import { useTestFetch } from '@/hooks/useProjects.ts';
 
 export default function Test() {
-  const [data, setData] = useState<DataTyper>([]);
+  const {
+    data: { projects, count, hasMore } = {
+      projects: [],
+      count: null,
+      hasMore: false,
+    },
+  } = useTestFetch();
 
-  useEffect(() => {
-    const getData = async () => {
-      const res = await getAllProjects();
-      setData(res);
-    };
-
-    getData();
-  }, []);
-  return <div>{!data ? 'no data babbbyyy' : JSON.stringify(data.length)}</div>;
+  return (
+    <pre>{!projects ? 'no projects babbbyyy' : JSON.stringify(projects, null, 2)}</pre>
+  );
 }

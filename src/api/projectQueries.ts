@@ -1,34 +1,57 @@
+import db from '@/database.ts';
 import { ProjectFormData } from '@/pages/Projects.tsx';
 import supabase from '@/supabase.ts';
-import { Json, Database as Smeg } from '@/types/database.types.ts';
-import { Contributor, ProjectWithAll } from '@/types/index.ts';
-import Database from '@tauri-apps/plugin-sql';
+import { Database as Smeg } from '@/types/database.types.ts';
+import { Contributor, MusicalKey, ProjectWithAll } from '@/types/index.ts';
+export const PAGE_SIZE = 100;
 
-export type DataTyper =
-  | {
-      album: Json | null;
-      bpm: number | null;
-      contributors: Json | null;
-      date_created: string | null;
-      folder_path_hash: string | null;
-      id: number | null;
-      musical_key: Smeg['public']['Enums']['musical_key'] | null;
-      notes: string | null;
-      path: string | null;
-      release_name: string | null;
-      title: string | null;
-    }[]
-  | null;
-
-// Example query function
-export async function getAllProjects() {
-  const db: Database | null = await Database.load('sqlite:music_catalog.db');
-  const result = (await db.select('SELECT * FROM projects_with_all')) as DataTyper;
-  console.log({ db, result });
-  return result;
+export interface Project {
+  id: number;
+  title: string;
+  bpm: number | null;
+  date_created: string | null;
+  folder_path_hash: string;
+  musical_key: MusicalKey | null;
+  notes: string | null;
+  path: string | null;
+  release_name: string | null;
 }
 
-export const PAGE_SIZE = 100;
+export interface Album {
+  id: number;
+  title: string;
+  notes: string | null;
+  release_date: string | null;
+}
+
+export const testFetchProjects = async () => {
+  const projects = await db.select<Project[]>('SELECT * FROM projects');
+
+  const projectsWithAlbum = await Promise.all(
+    projects.map(async (project) => {
+      const [album] = await db.select<Album[]>(
+        `
+          SELECT a.* 
+          FROM album_projects ap
+          JOIN albums a ON a.id = ap.album_id
+          WHERE ap.project_id = ?
+          LIMIT 1;
+        `,
+        [project.id],
+      );
+
+      return {
+        ...project,
+        album,
+      };
+    }),
+  );
+  return {
+    projects: projectsWithAlbum as Array<Project & { album?: Album }>,
+    count: 0,
+    hasMore: false,
+  };
+};
 
 export const fetchProjects = async ({
   page,
