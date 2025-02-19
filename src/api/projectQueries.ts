@@ -3,6 +3,7 @@ import { ProjectFormData } from '@/pages/Projects.tsx';
 import supabase from '@/supabase.ts';
 import { Database as Smeg } from '@/types/database.types.ts';
 import { Contributor, MusicalKey, ProjectWithAll } from '@/types/index.ts';
+
 export const PAGE_SIZE = 100;
 
 export interface Project {
@@ -24,8 +25,24 @@ export interface Album {
   release_date: string | null;
 }
 
-export const testFetchProjects = async () => {
-  const projects = await db.select<Project[]>('SELECT * FROM projects');
+export const testFetchProjects = async ({
+  page,
+  searchTerm,
+}: {
+  page: number;
+  searchTerm: string;
+}) => {
+  let whereClause = '';
+  if (searchTerm) {
+    const conditions = searchTerm.trim().split(' ').join(' AND ').concat('*');
+    whereClause = `WHERE projects_search = '${conditions}'`;
+  }
+  const projects = await db.select<Project[]>(
+    `
+      SELECT * FROM projects_search ${whereClause} LIMIT $1 OFFSET $2;
+    `,
+    [PAGE_SIZE, page * PAGE_SIZE],
+  );
 
   const projectsWithAlbum = await Promise.all(
     projects.map(async (project) => {
@@ -46,10 +63,17 @@ export const testFetchProjects = async () => {
       };
     }),
   );
+
+  const countResult = await db.select<{ count: number }[]>(
+    'SELECT COUNT(*) as count FROM projects;',
+  );
+  const count = countResult[0]?.count ?? 0;
+  const hasMore = count > page * PAGE_SIZE + (PAGE_SIZE - 1);
+
   return {
     projects: projectsWithAlbum as Array<Project & { album?: Album }>,
-    count: 0,
-    hasMore: false,
+    count,
+    hasMore,
   };
 };
 

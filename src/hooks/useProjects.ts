@@ -12,10 +12,16 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-export const useTestFetch = () =>
+export const useTestFetch = ({
+  page,
+  searchTerm,
+}: {
+  page: number;
+  searchTerm: string;
+}) =>
   useQuery({
-    queryKey: ['projects'],
-    queryFn: () => testFetchProjects(),
+    queryKey: ['projects', page, searchTerm],
+    queryFn: () => testFetchProjects({ page, searchTerm }),
     placeholderData: keepPreviousData,
   });
 
