@@ -1,12 +1,29 @@
 import { PAGE_SIZE } from '@/api/projectQueriesOld.ts';
 import ErrorMessage from '@/components/ErrorMessage.tsx';
 import LoadingBars from '@/components/LoadingBars.tsx';
-import { useGetProjects } from '@/hooks/useProjects.ts';
+import Modal from '@/components/Modal.tsx';
+import { ProjectsScanner } from '@/components/ProjectsScanner.tsx';
+import Select from '@/components/Select.tsx';
+import { useGetContributors } from '@/hooks/useContributors.ts';
+import {
+  useDeleteProject,
+  useGetProjects,
+  useUpdateProject,
+} from '@/hooks/useProjectsOld.ts';
 import { ProjectWithAll } from '@/types/index.ts';
-import { formatReadableDate } from '@/utils.ts';
-import { ArrowLeft, ArrowRight, Minus, Pencil, Search } from 'lucide-react';
+import { formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  LoaderCircle,
+  Minus,
+  Pencil,
+  Plus,
+  Search,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 
 export type ProjectFormData = Pick<
@@ -35,19 +52,37 @@ export default function Projects() {
     reset,
     control,
   } = useForm<ProjectFormData>();
+  const { data: contributors = [] } = useGetContributors();
   const {
     data: { projects, count, hasMore } = {
       projects: [],
-      count: 0,
+      count: null,
       hasMore: false,
     },
     isLoading,
     error,
   } = useGetProjects({ page, searchTerm: debouncedSearchTerm });
+  const { updateProject, isUpdating } = useUpdateProject();
+  const { deleteProject, isDeleting } = useDeleteProject();
+  const isMutating = isUpdating || isDeleting;
 
   useEffect(() => {
     setIsSearching(isPending());
   }, [searchTerm, debouncedSearchTerm]);
+
+  const closeModal = () => {
+    reset({
+      title: '',
+      release_name: null,
+      path: null,
+      bpm: null,
+      musical_key: null,
+      notes: null,
+      date_created: null,
+    });
+    setSelected(null);
+    setIsModalOpen(false);
+  };
 
   const handleEdit = (project: ProjectWithAll) => {
     reset({
@@ -62,6 +97,27 @@ export default function Projects() {
     });
     setSelected(project);
     setIsModalOpen(true);
+  };
+
+  const handleSave = async (formData: ProjectFormData) => {
+    console.log({ formData });
+    if (selected) {
+      updateProject({ id: selected.id, data: formData });
+    }
+
+    closeModal();
+  };
+
+  const handleDelete = () => {
+    if (!selected) {
+      throw Error('No project selected');
+    }
+    if (!window.confirm('Are you sure you want to delete this project?')) {
+      return;
+    }
+
+    deleteProject(selected.id);
+    closeModal();
   };
 
   const handlePageDecrement = () => {
@@ -83,13 +139,118 @@ export default function Projects() {
 
   return (
     <>
+      {/* Form modal */}
+      <Modal isOpen={isModalOpen} closeModal={closeModal} isMutating={isMutating}>
+        <form onSubmit={handleSubmit(handleSave)} className='w-164'>
+          <div className='flex justify-between items-center'>
+            <label>Title</label>
+            <input
+              {...register('title', { required: 'Title is required' })}
+              className='input-field w-88'
+            />
+          </div>
+          {formErrors.title && <p className='text-red-700'>{formErrors.title.message}</p>}
+          <div className='flex justify-between items-center mt-8'>
+            <label>Release Name</label>
+            <input {...register('release_name')} className='input-field w-88' />
+          </div>
+          <div className='flex justify-between items-center mt-8'>
+            <label>Folder Path</label>
+            <input {...register('path')} className='input-field w-88' />
+          </div>
+          <div className='flex justify-between items-center mt-8'>
+            <label>BPM</label>
+            <input
+              {...register('bpm')}
+              type='number'
+              min='0'
+              className='input-field w-22'
+            />
+          </div>
+          <div className='relative flex justify-between items-center mt-8'>
+            <label>Key</label>
+            <select
+              {...register('musical_key')}
+              className='input-field w-22 appearance-none'>
+              <option value=''></option>
+              {MUSICAL_KEYS.map((key) => (
+                <option key={key} value='key'>
+                  {key}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              strokeWidth={1.5}
+              className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none'
+              size={20}
+            />
+          </div>
+          <div className='flex justify-between items-center mt-8'>
+            <label>Contributors</label>
+            <Controller
+              name='contributors'
+              control={control}
+              render={({ field }) => <Select {...field} contributors={contributors} />}
+            />
+          </div>
+          <div className='flex justify-between items-center mt-8'>
+            <label>Date Created</label>
+            <input
+              {...register('date_created')}
+              type='date'
+              className='input-field w-44 dark:text-white dark:[color-scheme:dark]'
+            />
+          </div>
+          <div className='flex justify-between mt-8'>
+            <label>Notes</label>
+            <textarea {...register('notes')} rows={4} className='input-field w-88' />
+          </div>
+          <div className='flex mt-8 pt-4 border-t border-border'>
+            {selected && (
+              <button
+                type='button'
+                className='text-sm bg-red-700/75 px-2.5 py-1 rounded-md border border-red-500/50 hover'
+                onClick={handleDelete}>
+                Delete
+              </button>
+            )}
+            <div className='flex items-center gap-4 ml-auto'>
+              <button
+                type='button'
+                className='text-sm bg-gray-700/75 px-2.5 py-1 rounded-md border border-gray-500/50 hover'
+                onClick={closeModal}>
+                Cancel
+              </button>
+              <button
+                type='submit'
+                className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover'>
+                Save
+              </button>
+            </div>
+          </div>
+        </form>
+      </Modal>
+
       {/* Topbar */}
       <div className='py-4 flex items-center px-4 border-b border-border'>
+        <button
+          type='button'
+          onClick={() => setIsModalOpen(true)}
+          className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-1.5 justify-center'>
+          <Plus size={16} strokeWidth={1.25} />
+          <p>New Project</p>
+        </button>
+        <ProjectsScanner />
         <div className='ml-auto'>
           <div className='border ring-border has-focus:ring-2 has-focus-visible:ring-text-muted/30 has-focus-visible:border-text/50 has-focus-visible:shadow-lg outline-none w-56 py-1.5 pl-1.5 border-border flex items-center gap-1 rounded-md bg-background-mid/65'>
-            <span className='flex items-center justify-center w-5 h-5'>
+            <span>
               {isSearching ? (
-                <span className='w-4 h-4 border-[1.5px] border-text-muted/20 border-t-text-muted/75 rounded-full animate-spin' />
+                <LoaderCircle
+                  className='text-text-muted/75 animate-spin'
+                  strokeWidth={2}
+                  width={16}
+                  height={16}
+                />
               ) : (
                 <Search
                   className='text-text-muted/50'

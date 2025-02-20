@@ -1,4 +1,4 @@
-import { useGetProjects } from '@/hooks/useProjects.ts';
+import { useGetProjects } from '@/hooks/useProjectsOld.ts';
 import { Project, ProjectWithAll } from '@/types/index.ts';
 import {
   closestCenter,

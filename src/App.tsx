@@ -5,7 +5,6 @@ import Sidebar from './components/Sidebar.tsx';
 import Albums from './pages/Albums.tsx';
 import Contributors from './pages/Contributors.tsx';
 import Projects from './pages/Projects.tsx';
-import Test from './pages/Test.tsx';
 
 const queryClient = new QueryClient();
 
@@ -19,7 +18,7 @@ export default function App() {
             <Sidebar />
             <div className='flex flex-col flex-1 overflow-hidden'>
               <Routes>
-                <Route path='/' element={<Test />} />
+                <Route path='/' element={<Projects />} />
                 <Route path='projects' element={<Projects />} />
                 <Route path='albums' element={<Albums />} />
                 <Route path='contributors' element={<Contributors />} />
