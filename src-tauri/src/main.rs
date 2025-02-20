@@ -41,6 +41,18 @@ fn main() {
             sql: include_str!("../migrations/0003_create_projects_with_all_view.down.sql"),
             kind: MigrationKind::Down,
         },
+        Migration {
+            version: 4,
+            description: "create_projects_search_virtual_table",
+            sql: include_str!("../migrations/0004_create_projects_search_virtual_table.up.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 4,
+            description: "undo create_projects_search_virtual_table",
+            sql: include_str!("../migrations/0004_create_projects_search_virtual_table.down.sql"),
+            kind: MigrationKind::Down,
+        },
     ];
 
     tauri::Builder::default()
