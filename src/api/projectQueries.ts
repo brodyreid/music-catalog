@@ -39,6 +39,8 @@ export const fetchProjects = async ({
     whereClause = `WHERE projects_search MATCH $3`;
     params.push(terms.join(' AND '));
   }
+
+  console.log({ whereClause, params });
   const projects = await db.select<Array<Project & { count: number }>>(
     `
       SELECT p.*, COUNT(*) OVER() as count
