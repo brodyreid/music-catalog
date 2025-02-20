@@ -32,24 +32,25 @@ export const testFetchProjects = async ({
   page: number;
   searchTerm: string;
 }) => {
+  let params: Array<number | string> = [PAGE_SIZE, page * PAGE_SIZE];
   let whereClause = '';
   if (searchTerm) {
-    const conditions = searchTerm
+    const terms = searchTerm
       .trim()
       .split(' ')
-      .map((term) => `${term}*`)
-      .join(' AND ');
-    whereClause = `WHERE projects_search MATCH '${conditions}'`;
+      .map((term) => term.replace(/[^a-zA-Z0-9]/g, '') + '*');
+    whereClause = `WHERE projects_search MATCH $3`;
+    params.push(terms.join(' AND '));
   }
-  const projects = await db.select<Project[]>(
+  const projects = await db.select<Array<Project & { count: number }>>(
     `
-      SELECT p.*
+      SELECT p.*, COUNT(*) OVER() as count
       FROM projects p
       JOIN projects_search ps on ps.rowid = p.id
       ${whereClause}
       LIMIT $1 OFFSET $2;
     `,
-    [PAGE_SIZE, page * PAGE_SIZE],
+    params,
   );
 
   const projectsWithAll = await Promise.all(
@@ -82,14 +83,11 @@ export const testFetchProjects = async ({
     }),
   );
 
-  const countResult = await db.select<{ count: number }[]>(
-    'SELECT COUNT(*) as count FROM projects;',
-  );
-  const count = countResult[0]?.count ?? 0;
+  const count = projects[0]?.count ?? 0;
   const hasMore = count > page * PAGE_SIZE + (PAGE_SIZE - 1);
 
   return {
-    projects: projectsWithAll as Array<Project & { album?: Album }>,
+    projects: projectsWithAll,
     count,
     hasMore,
   };
