@@ -1,4 +1,4 @@
-import { Contributor } from '@/types/index.ts';
+import { Contributor } from '@/types.ts';
 import { ChevronDown, Minus, X } from 'lucide-react';
 import { DetailedHTMLProps, forwardRef, HTMLAttributes } from 'react';
 import { ControllerRenderProps } from 'react-hook-form';

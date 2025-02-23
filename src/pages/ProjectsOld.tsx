@@ -4,7 +4,7 @@ import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
 import { ProjectsScanner } from '@/components/ProjectsScanner.tsx';
 import Select from '@/components/Select.tsx';
-import { useGetContributors } from '@/hooks/useContributors.ts';
+import { useGetContributors } from '@/hooks/useContributorsOld.ts';
 import {
   useDeleteProject,
   useGetProjects,

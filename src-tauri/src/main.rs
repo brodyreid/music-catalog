@@ -1,4 +1,7 @@
-use tauri::Manager;
+use tauri::{
+    menu::{self, IsMenuItem},
+    Manager,
+};
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 // ~/Library/Application Support/com.music.catalog/music_catalog.db
