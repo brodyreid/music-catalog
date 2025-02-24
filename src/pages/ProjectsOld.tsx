@@ -2,15 +2,21 @@ import { PAGE_SIZE } from '@/api/projectQueriesOld.ts';
 import ErrorMessage from '@/components/ErrorMessage.tsx';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
+import { ProjectsScanner } from '@/components/ProjectsScanner.tsx';
 import Select from '@/components/Select.tsx';
-import { useGetContributors } from '@/hooks/useContributors.ts';
-import { useGetProjects, useUpdateProject } from '@/hooks/useProjects.ts';
-import { ProjectWithAll } from '@/types.ts';
+import { useGetContributors } from '@/hooks/useContributorsOld.ts';
+import {
+  useDeleteProject,
+  useGetProjects,
+  useUpdateProject,
+} from '@/hooks/useProjectsOld.ts';
+import { ProjectWithAll } from '@/types/index.ts';
 import { formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
 import {
   ArrowLeft,
   ArrowRight,
   ChevronDown,
+  LoaderCircle,
   Minus,
   Pencil,
   Plus,
@@ -46,17 +52,19 @@ export default function Projects() {
     reset,
     control,
   } = useForm<ProjectFormData>();
+  const { data: contributors = [] } = useGetContributors();
   const {
     data: { projects, count, hasMore } = {
       projects: [],
-      count: 0,
+      count: null,
       hasMore: false,
     },
     isLoading,
     error,
   } = useGetProjects({ page, searchTerm: debouncedSearchTerm });
-  const { data: contributors = [] } = useGetContributors();
   const { updateProject, isUpdating } = useUpdateProject();
+  const { deleteProject, isDeleting } = useDeleteProject();
+  const isMutating = isUpdating || isDeleting;
 
   useEffect(() => {
     setIsSearching(isPending());
@@ -92,10 +100,9 @@ export default function Projects() {
   };
 
   const handleSave = async (formData: ProjectFormData) => {
+    console.log({ formData });
     if (selected) {
       updateProject({ id: selected.id, data: formData });
-    } else {
-      console.log({ formData }); // Create project
     }
 
     closeModal();
@@ -108,7 +115,8 @@ export default function Projects() {
     if (!window.confirm('Are you sure you want to delete this project?')) {
       return;
     }
-    console.log('deleted ', selected.title);
+
+    deleteProject(selected.id);
     closeModal();
   };
 
@@ -132,7 +140,7 @@ export default function Projects() {
   return (
     <>
       {/* Form modal */}
-      <Modal isOpen={isModalOpen} closeModal={closeModal} isMutating={false}>
+      <Modal isOpen={isModalOpen} closeModal={closeModal} isMutating={isMutating}>
         <form onSubmit={handleSubmit(handleSave)} className='w-164'>
           <div className='flex justify-between items-center'>
             <label>Title</label>
@@ -232,11 +240,17 @@ export default function Projects() {
           <Plus size={16} strokeWidth={1.25} />
           <p>New Project</p>
         </button>
+        <ProjectsScanner />
         <div className='ml-auto'>
           <div className='border ring-border has-focus:ring-2 has-focus-visible:ring-text-muted/30 has-focus-visible:border-text/50 has-focus-visible:shadow-lg outline-none w-56 py-1.5 pl-1.5 border-border flex items-center gap-1 rounded-md bg-background-mid/65'>
-            <span className='flex items-center justify-center w-5 h-5'>
+            <span>
               {isSearching ? (
-                <span className='w-4 h-4 border-[1.5px] border-text-muted/20 border-t-text-muted/75 rounded-full animate-spin' />
+                <LoaderCircle
+                  className='text-text-muted/75 animate-spin'
+                  strokeWidth={2}
+                  width={16}
+                  height={16}
+                />
               ) : (
                 <Search
                   className='text-text-muted/50'

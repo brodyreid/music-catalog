@@ -1,4 +1,9 @@
-import { createProject, fetchProjects, updateProject } from '@/api/projectQueries.ts';
+import {
+  createProject,
+  deleteProject,
+  fetchProjects,
+  updateProject,
+} from '@/api/projectQueriesOld.ts';
 import {
   keepPreviousData,
   useMutation,
@@ -43,4 +48,17 @@ export const useUpdateProject = () => {
   });
 
   return { updateProject: mutate, isUpdating: isPending };
+};
+
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteProject,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
+
+  return { deleteProject: mutate, isDeleting: isPending };
 };

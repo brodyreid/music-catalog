@@ -1,7 +1,6 @@
+import db from '@/database.ts';
 import { ProjectFormData } from '@/pages/Projects.tsx';
-import supabase from '@/supabase.ts';
-import { Database } from '@/types/database.types.ts';
-import { Contributor, ProjectWithAll } from '@/types/index.ts';
+import { Album, Contributor, Project } from '@/types.ts';
 
 export const PAGE_SIZE = 100;
 
@@ -12,36 +11,88 @@ export const fetchProjects = async ({
   page: number;
   searchTerm: string;
 }) => {
-  const words = searchTerm?.split(' ');
-  const columns = ['title', 'release_name', 'path'];
-
-  let query = supabase.from('projects_with_all').select('*', { count: 'exact' });
-
-  if (words.length) {
-    words.map((word) => {
-      query = query.or(columns.map((col) => `${col}.ilike.%${word}%`).join(','));
-    });
+  let params: Array<number | string> = [PAGE_SIZE, page * PAGE_SIZE];
+  let whereClause = '';
+  if (searchTerm) {
+    const terms = searchTerm
+      .trim()
+      .split(' ')
+      .map((term) => term.replace(/[^a-zA-Z0-9]/g, '') + '*');
+    whereClause = `WHERE projects_search MATCH $3`;
+    params.push(terms.join(' AND '));
   }
-  const { data, error, count } = await query
-    .order('id')
-    .range(page * PAGE_SIZE, page * PAGE_SIZE + (PAGE_SIZE - 1));
-  if (error) {
-    throw error;
-  }
+
+  const projects = await db.select<Array<Project & { count: number }>>(
+    `
+      SELECT p.*, COUNT(*) OVER() as count
+      FROM projects p
+      JOIN projects_search ps on ps.rowid = p.id
+      ${whereClause}
+      LIMIT $1 OFFSET $2;
+    `,
+    params,
+  );
+
+  const projectsWithAll = await Promise.all(
+    projects.map(async (project) => {
+      const [album] = await db.select<Album[]>(
+        `
+          SELECT a.* 
+          FROM album_projects ap
+          JOIN albums a ON a.id = ap.album_id
+          WHERE ap.project_id = $1
+          LIMIT 1;
+        `,
+        [project.id],
+      );
+
+      const contributors = await db.select<Contributor[]>(
+        `
+          SELECT c.*
+          FROM project_contributors pc
+          JOIN contributors c ON pc.contributor_id = c.id
+          WHERE pc.project_id = $1;
+        `,
+        [project.id],
+      );
+
+      return {
+        ...project,
+        ...(album ? { album } : {}),
+        contributors,
+      };
+    }),
+  );
+
+  const count = projects[0]?.count ?? 0;
+  const hasMore = count > page * PAGE_SIZE + (PAGE_SIZE - 1);
 
   return {
-    projects: data as ProjectWithAll[],
+    projects: projectsWithAll,
     count,
-    hasMore: count ? count > page * PAGE_SIZE + (PAGE_SIZE - 1) : false,
+    hasMore,
   };
 };
 
-type InsertProjectData = Database['public']['Tables']['projects']['Insert'];
-export const createProject = async (data: InsertProjectData) => {
-  const { error } = await supabase.from('projects').insert(data);
-  if (error) {
-    throw error;
-  }
+export const createProject = async (data: Project) => {
+  const result = await db.execute(
+    `
+    INSERT INTO projects (title, bpm, date_created, folder_path_hash, musical_key, notes, path, release_name)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+  `,
+    [
+      data.title,
+      data.bpm,
+      data.date_created,
+      data.folder_path_hash,
+      data.musical_key,
+      data.notes,
+      data.path,
+      data.release_name,
+    ],
+  );
+
+  return result.lastInsertId;
 };
 
 export const updateProject = async ({
@@ -51,57 +102,56 @@ export const updateProject = async ({
   id: number;
   data: ProjectFormData;
 }) => {
-  const { contributors, ...projectData } = data;
+  try {
+    const { contributors, ...projectsData } = data;
 
-  const { error: updateError } = await supabase
-    .from('projects')
-    .update(projectData)
-    .eq('id', id);
-  if (updateError) {
-    throw updateError;
-  }
+    const projectResult = await db.execute(
+      `
+      UPDATE projects
+      SET title = $1, bpm = $2, date_created = $3, musical_key = $4, notes = $5, path = $6, release_name = $7
+      WHERE id = $8;
+      `,
+      [
+        projectsData.title,
+        projectsData.bpm,
+        projectsData.date_created,
+        projectsData.musical_key,
+        projectsData.notes,
+        projectsData.path,
+        projectsData.release_name,
+        id,
+      ],
+    );
 
-  const { error: deleteError } = await supabase
-    .from('project_contributors')
-    .delete()
-    .eq('project_id', id);
-  if (deleteError) {
-    throw deleteError;
-  }
+    const deleteResult = await db.execute(
+      `DELETE FROM project_contributors WHERE project_id = $1;`,
+      [id],
+    );
 
-  const newContributors = contributors.filter((c) => !c.id);
-  let insertedContributors: Contributor[] = [];
-  if (newContributors.length) {
-    const { data: newData, error: newError } = await supabase
-      .from('contributors')
-      .insert(newContributors)
-      .select();
-    if (newError) {
-      throw newError;
-    }
+    const newContributors = contributors.filter((c) => !c.id);
+    const insertedContributors: Contributor[] = [];
 
-    insertedContributors = newData;
-  }
+    newContributors.forEach(async (contributor) => {
+      const result = await db.execute(
+        `
+        INSERT INTO contributors (artist_name, first_name)
+        VALUES ($1, $2)
+        RETURNING *;
+        `,
+        [contributor.artist_name, contributor.first_name],
+      );
 
-  const allContributors = contributors.map((c) =>
-    c.id ? c : insertedContributors.find((ic) => ic.artist_name === c.artist_name),
-  ) as Contributor[];
+      if (result.lastInsertId) {
+        insertedContributors.push({ ...contributor, id: result.lastInsertId });
+      } else {
+        throw new Error(`Failed to insert contributor: ${contributor.artist_name}`);
+      }
+    });
 
-  if (!allContributors.length) {
-    return;
-  }
-
-  const { error: insertError } = await supabase
-    .from('project_contributors')
-    .insert(allContributors.map((c) => ({ project_id: id, contributor_id: c.id })));
-  if (insertError) {
-    throw insertError;
-  }
-};
-
-export const deleteProject = async (id: number) => {
-  const { error } = await supabase.from('projects').delete().eq('id', id);
-  if (error) {
-    throw error;
+    console.log({ projectResult, deleteResult, insertedContributors });
+    return { projectResult, deleteResult, insertedContributors };
+  } catch (error) {
+    console.error('Error updating project:', error);
+    throw new Error('Failed to update project. Please try again later.');
   }
 };

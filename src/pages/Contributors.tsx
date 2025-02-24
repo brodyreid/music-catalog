@@ -5,7 +5,7 @@ import {
   useDeleteContributor,
   useGetContributors,
   useUpdateContributor,
-} from '@/hooks/useContributors.ts';
+} from '@/hooks/useContributorsOld.ts';
 import { Contributor } from '@/types/index.ts';
 import { Minus, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
