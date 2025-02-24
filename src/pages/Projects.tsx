@@ -6,7 +6,7 @@ import Select from '@/components/Select.tsx';
 import { useGetContributors } from '@/hooks/useContributors.ts';
 import { useGetProjects, useUpdateProject } from '@/hooks/useProjects.ts';
 import { ProjectWithAll } from '@/types.ts';
-import { formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
+import { convertEmptyStringsToNull, formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
 import {
   ArrowLeft,
   ArrowRight,
@@ -92,8 +92,13 @@ export default function Projects() {
   };
 
   const handleSave = async (formData: ProjectFormData) => {
+    const formDataCleaned = convertEmptyStringsToNull(formData);
+
     if (selected) {
-      updateProject({ id: selected.id, data: formData });
+      updateProject({
+        id: selected.id,
+        data: formDataCleaned,
+      });
     } else {
       console.log({ formData }); // Create project
     }

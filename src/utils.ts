@@ -34,6 +34,19 @@ export const generateId = () => {
     .join('');
 };
 
+export const convertEmptyStringsToNull = <T extends Record<string, any>>(obj: T) => {
+  const result = { ...obj } as Record<string, any>;
+
+  for (const key in obj) {
+    const value = obj[key];
+    if (typeof value === 'string' && value === '') {
+      result[key] = null;
+    }
+  }
+
+  return result as T;
+};
+
 export const MUSICAL_KEYS = [
   'C Major',
   'C Minor',

@@ -64,9 +64,6 @@ export const fetchProjects = async ({
   const count = projects[0]?.count ?? 0;
   const hasMore = count > page * PAGE_SIZE + (PAGE_SIZE - 1);
 
-  console.log(projects.slice(0, 10));
-  console.log(projectsParsed.slice(0, 10));
-
   return {
     projects: projectsParsed,
     count,
@@ -103,47 +100,38 @@ export const updateProject = async ({
   data: ProjectFormData;
 }) => {
   try {
-    await db.execute('BEGIN TRANSACTION;');
-
     const { contributors, ...projectsData } = data;
-    console.log(data);
 
-    const projectResult = await db
-      .execute(
-        `
+    await db.execute(
+      `
       UPDATE projects
-      SET title = $1, bpm = $2, date_created = $3, musical_key = $4, notes = $5, path = $6, release_name = $7
-      WHERE id = $8;
+      SET title = $2, bpm = $3, date_created = $4, musical_key = $5, notes = $6, path = $7, release_name = $8
+      WHERE id = $1;
       `,
-        [
-          projectsData.title,
-          projectsData.bpm,
-          projectsData.date_created,
-          projectsData.musical_key,
-          projectsData.notes,
-          projectsData.path,
-          projectsData.release_name,
-          id,
-        ],
-      )
-      .catch((e) => console.error(e))
-      .finally(() => console.log('done'));
-    console.log(projectResult);
-
-    const deleteResult = await db.execute(
-      `DELETE FROM project_contributors WHERE project_id = $1;`,
-      [id],
+      [
+        id,
+        projectsData.title,
+        projectsData.bpm,
+        projectsData.date_created,
+        projectsData.musical_key,
+        projectsData.notes,
+        projectsData.path,
+        projectsData.release_name,
+      ],
     );
 
-    const newContributors = contributors.filter((c) => !c.id);
-    const allContributors: Contributor[] = contributors;
+    await db.execute(`DELETE FROM project_contributors WHERE project_id = $1;`, [id]);
 
-    newContributors.forEach(async (contributor) => {
+    const newContributors = contributors.filter((c) => !c.id);
+    const exisitingContributors = contributors.filter((c) => c.id);
+    const allContributors: Contributor[] = [...exisitingContributors];
+
+    for (const contributor of newContributors) {
       const result = await db.execute(
         `
         INSERT INTO contributors (artist_name, first_name)
         VALUES ($1, $2)
-        RETURNING *;
+        RETURNING id;
         `,
         [contributor.artist_name, contributor.first_name],
       );
@@ -153,25 +141,20 @@ export const updateProject = async ({
       } else {
         throw new Error(`Failed to insert contributor: ${contributor.artist_name}`);
       }
-    });
+    }
 
-    allContributors.forEach(async (contributor) => {
-      const joinResult = await db.execute(
+    for (const contributor of allContributors) {
+      await db.execute(
         `
         INSERT INTO project_contributors (project_id, contributor_id)
-        VALUES ($1, $2)
-        RETURNING *;
+        VALUES ($1, $2);
         `,
         [id, contributor.id],
       );
-      console.log(joinResult);
-    });
+    }
 
-    console.log({ projectResult, deleteResult, allContributors });
-    await db.execute('COMMIT;');
-    return { projectResult, deleteResult, allContributors };
+    return { success: true };
   } catch (error) {
-    await db.execute('ROLLBACK;');
     console.error('Error updating project:', error);
     throw new Error('Failed to update project. Please try again later.');
   }
