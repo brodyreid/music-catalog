@@ -266,7 +266,7 @@ export default function Projects() {
                 Title
               </th>
               <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>
-                Folder Path
+                Path
               </th>
               <th className='p-2 font-bold text-nowrap border border-t-0 border-border'>
                 Release Name

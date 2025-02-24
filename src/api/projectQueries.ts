@@ -105,7 +105,8 @@ export const updateProject = async ({
   try {
     const { contributors, ...projectsData } = data;
 
-    const projectResult = await db.execute(
+    await db.execute('BEGIN TRANSACTION;');
+    await db.execute(
       `
       UPDATE projects
       SET title = $1, bpm = $2, date_created = $3, musical_key = $4, notes = $5, path = $6, release_name = $7
@@ -122,14 +123,10 @@ export const updateProject = async ({
         id,
       ],
     );
-
-    const deleteResult = await db.execute(
-      `DELETE FROM project_contributors WHERE project_id = $1;`,
-      [id],
-    );
+    await db.execute(`DELETE FROM project_contributors WHERE project_id = $1;`, [id]);
 
     const newContributors = contributors.filter((c) => !c.id);
-    const insertedContributors: Contributor[] = [];
+    const allContributors: Contributor[] = contributors;
 
     newContributors.forEach(async (contributor) => {
       const result = await db.execute(
@@ -142,15 +139,26 @@ export const updateProject = async ({
       );
 
       if (result.lastInsertId) {
-        insertedContributors.push({ ...contributor, id: result.lastInsertId });
+        allContributors.push({ ...contributor, id: result.lastInsertId });
       } else {
         throw new Error(`Failed to insert contributor: ${contributor.artist_name}`);
       }
     });
 
-    console.log({ projectResult, deleteResult, insertedContributors });
-    return { projectResult, deleteResult, insertedContributors };
+    allContributors.forEach(async (contributor) => {
+      await db.execute(
+        `
+        INSERT INTO project_contributors (project_id, contributor_id)
+        VALUES ($1, $2)
+        RETURNING *;
+        `,
+        [id, contributor.id],
+      );
+    });
+
+    await db.execute('COMMIT;');
   } catch (error) {
+    await db.execute('ROLLBACK;');
     console.error('Error updating project:', error);
     throw new Error('Failed to update project. Please try again later.');
   }
