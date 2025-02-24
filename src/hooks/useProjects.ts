@@ -38,7 +38,7 @@ export const useUpdateProject = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: updateProject,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'], exact: false });
     },
   });
 

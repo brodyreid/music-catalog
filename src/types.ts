@@ -52,5 +52,5 @@ export interface Contributor {
 
 export interface ProjectWithAll extends Project {
   contributors: Contributor[];
-  album?: Album;
+  album: Album | null;
 }

@@ -1,6 +1,6 @@
 import db from '@/database.ts';
 import { ProjectFormData } from '@/pages/Projects.tsx';
-import { Album, Contributor, Project } from '@/types.ts';
+import { Contributor, Project, ProjectWithAll } from '@/types.ts';
 
 export const PAGE_SIZE = 100;
 
@@ -22,53 +22,53 @@ export const fetchProjects = async ({
     params.push(terms.join(' AND '));
   }
 
-  const projects = await db.select<Array<Project & { count: number }>>(
+  const projects = await db.select<any[]>(
     `
-      SELECT p.*, COUNT(*) OVER() as count
-      FROM projects p
-      JOIN projects_search ps on ps.rowid = p.id
-      ${whereClause}
-      LIMIT $1 OFFSET $2;
+    SELECT
+      p.*,
+      COUNT(*) OVER() AS count,
+      CASE
+        WHEN a.id IS NULL THEN NULL
+        ELSE json_object(
+          'id', a.id, 'title', a.title, 'notes', a.notes, 'release_date', a.release_date
+        )
+      END AS album,
+      CASE
+        WHEN COUNT(c.id) = 0 THEN json('[]')
+        ELSE 
+        json_group_array(
+          json_object(
+            'id', c.id, 'artist_name', c.artist_name, 'first_name', c.first_name
+          )
+        )
+      END AS contributors
+    FROM projects p
+    LEFT JOIN album_projects ap ON ap.project_id = p.id
+    LEFT JOIN albums a ON a.id = ap.album_id
+    LEFT JOIN project_contributors pc ON pc.project_id = p.id
+    LEFT JOIN contributors c ON c.id = pc.contributor_id
+    JOIN projects_search ps on ps.rowid = p.id
+    ${whereClause}
+    GROUP BY p.id
+    LIMIT $1 OFFSET $2;
     `,
     params,
   );
 
-  const projectsWithAll = await Promise.all(
-    projects.map(async (project) => {
-      const [album] = await db.select<Album[]>(
-        `
-          SELECT a.* 
-          FROM album_projects ap
-          JOIN albums a ON a.id = ap.album_id
-          WHERE ap.project_id = $1
-          LIMIT 1;
-        `,
-        [project.id],
-      );
-
-      const contributors = await db.select<Contributor[]>(
-        `
-          SELECT c.*
-          FROM project_contributors pc
-          JOIN contributors c ON pc.contributor_id = c.id
-          WHERE pc.project_id = $1;
-        `,
-        [project.id],
-      );
-
-      return {
-        ...project,
-        ...(album ? { album } : {}),
-        contributors,
-      };
-    }),
-  );
+  const projectsParsed: Array<ProjectWithAll & { count: number }> = projects.map((p) => ({
+    ...p,
+    album: p.album ? JSON.parse(p.album) : null,
+    contributors: JSON.parse(p.contributors),
+  }));
 
   const count = projects[0]?.count ?? 0;
   const hasMore = count > page * PAGE_SIZE + (PAGE_SIZE - 1);
 
+  console.log(projects.slice(0, 10));
+  console.log(projectsParsed.slice(0, 10));
+
   return {
-    projects: projectsWithAll,
+    projects: projectsParsed,
     count,
     hasMore,
   };
@@ -103,27 +103,37 @@ export const updateProject = async ({
   data: ProjectFormData;
 }) => {
   try {
-    const { contributors, ...projectsData } = data;
-
     await db.execute('BEGIN TRANSACTION;');
-    await db.execute(
-      `
+
+    const { contributors, ...projectsData } = data;
+    console.log(data);
+
+    const projectResult = await db
+      .execute(
+        `
       UPDATE projects
       SET title = $1, bpm = $2, date_created = $3, musical_key = $4, notes = $5, path = $6, release_name = $7
       WHERE id = $8;
       `,
-      [
-        projectsData.title,
-        projectsData.bpm,
-        projectsData.date_created,
-        projectsData.musical_key,
-        projectsData.notes,
-        projectsData.path,
-        projectsData.release_name,
-        id,
-      ],
+        [
+          projectsData.title,
+          projectsData.bpm,
+          projectsData.date_created,
+          projectsData.musical_key,
+          projectsData.notes,
+          projectsData.path,
+          projectsData.release_name,
+          id,
+        ],
+      )
+      .catch((e) => console.error(e))
+      .finally(() => console.log('done'));
+    console.log(projectResult);
+
+    const deleteResult = await db.execute(
+      `DELETE FROM project_contributors WHERE project_id = $1;`,
+      [id],
     );
-    await db.execute(`DELETE FROM project_contributors WHERE project_id = $1;`, [id]);
 
     const newContributors = contributors.filter((c) => !c.id);
     const allContributors: Contributor[] = contributors;
@@ -146,7 +156,7 @@ export const updateProject = async ({
     });
 
     allContributors.forEach(async (contributor) => {
-      await db.execute(
+      const joinResult = await db.execute(
         `
         INSERT INTO project_contributors (project_id, contributor_id)
         VALUES ($1, $2)
@@ -154,9 +164,12 @@ export const updateProject = async ({
         `,
         [id, contributor.id],
       );
+      console.log(joinResult);
     });
 
+    console.log({ projectResult, deleteResult, allContributors });
     await db.execute('COMMIT;');
+    return { projectResult, deleteResult, allContributors };
   } catch (error) {
     await db.execute('ROLLBACK;');
     console.error('Error updating project:', error);
