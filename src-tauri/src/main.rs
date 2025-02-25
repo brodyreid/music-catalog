@@ -2,6 +2,7 @@ use tauri::{
     menu::{self, IsMenuItem},
     Manager,
 };
+use tauri_plugin_dialog;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 // ~/Library/Application Support/com.music.catalog/music_catalog.db
@@ -64,6 +65,7 @@ fn main() {
                 .add_migrations("sqlite:music_catalog.db", migrations)
                 .build(),
         )
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_log::Builder::default().build())
         .setup(|app| {
             let handle = app.handle();

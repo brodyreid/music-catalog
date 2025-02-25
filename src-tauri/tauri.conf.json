@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "music-catalog",
+        "title": "Music Catalog",
         "width": 1000,
         "height": 800,
         "resizable": true,

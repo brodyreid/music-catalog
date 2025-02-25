@@ -22,8 +22,11 @@ export const fetchProjects = async ({
     params.push(terms.join(' AND '));
   }
 
-  const projects = await db.select<any[]>(
-    `
+  try {
+    const projects = await db.select<
+      Array<Project & { album: string; contributors: string; count: number }>
+    >(
+      `
     SELECT
       p.*,
       COUNT(*) OVER() AS count,
@@ -52,23 +55,29 @@ export const fetchProjects = async ({
     GROUP BY p.id
     LIMIT $1 OFFSET $2;
     `,
-    params,
-  );
+      params,
+    );
 
-  const projectsParsed: Array<ProjectWithAll & { count: number }> = projects.map((p) => ({
-    ...p,
-    album: p.album ? JSON.parse(p.album) : null,
-    contributors: JSON.parse(p.contributors),
-  }));
+    const projectsParsed: Array<ProjectWithAll & { count: number }> = projects.map(
+      (p) => ({
+        ...p,
+        album: p.album ? JSON.parse(p.album) : null,
+        contributors: JSON.parse(p.contributors),
+      }),
+    );
 
-  const count = projects[0]?.count ?? 0;
-  const hasMore = count > page * PAGE_SIZE + (PAGE_SIZE - 1);
+    const count = projects[0]?.count ?? 0;
+    const hasMore = count > page * PAGE_SIZE + (PAGE_SIZE - 1);
 
-  return {
-    projects: projectsParsed,
-    count,
-    hasMore,
-  };
+    return {
+      projects: projectsParsed,
+      count,
+      hasMore,
+    };
+  } catch (error) {
+    console.error('Error updating project:', error);
+    throw new Error('Failed to update project. Please try again later.');
+  }
 };
 
 export const createProject = async (data: Project) => {
@@ -89,7 +98,7 @@ export const createProject = async (data: Project) => {
     ],
   );
 
-  return result.lastInsertId;
+  return { success: true };
 };
 
 export const updateProject = async ({
@@ -154,6 +163,15 @@ export const updateProject = async ({
     }
 
     return { success: true };
+  } catch (error) {
+    console.error('Error updating project:', error);
+    throw new Error('Failed to update project. Please try again later.');
+  }
+};
+
+export const deleteProject = async (id: number) => {
+  try {
+    await db.execute(`DELETE FROM projects WHERE id = $1;`, [id]);
   } catch (error) {
     console.error('Error updating project:', error);
     throw new Error('Failed to update project. Please try again later.');

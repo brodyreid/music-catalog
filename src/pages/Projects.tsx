@@ -4,18 +4,15 @@ import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
 import Select from '@/components/Select.tsx';
 import { useGetContributors } from '@/hooks/useContributors.ts';
-import { useGetProjects, useUpdateProject } from '@/hooks/useProjects.ts';
+import {
+  useDeleteProject,
+  useGetProjects,
+  useUpdateProject,
+} from '@/hooks/useProjects.ts';
 import { ProjectWithAll } from '@/types.ts';
 import { convertEmptyStringsToNull, formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
-import {
-  ArrowLeft,
-  ArrowRight,
-  ChevronDown,
-  Minus,
-  Pencil,
-  Plus,
-  Search,
-} from 'lucide-react';
+import { confirm } from '@tauri-apps/plugin-dialog';
+import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
@@ -57,6 +54,8 @@ export default function Projects() {
   } = useGetProjects({ page, searchTerm: debouncedSearchTerm });
   const { data: contributors = [] } = useGetContributors();
   const { updateProject, isUpdating } = useUpdateProject();
+  const { deleteProject, isDeleting } = useDeleteProject();
+  const isMutating = isUpdating || isDeleting;
 
   useEffect(() => {
     setIsSearching(isPending());
@@ -92,28 +91,38 @@ export default function Projects() {
   };
 
   const handleSave = async (formData: ProjectFormData) => {
-    const formDataCleaned = convertEmptyStringsToNull(formData);
-
     if (selected) {
+      const formDataCleaned = convertEmptyStringsToNull(formData);
+
       updateProject({
         id: selected.id,
         data: formDataCleaned,
       });
-    } else {
-      console.log({ formData }); // Create project
     }
 
     closeModal();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!selected) {
       throw Error('No project selected');
     }
-    if (!window.confirm('Are you sure you want to delete this project?')) {
+
+    const confirmed = await confirm(
+      `Are you sure you want to delete ${selected.title}?`,
+      {
+        title: 'Delete Project',
+        kind: 'warning',
+        okLabel: 'Delete',
+        cancelLabel: 'Cancel',
+      },
+    );
+
+    if (!confirmed) {
       return;
     }
-    console.log('deleted ', selected.title);
+
+    deleteProject(selected.id);
     closeModal();
   };
 
@@ -137,7 +146,7 @@ export default function Projects() {
   return (
     <>
       {/* Form modal */}
-      <Modal isOpen={isModalOpen} closeModal={closeModal} isMutating={false}>
+      <Modal isOpen={isModalOpen} closeModal={closeModal} isMutating={isMutating}>
         <form onSubmit={handleSubmit(handleSave)} className='w-164'>
           <div className='flex justify-between items-center'>
             <label>Title</label>
@@ -230,13 +239,6 @@ export default function Projects() {
 
       {/* Topbar */}
       <div className='py-4 flex items-center px-4 border-b border-border'>
-        <button
-          type='button'
-          onClick={() => setIsModalOpen(true)}
-          className='text-sm bg-green-700 px-2.5 py-1 rounded-md border border-green-500/50 hover flex items-center gap-1.5 justify-center'>
-          <Plus size={16} strokeWidth={1.25} />
-          <p>New Project</p>
-        </button>
         <div className='ml-auto'>
           <div className='border ring-border has-focus:ring-2 has-focus-visible:ring-text-muted/30 has-focus-visible:border-text/50 has-focus-visible:shadow-lg outline-none w-56 py-1.5 pl-1.5 border-border flex items-center gap-1 rounded-md bg-background-mid/65'>
             <span className='flex items-center justify-center w-5 h-5'>
