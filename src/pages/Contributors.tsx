@@ -5,13 +5,13 @@ import {
   useDeleteContributor,
   useGetContributors,
   useUpdateContributor,
-} from '@/hooks/useContributorsOld.ts';
-import { Contributor } from '@/types/index.ts';
+} from '@/hooks/useContributors.ts';
+import { Contributor } from '@/types.ts';
 import { Minus, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-type FormData = Omit<Contributor, 'id'>;
+export type ContributorFormData = Omit<Contributor, 'id'>;
 
 export default function Contributors() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +21,7 @@ export default function Contributors() {
     register,
     handleSubmit,
     reset,
-  } = useForm<FormData>();
+  } = useForm<ContributorFormData>();
   const { data: contributors = [], isLoading, error } = useGetContributors();
   const { createContributor, isCreating } = useCreateContributor();
   const { updateContributor, isUpdating } = useUpdateContributor();
@@ -46,7 +46,7 @@ export default function Contributors() {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (formData: FormData) => {
+  const handleSave = async (formData: ContributorFormData) => {
     if (editingId) {
       updateContributor({ id: editingId, data: formData });
     } else {

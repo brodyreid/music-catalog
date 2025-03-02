@@ -101,7 +101,6 @@ export default function Projects() {
     }
 
     closeModal();
-    // helllooooooooo commit test
   };
 
   const handleDelete = async () => {
@@ -178,7 +177,7 @@ export default function Projects() {
             <label>Key</label>
             <select
               {...register('musical_key')}
-              className='input-field w-22 appearance-none'>
+              className='input-field w-32 appearance-none'>
               <option value=''></option>
               {MUSICAL_KEYS.map((key) => (
                 <option key={key} value='key'>

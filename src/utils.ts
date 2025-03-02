@@ -1,5 +1,32 @@
 import { MusicalKey } from './types/index.ts';
 
+export const MUSICAL_KEYS = [
+  'C Major',
+  'C Minor',
+  'C# Major',
+  'C# Minor',
+  'D Major',
+  'D Minor',
+  'D# Major',
+  'D# Minor',
+  'E Major',
+  'E Minor',
+  'F Major',
+  'F Minor',
+  'F# Major',
+  'F# Minor',
+  'G Major',
+  'G Minor',
+  'G# Major',
+  'G# Minor',
+  'A Major',
+  'A Minor',
+  'A# Major',
+  'A# Minor',
+  'B Major',
+  'B Minor',
+] as const satisfies MusicalKey[];
+
 export const formatReadableDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
     month: 'short',
@@ -34,8 +61,8 @@ export const generateId = () => {
     .join('');
 };
 
-export const convertEmptyStringsToNull = <T extends Record<string, any>>(obj: T) => {
-  const result = { ...obj } as Record<string, any>;
+export const convertEmptyStringsToNull = <T extends Record<string, unknown>>(obj: T) => {
+  const result = { ...obj } as Record<string, unknown>;
 
   for (const key in obj) {
     const value = obj[key];
@@ -47,29 +74,7 @@ export const convertEmptyStringsToNull = <T extends Record<string, any>>(obj: T)
   return result as T;
 };
 
-export const MUSICAL_KEYS = [
-  'C Major',
-  'C Minor',
-  'C# Major',
-  'C# Minor',
-  'D Major',
-  'D Minor',
-  'D# Major',
-  'D# Minor',
-  'E Major',
-  'E Minor',
-  'F Major',
-  'F Minor',
-  'F# Major',
-  'F# Minor',
-  'G Major',
-  'G Minor',
-  'G# Major',
-  'G# Minor',
-  'A Major',
-  'A Minor',
-  'A# Major',
-  'A# Minor',
-  'B Major',
-  'B Minor',
-] as const satisfies MusicalKey[];
+export const apiError = (error: unknown) => {
+  console.error(error);
+  return { success: false, message: error };
+};

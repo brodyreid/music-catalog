@@ -1,6 +1,7 @@
 import db from '@/database.ts';
 import { ProjectFormData } from '@/pages/Projects.tsx';
 import { Contributor, Project, ProjectWithAll } from '@/types.ts';
+import { apiError } from '@/utils.ts';
 
 export const PAGE_SIZE = 100;
 
@@ -75,30 +76,33 @@ export const fetchProjects = async ({
       hasMore,
     };
   } catch (error) {
-    console.error('Error updating project:', error);
-    throw new Error('Failed to update project. Please try again later.');
+    apiError(error);
   }
 };
 
-export const createProject = async (data: Project) => {
-  const result = await db.execute(
-    `
+export const createProject = async (data: Omit<Project, 'id'>) => {
+  try {
+    await db.execute(
+      `
     INSERT INTO projects (title, bpm, date_created, folder_path_hash, musical_key, notes, path, release_name)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
   `,
-    [
-      data.title,
-      data.bpm,
-      data.date_created,
-      data.folder_path_hash,
-      data.musical_key,
-      data.notes,
-      data.path,
-      data.release_name,
-    ],
-  );
+      [
+        data.title,
+        data.bpm,
+        data.date_created,
+        data.folder_path_hash,
+        data.musical_key,
+        data.notes,
+        data.path,
+        data.release_name,
+      ],
+    );
 
-  return { success: true };
+    return { success: true };
+  } catch (error) {
+    apiError(error);
+  }
 };
 
 export const updateProject = async ({
@@ -148,15 +152,15 @@ export const updateProject = async ({
       if (result.lastInsertId) {
         allContributors.push({ ...contributor, id: result.lastInsertId });
       } else {
-        throw new Error(`Failed to insert contributor: ${contributor.artist_name}`);
+        apiError(`Failed to insert contributor: ${contributor.artist_name}`);
       }
     }
 
     for (const contributor of allContributors) {
       await db.execute(
         `
-        INSERT INTO project_contributors (project_id, contributor_id)
-        VALUES ($1, $2);
+          INSERT INTO project_contributors (project_id, contributor_id)
+          VALUES ($1, $2);
         `,
         [id, contributor.id],
       );
@@ -164,8 +168,7 @@ export const updateProject = async ({
 
     return { success: true };
   } catch (error) {
-    console.error('Error updating project:', error);
-    throw new Error('Failed to update project. Please try again later.');
+    apiError(error);
   }
 };
 
@@ -173,7 +176,6 @@ export const deleteProject = async (id: number) => {
   try {
     await db.execute(`DELETE FROM projects WHERE id = $1;`, [id]);
   } catch (error) {
-    console.error('Error updating project:', error);
-    throw new Error('Failed to update project. Please try again later.');
+    apiError(error);
   }
 };
