@@ -1,4 +1,4 @@
-import { PAGE_SIZE } from '@/api/projectQueriesOld.ts';
+import { PAGE_SIZE } from '@/api/projectQueries.ts';
 import ErrorMessage from '@/components/ErrorMessage.tsx';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
@@ -17,17 +17,7 @@ import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 
-export type ProjectFormData = Pick<
-  ProjectWithAll,
-  | 'title'
-  | 'release_name'
-  | 'path'
-  | 'bpm'
-  | 'musical_key'
-  | 'notes'
-  | 'date_created'
-  | 'contributors'
->;
+export type ProjectFormData = Omit<ProjectWithAll, 'id' | 'folder_path_hash' | 'album'>;
 
 export default function Projects() {
   const [isModalOpen, setIsModalOpen] = useState(false);

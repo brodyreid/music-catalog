@@ -1,85 +1,75 @@
+import db from '@/database.ts';
 import { AlbumFormData } from '@/pages/Albums.tsx';
-import supabase from '@/supabase.ts';
+import { AlbumWithProjects } from '@/types.ts';
+import { apiError } from '@/utils.ts';
 
 export const fetchAlbums = async () => {
-  const { data, error } = await supabase
-    .from('albums')
-    .select(`*, projects ( * )`)
-    .order('id');
-  if (error) {
-    throw error;
+  try {
+    const albums = await db.select<AlbumWithProjects[]>(`
+    SELECT * FROM albums;
+  `);
+    return albums;
+  } catch (error) {
+    apiError(error);
   }
-  return data;
 };
 
 export const createAlbum = async (data: AlbumFormData) => {
-  const { projects, ...albumData } = data;
+  try {
+    const { projects, ...albumData } = data;
 
-  const { data: newAlbum, error: albumError } = await supabase
-    .from('albums')
-    .insert(albumData)
-    .select()
-    .single();
-  if (albumError) {
-    throw albumError;
-  }
+    const result = await db.execute(
+      `INSERT INTO albums (title, release_date, notes) VALUES ($1, $2, $3)`,
+      [albumData.title, albumData.release_date, albumData.notes],
+    );
 
-  if (projects.length) {
-    const projectsData = projects.map((p, index) => ({
-      album_id: newAlbum.id,
-      project_id: p.id,
-      position: index,
-    }));
-
-    const { error: projectsError } = await supabase
-      .from('album_projects')
-      .insert(projectsData);
-    if (projectsError) {
-      throw projectsError;
+    if (!result.lastInsertId) {
+      throw new Error(`Error inserting album: ${albumData.title}`);
     }
+
+    for (const project of projects) {
+      await db.execute(
+        `INSERT INTO album_projects (album_id, project_id) VALUES ($1, $2)`,
+        [result.lastInsertId, project.id],
+      );
+    }
+
+    return { success: true };
+  } catch (error) {
+    apiError(error);
   }
 };
 
 export const updateAlbum = async ({ id, data }: { id: number; data: AlbumFormData }) => {
-  const { projects, ...albumData } = data;
+  try {
+    const { projects, ...albumData } = data;
 
-  const { error: albumError } = await supabase
-    .from('albums')
-    .update(albumData)
-    .eq('id', id);
-  if (albumError) {
-    throw albumError;
-  }
+    await db.execute(
+      `UPDATE albums SET title = $2, release_date = $3, notes = $4 WHERE id = $1`,
+      [id, albumData.title, albumData.release_date, albumData.notes],
+    );
 
-  const { error: deleteError } = await supabase
-    .from('album_projects')
-    .delete()
-    .eq('album_id', id);
-  if (deleteError) {
-    throw deleteError;
-  }
+    await db.execute(`DELETE FROM album_projects WHERE album_id = $1`, [id]);
 
-  if (!projects.length) {
-    return;
-  }
+    for (const project of projects) {
+      await db.execute(
+        `INSERT INTO album_projects (album_id, project_id) VALUES ($1, $2)`,
+        [id, project.id],
+      );
+    }
 
-  const projectsData = projects.map((p, index) => ({
-    album_id: id,
-    project_id: p.id,
-    position: index,
-  }));
-
-  const { error: projectsError } = await supabase
-    .from('album_projects')
-    .insert(projectsData);
-  if (projectsError) {
-    throw projectsError;
+    return { success: true };
+  } catch (error) {
+    apiError(error);
   }
 };
 
 export const deleteAlbum = async (id: number) => {
-  const { error } = await supabase.from('albums').delete().eq('id', id);
-  if (error) {
-    throw error;
+  try {
+    await db.execute(`DELETE FROM albums WHERE id = $1`, [id]);
+
+    return { success: true };
+  } catch (error) {
+    apiError(error);
   }
 };

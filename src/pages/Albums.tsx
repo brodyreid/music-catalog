@@ -7,7 +7,7 @@ import {
   useGetAlbums,
   useUpdateAlbum,
 } from '@/hooks/useAlbums.ts';
-import { AlbumWithProjects } from '@/types/index.ts';
+import { AlbumWithProjects } from '@/types.ts';
 import { formatReadableDate } from '@/utils.ts';
 import { ChevronDown, ChevronRight, Minus, Pencil, Plus } from 'lucide-react';
 import { Fragment, useState } from 'react';

@@ -54,3 +54,7 @@ export interface ProjectWithAll extends Project {
   contributors: Contributor[];
   album: Album | null;
 }
+
+export interface AlbumWithProjects extends Album {
+  projects: Project[];
+}

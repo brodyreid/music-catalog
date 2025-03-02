@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import { MusicalKey } from './types/index.ts';
 
 export const MUSICAL_KEYS = [

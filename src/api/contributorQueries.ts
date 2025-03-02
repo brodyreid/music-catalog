@@ -39,6 +39,8 @@ export const updateContributor = async ({
       `UPDATE contributors SET artist_name = $2, first_name = $3 WHERE id = $1`,
       [id, data.artist_name, data.first_name],
     );
+
+    return { success: true };
   } catch (error) {
     apiError(error);
   }
@@ -47,6 +49,8 @@ export const updateContributor = async ({
 export const deleteContributor = async (id: number) => {
   try {
     await db.execute(`DELETE FROM contributors WHERE id = $1`, [id]);
+
+    return { success: true };
   } catch (error) {
     apiError(error);
   }

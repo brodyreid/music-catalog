@@ -98,6 +98,7 @@ export const createProject = async (data: Omit<Project, 'id'>) => {
         data.release_name,
       ],
     );
+    // need to be able to add contributors
 
     return { success: true };
   } catch (error) {
