@@ -2,6 +2,7 @@ import { PAGE_SIZE } from '@/api/projectQueries.ts';
 import ErrorMessage from '@/components/ErrorMessage.tsx';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
+import ProjectsScanner from '@/components/ProjectsScanner.tsx';
 import Select from '@/components/Select.tsx';
 import { useGetContributors } from '@/hooks/useContributors.ts';
 import {
@@ -11,7 +12,7 @@ import {
 } from '@/hooks/useProjects.ts';
 import { ProjectWithAll } from '@/types.ts';
 import { convertEmptyStringsToNull, formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
-import { confirm, open } from '@tauri-apps/plugin-dialog';
+import { confirm } from '@tauri-apps/plugin-dialog';
 import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -114,19 +115,6 @@ export default function Projects() {
 
     deleteProject(selected.id);
     closeModal();
-  };
-
-  const chooseDirectory = async () => {
-    try {
-      const dir = await open({
-        multiple: false,
-        directory: true,
-      });
-
-      console.log(dir);
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   const handlePageDecrement = () => {
@@ -242,12 +230,7 @@ export default function Projects() {
 
       {/* Topbar */}
       <div className='py-4 flex items-center px-4 border-b border-border'>
-        <button
-          type='button'
-          className='px-2.5 py-1.5 border border-zinc-400 rounded hover text-sm'
-          onClick={chooseDirectory}>
-          Choose Directory
-        </button>
+        <ProjectsScanner />
         <div className='ml-auto'>
           <div className='border ring-border has-focus:ring-2 has-focus-visible:ring-text-muted/30 has-focus-visible:border-text/50 has-focus-visible:shadow-lg outline-none w-56 py-1.5 pl-1.5 border-border flex items-center gap-1 rounded-md bg-background-mid/65'>
             <span className='flex items-center justify-center w-5 h-5'>

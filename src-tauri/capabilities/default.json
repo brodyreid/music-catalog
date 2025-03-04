@@ -9,6 +9,10 @@
     "sql:allow-select",
     "sql:allow-execute",
     "dialog:allow-confirm",
-    "dialog:allow-open"
+    "dialog:allow-open",
+    "fs:allow-app-read",
+    "fs:allow-read-dir",
+    "fs:allow-app-read-recursive",
+    "fs:allow-open"
   ]
 }

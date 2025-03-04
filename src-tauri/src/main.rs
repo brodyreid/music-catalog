@@ -62,6 +62,7 @@ fn main() {
                 .add_migrations("sqlite:music_catalog.db", migrations)
                 .build(),
         )
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_log::Builder::default().build())
         .setup(|app| {
