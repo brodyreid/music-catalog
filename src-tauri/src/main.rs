@@ -1,7 +1,4 @@
-use tauri::{
-    menu::{self, IsMenuItem},
-    Manager,
-};
+use tauri::Manager;
 use tauri_plugin_dialog;
 use tauri_plugin_sql::{Migration, MigrationKind};
 

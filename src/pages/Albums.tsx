@@ -80,7 +80,7 @@ export default function Albums() {
     deleteAlbum(editingId);
     closeModal();
   };
-
+  console.log(albums);
   if (isLoading || isMutating) return <LoadingBars />;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -231,11 +231,15 @@ export default function Albums() {
                       <td className='border-b border-border'></td>
                       <td colSpan={3} className='border-r border-b border-border'>
                         <ol>
-                          {album.projects.map((project) => (
-                            <li key={project.id} className='p-2 list-inside list-decimal'>
-                              {project.release_name || project.title}
-                            </li>
-                          ))}
+                          {album.projects
+                            .sort((a, b) => (a < b ? 1 : -1))
+                            .map((project) => (
+                              <li
+                                key={project.id}
+                                className='p-2 list-inside list-decimal'>
+                                {project.release_name || project.title}
+                              </li>
+                            ))}
                         </ol>
                       </td>
                     </tr>

@@ -11,7 +11,7 @@ import {
 } from '@/hooks/useProjects.ts';
 import { ProjectWithAll } from '@/types.ts';
 import { convertEmptyStringsToNull, formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
-import { confirm } from '@tauri-apps/plugin-dialog';
+import { confirm, open } from '@tauri-apps/plugin-dialog';
 import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -114,6 +114,19 @@ export default function Projects() {
 
     deleteProject(selected.id);
     closeModal();
+  };
+
+  const chooseDirectory = async () => {
+    try {
+      const dir = await open({
+        multiple: false,
+        directory: true,
+      });
+
+      console.log(dir);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handlePageDecrement = () => {
@@ -229,6 +242,12 @@ export default function Projects() {
 
       {/* Topbar */}
       <div className='py-4 flex items-center px-4 border-b border-border'>
+        <button
+          type='button'
+          className='px-2.5 py-1.5 border border-zinc-400 rounded hover text-sm'
+          onClick={chooseDirectory}>
+          Choose Directory
+        </button>
         <div className='ml-auto'>
           <div className='border ring-border has-focus:ring-2 has-focus-visible:ring-text-muted/30 has-focus-visible:border-text/50 has-focus-visible:shadow-lg outline-none w-56 py-1.5 pl-1.5 border-border flex items-center gap-1 rounded-md bg-background-mid/65'>
             <span className='flex items-center justify-center w-5 h-5'>
@@ -327,7 +346,7 @@ export default function Projects() {
       {count ? (
         <div className='flex items-center gap-4 bg-background-mid py-4 px-4'>
           <button
-            className='p-1 rounded-md border border-text-muted/35 hover:not-disabled:border-text-muted/60 duration-300 cursor-pointer disabled:cursor-default disabled:opacity-50'
+            className='p-1 rounded-md border border-text-muted/35 hover:not-disabled:border-text-muted/60 duration-300 cursor-pointer disabled:cursor-default disabled:opacity-30'
             disabled={page < 1}
             onClick={handlePageDecrement}>
             <ArrowLeft size={16} strokeWidth={2} className='text-text-muted/80' />

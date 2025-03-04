@@ -5,6 +5,53 @@ import { apiError } from '@/utils.ts';
 
 export const PAGE_SIZE = 100;
 
+const upsertProjectContributors = async ({
+  project_id,
+  contributors,
+}: {
+  project_id: number;
+  contributors: Contributor[];
+}) => {
+  try {
+    await db.execute(`DELETE FROM project_contributors WHERE project_id = $1;`, [
+      project_id,
+    ]);
+
+    const newContributors = contributors.filter((c) => !c.id);
+    const exisitingContributors = contributors.filter((c) => c.id);
+    const allContributors: Contributor[] = [...exisitingContributors];
+
+    for (const contributor of newContributors) {
+      const result = await db.execute(
+        `
+      INSERT INTO contributors (artist_name, first_name)
+      VALUES ($1, $2)
+      RETURNING id;
+      `,
+        [contributor.artist_name, contributor.first_name],
+      );
+
+      if (result.lastInsertId) {
+        allContributors.push({ ...contributor, id: result.lastInsertId });
+      } else {
+        apiError(`Failed to insert contributor: ${contributor.artist_name}`);
+      }
+    }
+
+    for (const contributor of allContributors) {
+      await db.execute(
+        `
+        INSERT INTO project_contributors (project_id, contributor_id)
+        VALUES ($1, $2);
+      `,
+        [project_id, contributor.id],
+      );
+    }
+  } catch (error) {
+    apiError(error);
+  }
+};
+
 export const fetchProjects = async ({
   page,
   searchTerm,
@@ -24,7 +71,7 @@ export const fetchProjects = async ({
   }
 
   try {
-    const projects = await db.select<
+    const projectsRaw = await db.select<
       Array<Project & { album: string; contributors: string; count: number }>
     >(
       `
@@ -59,19 +106,17 @@ export const fetchProjects = async ({
       params,
     );
 
-    const projectsParsed: Array<ProjectWithAll & { count: number }> = projects.map(
-      (p) => ({
-        ...p,
-        album: p.album ? JSON.parse(p.album) : null,
-        contributors: JSON.parse(p.contributors),
-      }),
-    );
+    const projects: Array<ProjectWithAll & { count: number }> = projectsRaw.map((p) => ({
+      ...p,
+      album: p.album ? JSON.parse(p.album) : null,
+      contributors: JSON.parse(p.contributors),
+    }));
 
     const count = projects[0]?.count ?? 0;
     const hasMore = count > page * PAGE_SIZE + (PAGE_SIZE - 1);
 
     return {
-      projects: projectsParsed,
+      projects,
       count,
       hasMore,
     };
@@ -80,25 +125,30 @@ export const fetchProjects = async ({
   }
 };
 
-export const createProject = async (data: Omit<Project, 'id'>) => {
+export const createProject = async (data: Omit<ProjectWithAll, 'id' | 'albums'>) => {
   try {
-    await db.execute(
+    const { contributors, ...projectsData } = data;
+
+    const result = await db.execute(
       `
-    INSERT INTO projects (title, bpm, date_created, folder_path_hash, musical_key, notes, path, release_name)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
-  `,
+        INSERT INTO projects (title, bpm, date_created, folder_path_hash, musical_key, notes, path, release_name)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+      `,
       [
-        data.title,
-        data.bpm,
-        data.date_created,
-        data.folder_path_hash,
-        data.musical_key,
-        data.notes,
-        data.path,
-        data.release_name,
+        projectsData.title,
+        projectsData.bpm,
+        projectsData.date_created,
+        projectsData.folder_path_hash,
+        projectsData.musical_key,
+        projectsData.notes,
+        projectsData.path,
+        projectsData.release_name,
       ],
     );
-    // need to be able to add contributors
+
+    if (result.lastInsertId) {
+      await upsertProjectContributors({ project_id: result.lastInsertId, contributors });
+    }
 
     return { success: true };
   } catch (error) {
@@ -134,38 +184,7 @@ export const updateProject = async ({
       ],
     );
 
-    await db.execute(`DELETE FROM project_contributors WHERE project_id = $1;`, [id]);
-
-    const newContributors = contributors.filter((c) => !c.id);
-    const exisitingContributors = contributors.filter((c) => c.id);
-    const allContributors: Contributor[] = [...exisitingContributors];
-
-    for (const contributor of newContributors) {
-      const result = await db.execute(
-        `
-        INSERT INTO contributors (artist_name, first_name)
-        VALUES ($1, $2)
-        RETURNING id;
-        `,
-        [contributor.artist_name, contributor.first_name],
-      );
-
-      if (result.lastInsertId) {
-        allContributors.push({ ...contributor, id: result.lastInsertId });
-      } else {
-        apiError(`Failed to insert contributor: ${contributor.artist_name}`);
-      }
-    }
-
-    for (const contributor of allContributors) {
-      await db.execute(
-        `
-          INSERT INTO project_contributors (project_id, contributor_id)
-          VALUES ($1, $2);
-        `,
-        [id, contributor.id],
-      );
-    }
+    await upsertProjectContributors({ project_id: id, contributors });
 
     return { success: true };
   } catch (error) {
@@ -176,6 +195,8 @@ export const updateProject = async ({
 export const deleteProject = async (id: number) => {
   try {
     await db.execute(`DELETE FROM projects WHERE id = $1;`, [id]);
+
+    return { success: true };
   } catch (error) {
     apiError(error);
   }

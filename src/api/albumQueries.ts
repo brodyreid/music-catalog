@@ -1,13 +1,33 @@
 import db from '@/database.ts';
 import { AlbumFormData } from '@/pages/Albums.tsx';
-import { AlbumWithProjects } from '@/types.ts';
+import { Album, AlbumWithProjects, Project } from '@/types.ts';
 import { apiError } from '@/utils.ts';
 
 export const fetchAlbums = async () => {
   try {
-    const albums = await db.select<AlbumWithProjects[]>(`
-    SELECT * FROM albums;
+    const albumsRaw = await db.select<Array<Album & { projects: string }>>(`
+    SELECT
+      a.*,
+      CASE
+        WHEN COUNT(p.id) = 0 THEN json('[]')
+        ELSE
+        json_group_array(
+          json_object(
+            'id', p.id, 'title', p.title, 'release_name', p.release_name, 'notes', p.notes, 'folder_path_hash', p.folder_path_hash, 'date_created', p.date_created, 'bpm', p.bpm, 'musical_key', p.musical_key, 'path', p.path
+          )
+        )
+      END AS projects
+    FROM albums a
+    LEFT JOIN album_projects ap on ap.album_id = a.id
+    LEFT JOIN projects p on p.id = ap.project_id
+    GROUP BY a.id;
   `);
+
+    const albums: Array<AlbumWithProjects> = albumsRaw.map((a) => ({
+      ...a,
+      projects: JSON.parse(a.projects),
+    }));
+
     return albums;
   } catch (error) {
     apiError(error);
@@ -51,10 +71,10 @@ export const updateAlbum = async ({ id, data }: { id: number; data: AlbumFormDat
 
     await db.execute(`DELETE FROM album_projects WHERE album_id = $1`, [id]);
 
-    for (const project of projects) {
+    for (const [index, project] of projects.entries()) {
       await db.execute(
-        `INSERT INTO album_projects (album_id, project_id) VALUES ($1, $2)`,
-        [id, project.id],
+        `INSERT INTO album_projects (album_id, project_id, position) VALUES ($1, $2, $3)`,
+        [id, project.id, index],
       );
     }
 
