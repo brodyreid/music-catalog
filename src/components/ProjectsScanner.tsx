@@ -1,10 +1,9 @@
 import { open } from '@tauri-apps/plugin-dialog';
-import { readDir } from '@tauri-apps/plugin-fs';
-import { useState } from 'react';
+import { readDir, readFile, writeFile } from '@tauri-apps/plugin-fs';
+import { XMLParser } from 'fast-xml-parser';
+import { ungzip } from 'pako';
 
 const ProjectsScanner = () => {
-  const [directory, setDirectory] = useState<string | null>(null);
-
   const chooseDirectory = async () => {
     try {
       const dir = await open({
@@ -12,11 +11,31 @@ const ProjectsScanner = () => {
         directory: true,
       });
 
-      if (dir) {
-        const entries = await readDir(dir);
-        console.log('Entries:', entries);
-        console.log('Directory:', dir);
+      if (!dir) {
+        return;
       }
+
+      const entries = await readDir(dir);
+      const alsFile = entries.find((e) => e.name.endsWith('.als'));
+
+      if (!alsFile) {
+        return;
+      }
+
+      const filePath = `${dir}/${alsFile.name}`;
+      const fileContent = await readFile(filePath);
+      const decompressedContent = ungzip(fileContent);
+
+      const xmlString = new TextDecoder('utf-8').decode(decompressedContent);
+
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: '',
+      });
+      const parsedData = parser.parse(xmlString);
+      const jsonString = JSON.stringify(parsedData, null, 2);
+      const encodedData = new TextEncoder().encode(jsonString);
+      await writeFile('/Users/brodyreid/Desktop/egg.json', encodedData);
     } catch (error) {
       console.error(error);
     }
@@ -30,7 +49,6 @@ const ProjectsScanner = () => {
         onClick={chooseDirectory}>
         Choose Directory
       </button>
-      {directory && <p className='text-xs ml-4'>Selected: {directory}</p>}
     </>
   );
 };
@@ -48,3 +66,15 @@ export default ProjectsScanner;
 // import { extname } from '@tauri-apps/api/path';
 // const ext = await extname('/path/to/file.html');
 // assert(ext === 'html');
+
+// [object] Ableton.LiveSet.MasterTrack.DeviceChain.Mixer.Tempo.Manual.Value
+
+// interface LiveSet
+// id: String;
+// name: String;
+// creationTime: DateTime;
+// dateModified: DateTime;
+// majorVersion: String;
+// minorVersion: String;
+// tempo: Tempo;
+// timeSignature: TimeSignature;
