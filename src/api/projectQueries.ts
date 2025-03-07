@@ -1,4 +1,4 @@
-import db from '@/database.ts';
+import { getDatabase } from '@/database.ts';
 import { ProjectFormData } from '@/pages/Projects.tsx';
 import { Contributor, Project, ProjectWithAll } from '@/types.ts';
 import { apiError } from '@/utils.ts';
@@ -13,6 +13,8 @@ const upsertProjectContributors = async ({
   contributors: Contributor[];
 }) => {
   try {
+    const db = await getDatabase();
+
     await db.execute(`DELETE FROM project_contributors WHERE project_id = $1;`, [
       project_id,
     ]);
@@ -71,6 +73,8 @@ export const fetchProjects = async ({
   }
 
   try {
+    const db = await getDatabase();
+
     const projectsRaw = await db.select<
       Array<Project & { album: string; contributors: string; count: number }>
     >(
@@ -127,6 +131,8 @@ export const fetchProjects = async ({
 
 export const createProject = async (data: Omit<ProjectWithAll, 'id' | 'albums'>) => {
   try {
+    const db = await getDatabase();
+
     const { contributors, ...projectsData } = data;
 
     const result = await db.execute(
@@ -164,6 +170,8 @@ export const updateProject = async ({
   data: ProjectFormData;
 }) => {
   try {
+    const db = await getDatabase();
+
     const { contributors, ...projectsData } = data;
 
     await db.execute(
@@ -194,6 +202,8 @@ export const updateProject = async ({
 
 export const deleteProject = async (id: number) => {
   try {
+    const db = await getDatabase();
+
     await db.execute(`DELETE FROM projects WHERE id = $1;`, [id]);
 
     return { success: true };

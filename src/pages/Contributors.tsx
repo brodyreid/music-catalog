@@ -1,3 +1,4 @@
+import ErrorMessage from '@/components/ErrorMessage.tsx';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
 import {
@@ -68,7 +69,7 @@ export default function Contributors() {
   };
 
   if (isLoading) return <LoadingBars />;
-  if (error) return <p>Error: {error.message}</p>;
+  if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>

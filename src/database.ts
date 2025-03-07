@@ -1,5 +1,11 @@
 import Database from '@tauri-apps/plugin-sql';
 
-const db: Database = await Database.load('sqlite:music_catalog.db');
+let dbInstance: Database | null = null;
 
-export default db;
+export const getDatabase = async (): Promise<Database> => {
+  if (dbInstance) {
+    return dbInstance;
+  }
+  dbInstance = await Database.load('sqlite:music_catalog.db');
+  return dbInstance;
+};

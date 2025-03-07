@@ -1,3 +1,4 @@
+import ErrorMessage from '@/components/ErrorMessage.tsx';
 import LoadingBars from '@/components/LoadingBars.tsx';
 import Modal from '@/components/Modal.tsx';
 import ProjectSelector from '@/components/ProjectSelector.tsx';
@@ -82,7 +83,7 @@ export default function Albums() {
   };
   console.log(albums);
   if (isLoading || isMutating) return <LoadingBars />;
-  if (error) return <p>Error: {error.message}</p>;
+  if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>

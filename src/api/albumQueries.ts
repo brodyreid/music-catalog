@@ -1,10 +1,14 @@
-import db from '@/database.ts';
+import { getDatabase } from '@/database.ts';
 import { AlbumFormData } from '@/pages/Albums.tsx';
-import { Album, AlbumWithProjects, Project } from '@/types.ts';
+import { Album, AlbumWithProjects } from '@/types.ts';
 import { apiError } from '@/utils.ts';
+
+const db = getDatabase();
 
 export const fetchAlbums = async () => {
   try {
+    const db = await getDatabase();
+
     const albumsRaw = await db.select<Array<Album & { projects: string }>>(`
     SELECT
       a.*,
@@ -36,6 +40,8 @@ export const fetchAlbums = async () => {
 
 export const createAlbum = async (data: AlbumFormData) => {
   try {
+    const db = await getDatabase();
+
     const { projects, ...albumData } = data;
 
     const result = await db.execute(
@@ -62,6 +68,8 @@ export const createAlbum = async (data: AlbumFormData) => {
 
 export const updateAlbum = async ({ id, data }: { id: number; data: AlbumFormData }) => {
   try {
+    const db = await getDatabase();
+
     const { projects, ...albumData } = data;
 
     await db.execute(
@@ -86,6 +94,8 @@ export const updateAlbum = async ({ id, data }: { id: number; data: AlbumFormDat
 
 export const deleteAlbum = async (id: number) => {
   try {
+    const db = await getDatabase();
+
     await db.execute(`DELETE FROM albums WHERE id = $1`, [id]);
 
     return { success: true };
