@@ -1,5 +1,5 @@
 import { open } from '@tauri-apps/plugin-dialog';
-import { readDir, readFile, writeFile } from '@tauri-apps/plugin-fs';
+import { readDir, readFile, stat, writeFile } from '@tauri-apps/plugin-fs';
 import { XMLParser } from 'fast-xml-parser';
 import { ungzip } from 'pako';
 
@@ -23,6 +23,8 @@ const ProjectsScanner = () => {
       }
 
       const filePath = `${dir}/${alsFile.name}`;
+      const fileStats = await stat(filePath);
+      console.log(fileStats);
       const fileContent = await readFile(filePath);
       const decompressedContent = ungzip(fileContent);
 
