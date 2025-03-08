@@ -10,13 +10,16 @@
     "sql:allow-execute",
     "dialog:allow-confirm",
     "dialog:allow-open",
-    "fs:allow-app-read",
-    "fs:allow-read-dir",
+    "fs:read-dirs",
     "fs:allow-app-read-recursive",
     "fs:allow-open",
     "fs:allow-app-write",
     "fs:allow-desktop-write",
-    "fs:allow-create"
+    "fs:allow-create",
+    "fs:read-app-specific-dirs-recursive",
+    "fs:read-all",
+    "fs:scope-app-recursive",
+    "fs:allow-audio-read-recursive"
   ],
   "local": true
 }

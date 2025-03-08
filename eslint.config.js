@@ -34,7 +34,7 @@ export default [
       'react-hooks/rules-of-hooks': 'error',
       '@typescript-eslint/no-unused-vars': 'off',
       'react/jsx-max-props-per-line': ['off', { maximum: 1, when: 'multiline' }],
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
       'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
     },
   },
