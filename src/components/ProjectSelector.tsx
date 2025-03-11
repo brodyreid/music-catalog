@@ -77,7 +77,7 @@ const ProjectSelector = forwardRef<HTMLDivElement, ProjectSelectorProps>(
         const oldIndex = selectedProjects.map((p) => p.id).indexOf(Number(active.id));
         const newIndex = selectedProjects.map((p) => p.id).indexOf(Number(over.id));
         const newOrder = arrayMove(selectedProjects, oldIndex, newIndex);
-        console.log({ oldIndex, newIndex, newOrder });
+
         onChange(newOrder);
       }
     };

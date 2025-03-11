@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 
-export type ProjectFormData = Omit<ProjectWithAll, 'id' | 'folder_path_hash' | 'album'>;
+export type ProjectFormData = Omit<ProjectWithAll, 'id' | 'als_uid' | 'album'>;
 
 export default function Projects() {
   const [isModalOpen, setIsModalOpen] = useState(false);

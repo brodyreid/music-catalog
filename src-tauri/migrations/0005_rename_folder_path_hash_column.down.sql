@@ -1,0 +1,1 @@
+ALTER TABLE projects RENAME COLUMN als_uid TO folder_path_hash;

@@ -81,7 +81,7 @@ export default function Albums() {
     deleteAlbum(editingId);
     closeModal();
   };
-  console.log(albums);
+
   if (isLoading || isMutating) return <LoadingBars />;
   if (error) return <ErrorMessage message={error.message} />;
 

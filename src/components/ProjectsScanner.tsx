@@ -1,3 +1,4 @@
+import { Project } from '@/types.ts';
 import { join } from '@tauri-apps/api/path';
 import { open } from '@tauri-apps/plugin-dialog';
 import { DirEntry, readDir, readFile, stat, writeFile } from '@tauri-apps/plugin-fs';
@@ -24,27 +25,59 @@ const ProjectsScanner = () => {
     }
   };
 
-  const extractData = async (filePath: string) => {
+  const extractAlsData = async (filePath: string) => {
     try {
       const parsedData = parseAlsFile(filePath) as any;
 
       const id: string = parsedData.Ableton.Revision;
-      const tempo: number | null =
+      const bpm: number | null =
         parseInt(
           parsedData.Ableton.LiveSet.MasterTrack.DeviceChain.Mixer.Tempo.Manual.Value,
         ) || null;
 
       const fileStats = await stat(filePath);
       const dateCreated = fileStats.birthtime?.toDateString() || null;
+      // const dateModified = fileStats.mtime?.toDateString() || null;
 
       return {
         id,
+        bpm,
         dateCreated,
-        tempo,
-        filePath,
       };
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const scanDirectory = async (
+    currentDir: string,
+    entries: Array<DirEntry & { path: string }>,
+  ) => {
+    try {
+      const children = await readDir(currentDir);
+
+      for (const entry of children) {
+        const entryPath = await join(currentDir, entry.name);
+
+        if (entry.isFile && entry.name.endsWith('.als')) {
+          console.log(`IS FILE: ${JSON.stringify(entry, null, 2)}`);
+          entries.push({ path: currentDir, ...entry });
+        } else if (
+          entry.isDirectory &&
+          ![
+            'Backup',
+            'Samples',
+            'Ableton Project Info',
+            'Presets',
+            'splice_folder',
+          ].includes(entry.name)
+        ) {
+          console.log(`IS DIR: ${JSON.stringify(entry, null, 2)}`);
+          await scanDirectory(entryPath, entries);
+        }
+      }
+    } catch (error) {
+      console.error(`Error accessing path: ${currentDir}\n`, error);
     }
   };
 
@@ -59,40 +92,30 @@ const ProjectsScanner = () => {
         return;
       }
 
-      console.log(`Base Directory: ${baseDir}`);
-
       let entries: Array<DirEntry & { path: string }> = [];
+      await scanDirectory(baseDir, entries);
 
-      const scanDirectory = async (currentDir: string) => {
-        try {
-          console.log(`Scanning Directory: ${currentDir}`);
-          const children = await readDir(currentDir);
+      const alsFiles: Omit<Project, 'id' | 'musical_key' | 'notes' | 'release_name'>[] =
+        [];
+      for (const entry of entries) {
+        const alsData = await extractAlsData(await join(entry.path, entry.name));
 
-          for (const entry of children) {
-            const entryPath = await join(currentDir, entry.name);
-            console.log(`Processing Entry: ${entryPath}`);
+        if (!alsData) {
+          console.error(`No ALS data in file ${entry.name}`);
+        } else {
+          const { id, bpm, dateCreated } = alsData;
 
-            if (entry.isFile && entry.name.endsWith('.als')) {
-              console.log(`IS FILE: ${JSON.stringify(entry, null, 2)}`);
-              entries.push({ path: currentDir, ...entry });
-            } else if (
-              entry.isDirectory &&
-              !['Backup', 'Samples', 'Ableton Project Info', 'Presets'].includes(
-                entry.name,
-              )
-            ) {
-              console.log(`IS DIR: ${JSON.stringify(entry, null, 2)}`);
-              await scanDirectory(entryPath);
-            }
-          }
-        } catch (error) {
-          console.error(`Error accessing path: ${currentDir}\n`, error);
+          alsFiles.push({
+            title: entry.name,
+            bpm,
+            als_uid: id,
+            path: entry.path,
+            date_created: dateCreated,
+          });
         }
-      };
+      }
 
-      scanDirectory(baseDir);
-
-      const jsonString = JSON.stringify(entries, null, 2);
+      const jsonString = JSON.stringify(alsFiles, null, 2);
       const encodedData = new TextEncoder().encode(jsonString);
       await writeFile('/Users/brodyreid/Desktop/entries.json', encodedData);
     } catch (error) {

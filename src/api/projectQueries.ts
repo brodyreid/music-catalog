@@ -137,14 +137,14 @@ export const createProject = async (data: Omit<ProjectWithAll, 'id' | 'albums'>)
 
     const result = await db.execute(
       `
-        INSERT INTO projects (title, bpm, date_created, folder_path_hash, musical_key, notes, path, release_name)
+        INSERT INTO projects (title, bpm, date_created, als_uid, musical_key, notes, path, release_name)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
       `,
       [
         projectsData.title,
         projectsData.bpm,
         projectsData.date_created,
-        projectsData.folder_path_hash,
+        projectsData.als_uid,
         projectsData.musical_key,
         projectsData.notes,
         projectsData.path,

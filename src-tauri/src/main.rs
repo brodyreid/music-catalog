@@ -54,6 +54,18 @@ fn main() {
             sql: include_str!("../migrations/0004_create_projects_search_virtual_table.down.sql"),
             kind: MigrationKind::Down,
         },
+        Migration {
+            version: 5,
+            description: "rename_folder_path_hash_column",
+            sql: include_str!("../migrations/0005_rename_folder_path_hash_column.up.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 5,
+            description: "undo rename_folder_path_hash_column",
+            sql: include_str!("../migrations/0005_rename_folder_path_hash_column.down.sql"),
+            kind: MigrationKind::Down,
+        },
     ];
 
     tauri::Builder::default()

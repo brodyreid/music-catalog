@@ -30,7 +30,7 @@ export interface Project {
   title: string;
   bpm: number | null;
   date_created: string | null;
-  folder_path_hash: string;
+  als_uid: string;
   musical_key: MusicalKey | null;
   notes: string | null;
   path: string | null;
