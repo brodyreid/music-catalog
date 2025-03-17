@@ -62,6 +62,7 @@ export default function Albums() {
   };
 
   const handleSave = async (formData: AlbumFormData) => {
+    console.log(formData);
     if (editingId) {
       updateAlbum({ id: editingId, data: formData });
     } else {
@@ -233,7 +234,7 @@ export default function Albums() {
                       <td colSpan={3} className='border-r border-b border-border'>
                         <ol>
                           {album.projects
-                            .sort((a, b) => (a < b ? 1 : -1))
+                            .sort((a, b) => (a.position < b.position ? -1 : 1))
                             .map((project) => (
                               <li
                                 key={project.id}

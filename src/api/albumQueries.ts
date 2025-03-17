@@ -17,8 +17,9 @@ export const fetchAlbums = async () => {
         ELSE
         json_group_array(
           json_object(
-            'id', p.id, 'title', p.title, 'release_name', p.release_name, 'notes', p.notes, 'als_uid', p.als_uid, 'date_created', p.date_created, 'bpm', p.bpm, 'musical_key', p.musical_key, 'path', p.path
+            'id', p.id, 'title', p.title, 'release_name', p.release_name, 'notes', p.notes, 'als_uid', p.als_uid, 'date_created', p.date_created, 'bpm', p.bpm, 'musical_key', p.musical_key, 'path', p.path, 'position', ap.position
           )
+          ORDER BY ap.position
         )
       END AS projects
     FROM albums a

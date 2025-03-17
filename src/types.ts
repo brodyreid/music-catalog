@@ -35,6 +35,7 @@ export interface Project {
   notes: string | null;
   path: string | null;
   release_name: string | null;
+  position: number;
 }
 
 export interface Album {

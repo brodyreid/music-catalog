@@ -1,5 +1,5 @@
 import { useGetProjects } from '@/hooks/useProjects.ts';
-import { Project, ProjectWithAll } from '@/types/index.ts';
+import { Project, ProjectWithAll } from '@/types.ts';
 import {
   closestCenter,
   DndContext,
