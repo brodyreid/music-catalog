@@ -1,32 +1,32 @@
-import { useQuery } from '@tanstack/react-query';
-import { MusicalKey } from './types/index.ts';
+import { Store } from '@tauri-apps/plugin-store';
+import { MusicalKey } from './types.ts';
 
-export const MUSICAL_KEYS = [
-  'C Major',
-  'C Minor',
-  'C# Major',
-  'C# Minor',
-  'D Major',
-  'D Minor',
-  'D# Major',
-  'D# Minor',
-  'E Major',
-  'E Minor',
-  'F Major',
-  'F Minor',
-  'F# Major',
-  'F# Minor',
-  'G Major',
-  'G Minor',
-  'G# Major',
-  'G# Minor',
-  'A Major',
-  'A Minor',
-  'A# Major',
-  'A# Minor',
-  'B Major',
-  'B Minor',
-] as const satisfies MusicalKey[];
+export const MUSICAL_KEYS: MusicalKey[] = [
+  MusicalKey.C_Major,
+  MusicalKey.C_Minor,
+  MusicalKey.CSharp_Major,
+  MusicalKey.CSharp_Minor,
+  MusicalKey.D_Major,
+  MusicalKey.D_Minor,
+  MusicalKey.DSharp_Major,
+  MusicalKey.DSharp_Minor,
+  MusicalKey.E_Major,
+  MusicalKey.E_Minor,
+  MusicalKey.F_Major,
+  MusicalKey.F_Minor,
+  MusicalKey.FSharp_Major,
+  MusicalKey.FSharp_Minor,
+  MusicalKey.G_Major,
+  MusicalKey.G_Minor,
+  MusicalKey.GSharp_Major,
+  MusicalKey.GSharp_Minor,
+  MusicalKey.A_Major,
+  MusicalKey.A_Minor,
+  MusicalKey.ASharp_Major,
+  MusicalKey.ASharp_Minor,
+  MusicalKey.B_Major,
+  MusicalKey.B_Minor,
+];
 
 export const formatReadableDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -52,16 +52,6 @@ export const generateHash = async (key: string) => {
   return hashHex;
 };
 
-// Deprecated
-export const generateId = () => {
-  const array = new Uint8Array(8);
-  window.crypto.getRandomValues(array);
-
-  return Array.from(array)
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('');
-};
-
 export const convertEmptyStringsToNull = <T extends Record<string, unknown>>(obj: T) => {
   const result = { ...obj } as Record<string, unknown>;
 
@@ -78,4 +68,9 @@ export const convertEmptyStringsToNull = <T extends Record<string, unknown>>(obj
 export const apiError = (error: unknown) => {
   console.error(error);
   return { success: false, message: error };
+};
+
+export const setTheme = async (newTheme: 'light' | 'dark') => {
+  const store = await Store.load('store.json');
+  store.set('theme', newTheme);
 };

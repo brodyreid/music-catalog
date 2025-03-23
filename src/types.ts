@@ -35,7 +35,6 @@ export interface Project {
   notes: string | null;
   path: string | null;
   release_name: string | null;
-  position: number;
 }
 
 export interface Album {
@@ -57,5 +56,5 @@ export interface ProjectWithAll extends Project {
 }
 
 export interface AlbumWithProjects extends Album {
-  projects: Project[];
+  projects: Array<Project & { position: number }>;
 }

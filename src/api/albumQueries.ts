@@ -3,8 +3,6 @@ import { AlbumFormData } from '@/pages/Albums.tsx';
 import { Album, AlbumWithProjects } from '@/types.ts';
 import { apiError } from '@/utils.ts';
 
-const db = getDatabase();
-
 export const fetchAlbums = async () => {
   try {
     const db = await getDatabase();

@@ -1,4 +1,5 @@
 import { Project } from '@/types.ts';
+import { generateHash } from '@/utils.ts';
 import { join } from '@tauri-apps/api/path';
 import { open } from '@tauri-apps/plugin-dialog';
 import { DirEntry, readDir, readFile, stat, writeFile } from '@tauri-apps/plugin-fs';
@@ -27,17 +28,16 @@ const ProjectsScanner = () => {
 
   const extractAlsData = async (filePath: string) => {
     try {
-      const parsedData = parseAlsFile(filePath) as any;
-
-      const id: string = parsedData.Ableton.Revision;
+      const parsedData = await parseAlsFile(filePath);
       const bpm: number | null =
         parseInt(
           parsedData.Ableton.LiveSet.MasterTrack.DeviceChain.Mixer.Tempo.Manual.Value,
         ) || null;
 
       const fileStats = await stat(filePath);
+      console.log(fileStats);
+      const id = await generateHash(`${fileStats.ino}_${fileStats.birthtime?.getTime()}`);
       const dateCreated = fileStats.birthtime?.toDateString() || null;
-      // const dateModified = fileStats.mtime?.toDateString() || null;
 
       return {
         id,
@@ -99,7 +99,7 @@ const ProjectsScanner = () => {
         [];
       for (const entry of entries) {
         const alsData = await extractAlsData(await join(entry.path, entry.name));
-
+        console.log({ entry, alsData });
         if (!alsData) {
           console.error(`No ALS data in file ${entry.name}`);
         } else {
