@@ -66,6 +66,30 @@ fn main() {
             sql: include_str!("../migrations/0005_rename_folder_path_hash_column.down.sql"),
             kind: MigrationKind::Down,
         },
+        Migration {
+            version: 6,
+            description: "add_unique_constraint_to_als_uid",
+            sql: include_str!("../migrations/0006_add_unique_constraint_to_als_uid.up.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 6,
+            description: "undo add_unique_constraint_to_als_uid",
+            sql: include_str!("../migrations/0006_add_unique_constraint_to_als_uid.down.sql"),
+            kind: MigrationKind::Down,
+        },
+        Migration {
+            version: 7,
+            description: "create_search_table_triggers",
+            sql: include_str!("../migrations/0007_create_search_table_triggers.up.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 7,
+            description: "undo create_search_table_triggers",
+            sql: include_str!("../migrations/0007_create_search_table_triggers.down.sql"),
+            kind: MigrationKind::Down,
+        },
     ];
 
     tauri::Builder::default()

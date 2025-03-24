@@ -211,3 +211,36 @@ export const deleteProject = async (id: number) => {
     apiError(error);
   }
 };
+
+export const bulkInsertProjects = async (
+  data: Array<Omit<Project, 'id' | 'musical_key' | 'notes' | 'release_name'>>,
+) => {
+  try {
+    const db = await getDatabase();
+
+    try {
+      for (const project of data) {
+        await db.execute(
+          `
+        INSERT INTO projects (title, bpm, date_created, als_uid, path)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (als_uid) DO NOTHING;
+        `,
+          [
+            project.title,
+            project.bpm,
+            project.date_created,
+            project.als_uid,
+            project.path,
+          ],
+        );
+      }
+
+      return { success: true, count: data.length };
+    } catch (error) {
+      apiError(error);
+    }
+  } catch (error) {
+    apiError(error);
+  }
+};

@@ -11,7 +11,7 @@ import {
   useUpdateProject,
 } from '@/hooks/useProjects.ts';
 import { ProjectWithAll } from '@/types.ts';
-import { convertEmptyStringsToNull, formatReadableDate, MUSICAL_KEYS } from '@/utils.ts';
+import { convertEmptyStringsToNull, formatReadableDate, musicalKeys } from '@/utils.ts';
 import { confirm } from '@tauri-apps/plugin-dialog';
 import { ArrowLeft, ArrowRight, ChevronDown, Minus, Pencil, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -30,8 +30,8 @@ export default function Projects() {
   const {
     register,
     handleSubmit,
-    formState: { errors: formErrors },
     reset,
+    formState: { errors: formErrors },
     control,
   } = useForm<ProjectFormData>();
   const {
@@ -170,7 +170,7 @@ export default function Projects() {
               {...register('musical_key')}
               className='input-field w-32 appearance-none'>
               <option value=''></option>
-              {MUSICAL_KEYS.map((key) => (
+              {musicalKeys.map((key) => (
                 <option key={key} value='key'>
                   {key}
                 </option>

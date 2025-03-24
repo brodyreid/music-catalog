@@ -1,4 +1,5 @@
 import {
+  bulkInsertProjects,
   createProject,
   deleteProject,
   fetchProjects,
@@ -61,4 +62,17 @@ export const useDeleteProject = () => {
   });
 
   return { deleteProject: mutate, isDeleting: isPending };
+};
+
+export const useBulkInsertProjects = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: bulkInsertProjects,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
+
+  return { bulkInsertProjects: mutate, isInserting: isPending };
 };

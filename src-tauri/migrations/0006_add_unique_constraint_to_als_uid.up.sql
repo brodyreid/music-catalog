@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX als_uid_idx ON projects(als_uid);

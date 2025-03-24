@@ -1,3 +1,4 @@
+import { useBulkInsertProjects } from '@/hooks/useProjects.ts';
 import { Project } from '@/types.ts';
 import { generateHash } from '@/utils.ts';
 import { join } from '@tauri-apps/api/path';
@@ -5,8 +6,11 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { DirEntry, readDir, readFile, stat, writeFile } from '@tauri-apps/plugin-fs';
 import { XMLParser } from 'fast-xml-parser';
 import { ungzip } from 'pako';
+import { LoadingDots } from './LoadingDots.tsx';
 
 const ProjectsScanner = () => {
+  const { bulkInsertProjects, isInserting } = useBulkInsertProjects();
+
   const parseAlsFile = async (filePath: string) => {
     try {
       const fileContent = await readFile(filePath);
@@ -35,7 +39,6 @@ const ProjectsScanner = () => {
         ) || null;
 
       const fileStats = await stat(filePath);
-      console.log(fileStats);
       const id = await generateHash(`${fileStats.ino}_${fileStats.birthtime?.getTime()}`);
       const dateCreated = fileStats.birthtime?.toDateString() || null;
 
@@ -99,7 +102,7 @@ const ProjectsScanner = () => {
         [];
       for (const entry of entries) {
         const alsData = await extractAlsData(await join(entry.path, entry.name));
-        console.log({ entry, alsData });
+
         if (!alsData) {
           console.error(`No ALS data in file ${entry.name}`);
         } else {
@@ -118,6 +121,7 @@ const ProjectsScanner = () => {
       const jsonString = JSON.stringify(alsFiles, null, 2);
       const encodedData = new TextEncoder().encode(jsonString);
       await writeFile('/Users/brodyreid/Desktop/entries.json', encodedData);
+      bulkInsertProjects(alsFiles);
     } catch (error) {
       console.error(error);
     }
@@ -129,7 +133,7 @@ const ProjectsScanner = () => {
         type='button'
         className='px-2.5 py-1.5 border border-zinc-400 rounded hover text-sm'
         onClick={handleClick}>
-        Choose Directory
+        {isInserting ? <LoadingDots /> : 'Choose Directory'}
       </button>
     </>
   );

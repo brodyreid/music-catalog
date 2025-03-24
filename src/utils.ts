@@ -1,7 +1,7 @@
 import { Store } from '@tauri-apps/plugin-store';
 import { MusicalKey } from './types.ts';
 
-export const MUSICAL_KEYS: MusicalKey[] = [
+export const musicalKeys: MusicalKey[] = [
   MusicalKey.C_Major,
   MusicalKey.C_Minor,
   MusicalKey.CSharp_Major,

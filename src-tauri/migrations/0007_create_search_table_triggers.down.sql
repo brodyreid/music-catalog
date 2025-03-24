@@ -1,0 +1,3 @@
+DROP TRIGGER IF EXISTS projects_ai;
+DROP TRIGGER IF EXISTS projects_au;
+DROP TRIGGER IF EXISTS projects_ad;
