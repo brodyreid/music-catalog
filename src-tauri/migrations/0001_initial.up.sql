@@ -36,8 +36,17 @@ CREATE TABLE projects (
     notes TEXT,
     path TEXT,
     release_name TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT,
     FOREIGN KEY (musical_key) REFERENCES musical_key_enum(value)
 );
+
+-- Create updated_at trigger
+CREATE TRIGGER update_projects_timestamp 
+AFTER UPDATE ON projects
+BEGIN
+    UPDATE projects SET updated_at = datetime('now') WHERE id = NEW.id;
+END;
 
 -- Create the album_projects junction table
 CREATE TABLE album_projects (

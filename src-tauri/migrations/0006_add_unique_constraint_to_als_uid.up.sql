@@ -1,1 +1,1 @@
-CREATE UNIQUE INDEX als_uid_idx ON projects(als_uid);
+CREATE UNIQUE INDEX als_uid_index ON projects(als_uid);

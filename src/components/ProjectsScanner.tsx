@@ -6,10 +6,11 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { DirEntry, readDir, readFile, stat, writeFile } from '@tauri-apps/plugin-fs';
 import { XMLParser } from 'fast-xml-parser';
 import { ungzip } from 'pako';
-import { LoadingDots } from './LoadingDots.tsx';
+import { useState } from 'react';
 
 const ProjectsScanner = () => {
-  const { bulkInsertProjects, isInserting } = useBulkInsertProjects();
+  const [isInserting, setIsInserting] = useState(false);
+  const { bulkInsertProjects } = useBulkInsertProjects();
 
   const parseAlsFile = async (filePath: string) => {
     try {
@@ -85,6 +86,8 @@ const ProjectsScanner = () => {
   };
 
   const handleClick = async () => {
+    setIsInserting(true);
+
     try {
       const baseDir = await open({
         multiple: false,
@@ -98,8 +101,10 @@ const ProjectsScanner = () => {
       let entries: Array<DirEntry & { path: string }> = [];
       await scanDirectory(baseDir, entries);
 
-      const alsFiles: Omit<Project, 'id' | 'musical_key' | 'notes' | 'release_name'>[] =
-        [];
+      const alsFiles: Omit<
+        Project,
+        'id' | 'musical_key' | 'notes' | 'release_name' | 'created_at' | 'updated_at'
+      >[] = [];
       for (const entry of entries) {
         const alsData = await extractAlsData(await join(entry.path, entry.name));
 
@@ -124,6 +129,8 @@ const ProjectsScanner = () => {
       bulkInsertProjects(alsFiles);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsInserting(false);
     }
   };
 
@@ -131,9 +138,14 @@ const ProjectsScanner = () => {
     <>
       <button
         type='button'
-        className='px-2.5 py-1.5 border border-zinc-400 rounded hover text-sm'
+        className='px-2.5 py-1.5 border border-zinc-400 rounded not-disabled:hover text-sm disabled:border-zinc-700 disabled:select-none'
+        disabled={isInserting}
         onClick={handleClick}>
-        {isInserting ? <LoadingDots /> : 'Choose Directory'}
+        {isInserting ? (
+          <div className='w-4 h-4 border-[1.5px] border-text-muted/20 border-t-text-muted/75 rounded-full animate-spin'></div>
+        ) : (
+          'Choose Directory'
+        )}
       </button>
     </>
   );

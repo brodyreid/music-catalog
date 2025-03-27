@@ -89,7 +89,7 @@ fn main() {
             description: "undo create_search_table_triggers",
             sql: include_str!("../migrations/0007_create_search_table_triggers.down.sql"),
             kind: MigrationKind::Down,
-        },
+        }
     ];
 
     tauri::Builder::default()

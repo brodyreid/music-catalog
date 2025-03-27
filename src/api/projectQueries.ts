@@ -213,7 +213,12 @@ export const deleteProject = async (id: number) => {
 };
 
 export const bulkInsertProjects = async (
-  data: Array<Omit<Project, 'id' | 'musical_key' | 'notes' | 'release_name'>>,
+  data: Array<
+    Omit<
+      Project,
+      'id' | 'musical_key' | 'notes' | 'release_name' | 'created_at' | 'updated_at'
+    >
+  >,
 ) => {
   try {
     const db = await getDatabase();
